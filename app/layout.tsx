@@ -7,7 +7,6 @@ import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
 import { PerformanceMonitor } from "@/components/performance-monitor";
 import { EasterEgg } from "@/components/easter-egg";
 import { ScrollToTop } from "@/components/scroll-to-top";
-import { StatusIndicator } from "@/components/status-indicator";
 import { CommandPalette } from "@/components/command-palette";
 import { CosmicBackground } from "@/components/cosmic-background";
 import { Toaster } from "sonner";
@@ -58,7 +57,6 @@ export default function RootLayout({
           <PerformanceMonitor />
           <EasterEgg />
           <ScrollToTop />
-          <StatusIndicator />
           <Toaster 
             position="top-right" 
             theme="dark"

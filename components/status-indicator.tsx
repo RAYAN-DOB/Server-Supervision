@@ -38,13 +38,13 @@ export function StatusIndicator() {
 
   if (!mounted) return null;
 
-  return (
-    <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
+  const content = (
+    <>
       {/* Online Status */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        className="glass-card px-3 py-2 rounded-full flex items-center gap-2"
+        className="shrink-0 px-2.5 py-1.5 rounded-full flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06]"
       >
         {isOnline ? (
           <>
@@ -52,14 +52,14 @@ export function StatusIndicator() {
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <Wifi className="w-4 h-4 text-green-400" />
+              <Wifi className="w-3.5 h-3.5 text-green-400" />
             </motion.div>
-            <span className="text-xs font-medium text-green-400">En ligne</span>
+            <span className="text-xs font-medium text-green-400 whitespace-nowrap">En ligne</span>
           </>
         ) : (
           <>
-            <WifiOff className="w-4 h-4 text-red-400" />
-            <span className="text-xs font-medium text-red-400">Hors ligne</span>
+            <WifiOff className="w-3.5 h-3.5 text-red-400" />
+            <span className="text-xs font-medium text-red-400 whitespace-nowrap">Hors ligne</span>
           </>
         )}
       </motion.div>
@@ -69,14 +69,20 @@ export function StatusIndicator() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.1 }}
-        className="glass-card px-3 py-2 rounded-full flex items-center gap-2"
+        className="shrink-0 px-2.5 py-1.5 rounded-full flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06]"
         title="Temps depuis dernière synchronisation"
       >
-        <Database className="w-4 h-4 text-nebula-cyan" />
-        <span className="text-xs text-gray-400">
+        <Database className="w-3.5 h-3.5 text-nebula-cyan" />
+        <span className="text-xs text-gray-400 whitespace-nowrap">
           {timeSinceSync < 60 ? `${timeSinceSync}s` : `${Math.floor(timeSinceSync / 60)}m`}
         </span>
       </motion.div>
+    </>
+  );
+
+  return (
+    <div className="flex items-center gap-2 shrink-0">
+      {content}
     </div>
   );
 }
