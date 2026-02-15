@@ -90,9 +90,6 @@ export default function CartePage() {
                   style={{ height: "100%", width: "100%" }}
                   className="z-0"
                   scrollWheelZoom={true}
-                  whenCreated={(map) => {
-                    // Map created callback
-                  }}
                 >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
