@@ -12,7 +12,9 @@ import { MOCK_SITES } from "@/data/mock-sites";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-// Import Leaflet dynamically to avoid SSR issues
+// Styles Leaflet (fond sombre compatible)
+import "leaflet/dist/leaflet.css";
+
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
   { ssr: false }
@@ -29,10 +31,20 @@ const Popup = dynamic(
   () => import("react-leaflet").then((mod) => mod.Popup),
   { ssr: false }
 );
+// Couleurs des marqueurs par statut (style Waze / haute visibilité)
+const MARKER_COLORS: Record<string, { bg: string; border: string }> = {
+  ok: { bg: "#22c55e", border: "#16a34a" },
+  warning: { bg: "#eab308", border: "#ca8a04" },
+  critical: { bg: "#ef4444", border: "#b91c1c" },
+  maintenance: { bg: "#3b82f6", border: "#2563eb" },
+};
+
+type LeafletDivIcon = ReturnType<typeof import("leaflet")["divIcon"]>;
 
 export default function CartePage() {
   const { sites, setSites } = useStore();
   const [mounted, setMounted] = useState(false);
+  const [markerIcons, setMarkerIcons] = useState<Record<string, LeafletDivIcon>>({});
   const mapId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -44,27 +56,32 @@ export default function CartePage() {
   }, [sites.length, setSites]);
 
   useEffect(() => {
-    // Cleanup any existing map on unmount
-    return () => {
-      if (containerRef.current) {
-        const container = containerRef.current.querySelector('.leaflet-container');
-        if (container && (container as any)._leaflet_id) {
-          (container as any)._leaflet_id = undefined;
-        }
-      }
-    };
-  }, []);
+    if (!mounted) return;
+    import("leaflet").then((L) => {
+      const icons: Record<string, LeafletDivIcon> = {};
+      (Object.keys(MARKER_COLORS) as Array<keyof typeof MARKER_COLORS>).forEach((status) => {
+        const c = MARKER_COLORS[status];
+        icons[status] = L.divIcon({
+          className: "aurion-marker",
+          html: `<div style="width:24px;height:24px;background:${c.bg};border:3px solid ${c.border};border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 8px rgba(0,0,0,0.4)"></div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 24],
+        });
+      });
+      setMarkerIcons(icons);
+    });
+  }, [mounted]);
 
   const center: [number, number] = [48.8064, 2.4379];
+  const getMarkerIcon = (status: string) => markerIcons[status] || markerIcons.ok;
 
   return (
     <>
       <TopBar />
-      
+
       <div className="p-4 sm:p-6 lg:p-8">
         <Breadcrumbs />
 
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,50 +91,58 @@ export default function CartePage() {
             Carte Interactive
           </h1>
           <p className="text-gray-500 font-light">
-            Visualisation géographique de vos 12 sites municipaux
+            Visualisation géographique de vos {sites.length} sites municipaux
           </p>
         </motion.div>
 
-        {/* Map Card */}
         <Card className="border-white/[0.06] bg-white/[0.02] overflow-hidden mb-6">
           <CardContent className="p-0">
-            <div ref={containerRef} className="relative h-[600px] w-full">
+            <div
+              ref={containerRef}
+              className="relative w-full overflow-hidden"
+              style={{ height: "min(70vh, 600px)" }}
+            >
               {mounted ? (
                 <MapContainer
                   key={`map-${mapId}`}
                   center={center}
-                  zoom={14}
+                  zoom={13}
                   style={{ height: "100%", width: "100%" }}
-                  className="z-0"
+                  className="z-0 aurion-map-dark"
                   scrollWheelZoom={true}
                 >
+                  {/* Fond de carte sombre type Waze / CartoDB Dark */}
                   <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                   />
                   {sites.map((site) => (
-                    <Marker key={site.id} position={site.coordinates}>
-                      <Popup>
-                        <div className="p-3 min-w-[220px]">
-                          <h3 className="font-bold mb-3 text-lg">{site.name}</h3>
+                    <Marker
+                      key={site.id}
+                      position={site.coordinates as [number, number]}
+                      icon={markerIcons.ok ? getMarkerIcon(site.status) : undefined}
+                    >
+                      <Popup className="aurion-popup">
+                        <div className="p-3 min-w-[220px] bg-[#0f0f14] text-gray-100">
+                          <h3 className="font-bold mb-3 text-lg text-white">{site.name}</h3>
                           <div className="space-y-2 text-sm">
                             <div className="flex items-center justify-between">
-                              <span className="text-gray-600">Statut:</span>
+                              <span className="text-gray-400">Statut</span>
                               <Badge variant={site.status as any}>{site.status}</Badge>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-gray-600">Baies:</span>
-                              <span className="font-medium">{site.bayCount}</span>
+                              <span className="text-gray-400">Baies</span>
+                              <span className="font-medium text-white">{site.bayCount}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-gray-600">Alertes:</span>
-                              <span className={site.alertCount > 0 ? "text-red-500 font-medium" : "text-green-500"}>
+                              <span className="text-gray-400">Alertes</span>
+                              <span className={site.alertCount > 0 ? "text-red-400 font-medium" : "text-green-400"}>
                                 {site.alertCount}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-gray-600">Température:</span>
-                              <span className="font-medium">{site.temperature.toFixed(1)}°C</span>
+                              <span className="text-gray-400">Température</span>
+                              <span className="font-medium text-white">{site.temperature.toFixed(1)}°C</span>
                             </div>
                           </div>
                           <Link href={`/sites/${site.id}`}>
@@ -131,7 +156,7 @@ export default function CartePage() {
                   ))}
                 </MapContainer>
               ) : (
-                <div className="h-full flex items-center justify-center">
+                <div className="h-full flex items-center justify-center bg-white/[0.02]">
                   <div className="text-center">
                     <MapPin className="w-16 h-16 mx-auto mb-4 text-purple-500 animate-pulse" />
                     <p className="text-gray-400">Chargement de la carte...</p>
@@ -139,21 +164,24 @@ export default function CartePage() {
                 </div>
               )}
 
-              {/* Legend */}
               <div className="absolute bottom-4 right-4 z-[1000] clean-card p-4 space-y-2">
                 <h4 className="text-sm font-semibold text-white mb-3">Légende</h4>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-xs text-gray-300">
                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span>OK ({sites.filter(s => s.status === "ok").length})</span>
+                    <span>OK ({sites.filter((s) => s.status === "ok").length})</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-300">
                     <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <span>Warning ({sites.filter(s => s.status === "warning").length})</span>
+                    <span>Warning ({sites.filter((s) => s.status === "warning").length})</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-300">
                     <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span>Critical ({sites.filter(s => s.status === "critical").length})</span>
+                    <span>Critical ({sites.filter((s) => s.status === "critical").length})</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-300">
+                    <div className="w-3 h-3 rounded-full bg-blue-500" />
+                    <span>Maintenance ({sites.filter((s) => s.status === "maintenance").length})</span>
                   </div>
                 </div>
               </div>
@@ -161,7 +189,6 @@ export default function CartePage() {
           </CardContent>
         </Card>
 
-        {/* Sites Grid Below Map */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sites.map((site, index) => (
             <Link key={site.id} href={`/sites/${site.id}`}>
@@ -175,10 +202,10 @@ export default function CartePage() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-purple-400" />
+                        <MapPin className="w-4 h-4 text-purple-400 shrink-0" />
                         <h3 className="font-semibold text-sm text-white">{site.name}</h3>
                       </div>
-                      <Badge variant={site.status as any} className="text-xs">{site.status}</Badge>
+                      <Badge variant={site.status as any} className="text-xs shrink-0">{site.status}</Badge>
                     </div>
                     <p className="text-xs text-gray-500 line-clamp-1 mb-3">{site.address}</p>
                     <div className="grid grid-cols-3 gap-2 text-xs">
@@ -188,7 +215,7 @@ export default function CartePage() {
                       </div>
                       <div className="text-center p-2 rounded-lg bg-white/[0.02]">
                         <p className="text-gray-600 mb-1">Alertes</p>
-                        <p className={`font-semibold ${site.alertCount > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                        <p className={`font-semibold ${site.alertCount > 0 ? "text-red-400" : "text-green-400"}`}>
                           {site.alertCount}
                         </p>
                       </div>
@@ -204,6 +231,7 @@ export default function CartePage() {
           ))}
         </div>
       </div>
+
     </>
   );
 }

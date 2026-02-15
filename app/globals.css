@@ -129,3 +129,13 @@ h1, h2, h3, h4, h5, h6 {
     @apply text-lg;
   }
 }
+
+/* Carte : fond sombre type Waze + marqueurs */
+.aurion-map-dark .leaflet-tile-pane { z-index: 1; }
+.aurion-map-dark .leaflet-overlay-pane { z-index: 2; }
+.aurion-map-dark .leaflet-marker-pane { z-index: 3; }
+.aurion-map-dark .leaflet-popup-pane { z-index: 4; }
+.aurion-marker { background: transparent !important; border: none !important; }
+.leaflet-popup-content-wrapper { background: #0f0f14; color: #e5e5e5; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.leaflet-popup-tip { background: #0f0f14; }
+.leaflet-container { font-family: inherit; }
