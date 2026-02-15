@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 2 2 8;
+    --foreground: 250 250 250;
+  }
+  
+  * {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  
+  body {
+    background: #020208;
+    color: rgb(250, 250, 250);
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Custom scrollbar - Ultra minimal */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(106, 0, 255, 0.3);
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 0, 255, 0.5);
+  }
+
+  /* Hide scrollbar for tabs on mobile */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* Clean Card - Vercel Style */
+  .clean-card {
+    @apply bg-white/[0.02] border border-white/[0.06] rounded-2xl backdrop-blur-sm;
+    @apply hover:border-white/[0.12] hover:bg-white/[0.04];
+    @apply transition-all duration-300;
+  }
+  
+  /* Gradient Text - Subtle */
+  .gradient-text-clean {
+    @apply bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent;
+  }
+  
+  /* Gradient Text - Colorful */
+  .gradient-text-color {
+    @apply bg-gradient-to-r from-nebula-violet via-nebula-magenta to-nebula-cyan bg-clip-text text-transparent;
+  }
+  
+  /* Button Clean */
+  .btn-clean {
+    @apply px-4 sm:px-6 py-2.5 rounded-xl bg-white/[0.08] border border-white/[0.12];
+    @apply hover:bg-white/[0.12] hover:border-white/[0.20];
+    @apply transition-all duration-200;
+    @apply text-xs sm:text-sm font-medium;
+  }
+  
+  /* Button Primary */
+  .btn-primary {
+    @apply px-4 sm:px-6 py-2.5 rounded-xl;
+    @apply bg-gradient-to-r from-nebula-violet to-nebula-magenta;
+    @apply hover:shadow-lg hover:shadow-nebula-violet/20;
+    @apply transition-all duration-200;
+    @apply text-xs sm:text-sm font-semibold text-white;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-space), var(--font-inter), system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Smooth transitions globally */
+* {
+  @apply transition-colors;
+}
+
+/* Focus states */
+*:focus-visible {
+  @apply outline-none ring-2 ring-nebula-violet/50 ring-offset-2 ring-offset-[#020208];
+}
+
+/* Selection */
+::selection {
+  background: rgba(106, 0, 255, 0.3);
+  color: white;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  h1 {
+    @apply text-3xl;
+  }
+  
+  h2 {
+    @apply text-2xl;
+  }
+  
+  h3 {
+    @apply text-lg;
+  }
+}
