@@ -58,7 +58,7 @@ Sois précis, professionnel et proactif. Utilise des émojis pour clarity.`;
 }
 
 async function analyzeAndRespond(context: AIContext): Promise<string> {
-  const { sites, alerts, userQuery } = context;
+  const { sites, alerts, userQuery, conversationHistory } = context;
   const query = userQuery.toLowerCase();
   
   // Data analysis
@@ -130,7 +130,8 @@ async function analyzeAndRespond(context: AIContext): Promise<string> {
       return `💡 **Recommandations Intelligentes**\n\nBasé sur mon analyse de vos données :\n\n${recommendations.join("\n")}\n\n**Actions suggérées** :\n1. Planifier une maintenance préventive\n2. Revoir les seuils d'alertes\n3. Optimiser la consommation énergétique\n\nVoulez-vous un rapport détaillé ?`;
     }
     
-    return `✅ **Analyse Positive**\n\nVotre infrastructure est en excellent état !\n\n**Points forts** :\n• ${okSites} sites opérationnels\n• Uptime moyen: ${avgUptime.toFixed(1)}%\n• Températures normales\n\nContinuez le bon travail ! 🎉`;
+    const okCount = sites.filter((s) => s.status === "ok").length;
+    return `✅ **Analyse Positive**\n\nVotre infrastructure est en excellent état !\n\n**Points forts** :\n• ${okCount} sites opérationnels\n• Uptime moyen: ${avgUptime.toFixed(1)}%\n• Températures normales\n\nContinuez le bon travail ! 🎉`;
   }
 
   // 6. Help / Commands
