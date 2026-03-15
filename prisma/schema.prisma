@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── Sites municipaux ────────────────────────────────────────────────────────
+
+model Site {
+  id                  String   @id
+  name                String
+  aliases             String?  // JSON array
+  address             String?
+  postalCode          String   @default("94700")
+  city                String   @default("Maisons-Alfort")
+  lat                 Float?
+  lng                 Float?
+  addressStatus       String   @default("needs_manual_validation") // verified | internal_only | needs_manual_validation
+  ltNames             String   @default("[]") // JSON array
+  ltCount             Int      @default(0)
+  telephonyEquipment  String?
+  likelyManagedByDSI  Boolean  @default(false)
+  category            String?  // administratif | école | culture | sport | ...
+  zabbixStatus        String   @default("not_connected") // not_connected | pending | partial | connected
+  sensorsStatus       String   @default("none") // none | partial | active
+  zabbixEnabled       Boolean  @default(false)
+  zabbixHostId        String?  @unique
+  zabbixHostName      String?
+  zabbixTemplate      String?
+  zabbixLastSync      DateTime?
+  zabbixError         String?
+  visibleOnMap        Boolean  @default(true)
+  notes               String?
+  source              String?
+  blackboxInstalled   Boolean  @default(false)
+  blackboxModel       String?
+  blackboxSerial      String?
+  blackboxFirmware    String?
+  blackboxInstalledAt DateTime?
+  blackboxInstalledBy String?
+  blackboxBayCount    Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  bays    Bay[]
+  alerts  Alert[]
+  sensors SensorReading[]
+
+  @@index([zabbixStatus])
+  @@index([category])
+  @@index([blackboxInstalled])
+}
+
+// ─── Baies / Locaux techniques ───────────────────────────────────────────────
+
+model Bay {
+  id               String   @id @default(cuid())
+  siteId           String
+  name             String
+  location         String?
+  status           String   @default("normal") // normal | warning | critical | offline
+  powerConsumption Float    @default(0)
+  lastUpdate       DateTime @default(now())
+
+  site    Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  sensors SensorReading[]
+
+  @@index([siteId])
+}
+
+// ─── Lectures capteurs ───────────────────────────────────────────────────────
+
+model SensorReading {
+  id              String   @id @default(cuid())
+  siteId          String
+  bayId           String?
+  type            String   // temperature | humidity | smoke | water | door | vibration | power | airflow | pressure
+  value           Float
+  unit            String
+  status          String   @default("normal") // normal | warning | critical | offline
+  thresholdWarn   Float    @default(0)
+  thresholdCrit   Float    @default(0)
+  timestamp       DateTime @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  bay  Bay? @relation(fields: [bayId], references: [id], onDelete: SetNull)
+
+  @@index([siteId, type])
+  @@index([siteId, timestamp])
+  @@index([bayId])
+  @@index([timestamp])
+}
+
+// ─── Alertes ─────────────────────────────────────────────────────────────────
+
+model Alert {
+  id             String   @id @default(cuid())
+  siteId         String
+  siteName       String
+  bayId          String?
+  bayName        String?
+  severity       String   // info | minor | major | critical
+  title          String
+  description    String
+  status         String   @default("active") // active | acknowledged | resolved
+  source         String   @default("system") // blackbox | zabbix | manual | system
+  sensorType     String?
+  value          Float?
+  threshold      Float?
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  resolvedAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
+  @@index([status])
+  @@index([severity, status])
+  @@index([createdAt])
+}
+
+// ─── Utilisateurs ────────────────────────────────────────────────────────────
+
+model User {
+  id                 String    @id @default(cuid())
+  username           String    @unique
+  email              String    @unique
+  name               String
+  passwordHash       String
+  role               String    @default("viewer") // super_admin | admin | tech | viewer
+  department         String?
+  phone              String?
+  mustChangePassword Boolean   @default(true)
+  isActive           Boolean   @default(true)
+  lastLogin          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  createdBy          String?
+
+  auditLogs AuditLog[]
+
+  @@index([role])
+}
+
+// ─── Journal d'audit ─────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  userName   String?
+  action     String   // login | logout | acknowledge_alert | resolve_alert | update_site | ...
+  targetType String?  // user | site | alert | config
+  targetId   String?
+  details    String?  // JSON
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ─── Configuration système ───────────────────────────────────────────────────
+
+model SystemConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
