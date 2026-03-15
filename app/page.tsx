@@ -2,27 +2,25 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Activity } from "lucide-react";
+import { ArrowRight, Activity, Shield, MapPin, Building2 } from "lucide-react";
 import { AurionLogo } from "@/components/aurion-logo";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden">
-
       {/* Orbes de lumière */}
       <motion.div
         animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/3 left-1/3 w-[600px] h-[600px] bg-nebula-violet/20 rounded-full blur-[140px] pointer-events-none"
+        className="absolute top-1/3 left-1/3 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[140px] pointer-events-none"
       />
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-nebula-cyan/15 rounded-full blur-[160px] pointer-events-none"
+        className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-cyan-500/15 rounded-full blur-[160px] pointer-events-none"
       />
 
       <div className="relative z-10 flex flex-col items-center text-center px-6 select-none">
-
         {/* Badge statut */}
         <motion.div
           initial={{ opacity: 0, y: -16 }}
@@ -65,7 +63,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.7 }}
-          className="text-[88px] leading-none font-bold tracking-tighter mb-5"
+          className="text-7xl sm:text-[88px] leading-none font-bold tracking-tighter mb-5"
         >
           <motion.span
             animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
@@ -82,24 +80,44 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.8 }}
-          className="text-lg text-gray-500 font-light tracking-wide mb-14 max-w-sm"
+          className="text-lg text-gray-500 font-light tracking-wide mb-6 max-w-md"
         >
-          Supervision intelligente de l'infrastructure IT
+          Supervision et référentiel des sites municipaux de Maisons-Alfort
         </motion.p>
+
+        {/* Features */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.1, duration: 0.6 }}
+          className="flex flex-wrap justify-center gap-4 mb-12"
+        >
+          {[
+            { icon: Building2, label: "36 sites" },
+            { icon: MapPin, label: "Carte interactive" },
+            { icon: Shield, label: "Supervision sécurisée" },
+            { icon: Activity, label: "Temps réel" },
+          ].map(({ icon: Icon, label }) => (
+            <div key={label} className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] text-xs text-gray-500">
+              <Icon className="w-3.5 h-3.5 text-purple-400" />
+              {label}
+            </div>
+          ))}
+        </motion.div>
 
         {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.3, duration: 0.7 }}
+          className="flex flex-col sm:flex-row gap-3"
         >
           <Link href="/login">
             <motion.button
               whileHover={{ scale: 1.04, boxShadow: "0 0 60px rgba(106,0,255,0.5)" }}
               whileTap={{ scale: 0.97 }}
-              className="group relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-nebula-violet to-nebula-magenta rounded-2xl font-semibold text-white text-base overflow-hidden"
+              className="group relative flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-semibold text-white text-base overflow-hidden"
             >
-              {/* Shimmer */}
               <motion.div
                 animate={{ x: ["-100%", "200%"] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
@@ -110,6 +128,16 @@ export default function HomePage() {
               <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform duration-200" />
             </motion.button>
           </Link>
+          <Link href="/sites">
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              className="flex items-center gap-3 px-8 py-4 border border-white/[0.12] bg-white/[0.03] hover:bg-white/[0.06] rounded-2xl font-medium text-gray-300 text-base transition-all"
+            >
+              <Building2 className="w-4 h-4" />
+              <span>Voir le référentiel</span>
+            </motion.button>
+          </Link>
         </motion.div>
 
         {/* Ligne décorative */}
@@ -117,7 +145,7 @@ export default function HomePage() {
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
           transition={{ delay: 1.8, duration: 1.2, ease: "easeOut" }}
-          className="mt-20 w-px h-16 bg-gradient-to-b from-white/20 to-transparent mx-auto"
+          className="mt-16 w-px h-16 bg-gradient-to-b from-white/20 to-transparent mx-auto"
         />
       </div>
     </div>
