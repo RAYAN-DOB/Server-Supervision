@@ -27,6 +27,10 @@ import {
   AlertCircle,
   CheckCircle2,
   ExternalLink,
+  Cpu,
+  Radio,
+  CalendarClock,
+  User,
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { GradientBackground } from "@/components/ui/gradient-background";
@@ -170,12 +174,22 @@ export default function SiteDetailPage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Link href={`/sites/${siteId}/baies/${bays[0]?.id ?? ""}`}>
-              <Button variant="glass" size="sm">
-                <HardDrive className="w-4 h-4 mr-2" />
-                Baies
-              </Button>
-            </Link>
+            {bays.length > 0 && (
+              <Link href={`/sites/${siteId}/baies/${bays[0].id}`}>
+                <Button variant="glass" size="sm">
+                  <HardDrive className="w-4 h-4 mr-2" />
+                  Voir les baies
+                </Button>
+              </Link>
+            )}
+            {refSite?.lat && refSite?.lng && (
+              <Link href="/carte">
+                <Button variant="glass" size="sm">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Carte
+                </Button>
+              </Link>
+            )}
             <Button variant="glass" size="sm">
               <Download className="w-4 h-4 mr-2" />
               Rapport
@@ -318,6 +332,47 @@ export default function SiteDetailPage() {
                               {lt}
                             </span>
                           ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* BlackBox ServSensor */}
+                  {refSite.blackboxInstalled && (
+                    <Card className="bg-emerald-500/5 border-emerald-500/20">
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <Cpu className="w-5 h-5 text-emerald-400" />
+                          <span className="text-emerald-300">BlackBox ServSensor</span>
+                          <span className="ml-auto text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full px-2 py-0.5">
+                            Installé
+                          </span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="grid grid-cols-2 gap-4">
+                        {refSite.blackboxModel && (
+                          <InfoRow label="Modèle" value={refSite.blackboxModel} />
+                        )}
+                        {refSite.blackboxSerial && (
+                          <InfoRow label="N° de série" value={refSite.blackboxSerial} mono />
+                        )}
+                        {refSite.blackboxFirmware && (
+                          <InfoRow label="Firmware" value={refSite.blackboxFirmware} mono />
+                        )}
+                        {refSite.blackboxBayCount != null && (
+                          <InfoRow label="Baies supervisées" value={`${refSite.blackboxBayCount} baie(s)`} />
+                        )}
+                        {refSite.blackboxInstalledAt && (
+                          <InfoRow
+                            label="Installé le"
+                            value={new Date(refSite.blackboxInstalledAt).toLocaleDateString("fr-FR")}
+                          />
+                        )}
+                        {refSite.blackboxInstalledBy && (
+                          <InfoRow label="Installé par" value={refSite.blackboxInstalledBy} />
+                        )}
+                        <div className="col-span-2 mt-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
+                          <span className="font-semibold">Note :</span> Les données de supervision sont simulées localement. L&apos;intégration Zabbix est en cours de finalisation — les données seront synchronisées automatiquement une fois l&apos;API connectée.
                         </div>
                       </CardContent>
                     </Card>
@@ -610,12 +665,16 @@ export default function SiteDetailPage() {
                       date={refSite.updatedAt}
                       action="Mise à jour du référentiel"
                       source={refSite.source ?? "interne"}
+                      color="gray"
                     />
-                    <HistoryEntry
-                      date={refSite.createdAt}
-                      action="Création dans le référentiel"
-                      source="import initial"
-                    />
+                    {refSite.blackboxInstalled && refSite.blackboxInstalledAt && (
+                      <HistoryEntry
+                        date={refSite.blackboxInstalledAt}
+                        action={`Installation BlackBox ServSensor — ${refSite.blackboxModel ?? ""} (${refSite.blackboxSerial ?? ""})`}
+                        source={refSite.blackboxInstalledBy ?? "DSI"}
+                        color="green"
+                      />
+                    )}
                     {refSite.zabbixEnabled && refSite.zabbixLastSync && (
                       <HistoryEntry
                         date={refSite.zabbixLastSync}
@@ -624,6 +683,12 @@ export default function SiteDetailPage() {
                         color="blue"
                       />
                     )}
+                    <HistoryEntry
+                      date={refSite.createdAt}
+                      action="Création de la fiche dans le référentiel DSI"
+                      source="import initial"
+                      color="gray"
+                    />
                   </div>
                   <p className="text-xs text-gray-600 mt-6 text-center">
                     L&apos;historique complet sera disponible avec une base de données persistante.

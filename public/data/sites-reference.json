@@ -1,5 +1,5 @@
 {
-  "version": "2.0",
+  "version": "2.1",
   "lastUpdated": "2026-03-15",
   "sites": [
     {
@@ -23,8 +23,15 @@
       "zabbixHostId": "10001",
       "zabbixHostName": "HTDV-SRV01",
       "zabbixTemplate": "Template OS Linux",
+      "blackboxInstalled": true,
+      "blackboxModel": "BlackBox ServSensor Enterprise",
+      "blackboxSerial": "SRV-2024-HTDV-001",
+      "blackboxInstalledAt": "2024-11-15T09:00:00Z",
+      "blackboxInstalledBy": "Rayan DOB",
+      "blackboxFirmware": "v4.2.1",
+      "blackboxBayCount": 5,
       "visibleOnMap": true,
-      "notes": "Site principal - DSI présente sur site",
+      "notes": "Site principal — DSI hébergée sur place. Salle serveur principale avec 5 baies supervisées par BlackBox ServSensor Enterprise. Connexion Zabbix opérationnelle.",
       "source": "interne",
       "createdAt": "2024-01-01T00:00:00Z",
       "updatedAt": "2026-03-15T10:00:00Z"
@@ -49,12 +56,19 @@
       "zabbixEnabled": true,
       "zabbixHostId": "10045",
       "zabbixHostName": "PLDS-IOT-01",
-      "zabbixTemplate": "Template IoT Box",
+      "zabbixTemplate": "Template IoT BlackBox",
+      "blackboxInstalled": true,
+      "blackboxModel": "BlackBox ServSensor 4E",
+      "blackboxSerial": "SRV-2025-PLDS-001",
+      "blackboxInstalledAt": "2025-02-10T14:00:00Z",
+      "blackboxInstalledBy": "Rayan DOB",
+      "blackboxFirmware": "v4.1.3",
+      "blackboxBayCount": 3,
       "visibleOnMap": true,
-      "notes": "Boîtier IoT installé - supervision environnementale",
+      "notes": "BlackBox ServSensor 4E installé le 10/02/2025. Supervision environnementale de la salle technique (température, humidité, détection fumée/eau). Intégration Zabbix partielle — liaison en cours de finalisation. L'API Zabbix n'est pas encore pleinement opérationnelle.",
       "source": "interne",
       "createdAt": "2024-02-15T00:00:00Z",
-      "updatedAt": "2026-03-10T14:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "CTM",
@@ -74,11 +88,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": "Partage LT-03 avec Gambetta",
+      "notes": "Partage le LT-03 avec le site Gambetta (même bâtiment). Héberge les équipes travaux et entretien.",
       "source": "interne",
       "createdAt": "2024-01-10T00:00:00Z",
-      "updatedAt": "2026-02-20T09:15:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "GBTA",
@@ -98,17 +113,18 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": "Même bâtiment que CTM",
+      "notes": "Même bâtiment que le CTM — partage du local technique LT-03.",
       "source": "interne",
       "createdAt": "2024-01-10T00:00:00Z",
-      "updatedAt": "2026-02-20T09:16:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "CTAQ",
       "name": "Centre Aquatique",
       "aliases": ["CTAQ", "Piscine"],
-      "address": "55 rue du 11 novembre 1918",
+      "address": "55 rue du 11 Novembre 1918",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.7989,
@@ -122,11 +138,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Équipement téléphonie OXO présent. Piscine municipale avec bassin couvert. Intégration Zabbix envisagée.",
       "source": "interne",
       "createdAt": "2024-01-15T00:00:00Z",
-      "updatedAt": "2026-01-30T11:20:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "MRG",
@@ -146,11 +163,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Musée municipal — gestion externe. Téléphonie OXO. Pas de LT recensé.",
       "source": "interne",
       "createdAt": "2024-01-20T00:00:00Z",
-      "updatedAt": "2026-02-05T16:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "LPA",
@@ -170,17 +188,18 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Groupe scolaire Pasteur — école élémentaire et maternelle. Téléphonie 4200D.",
       "source": "interne",
       "createdAt": "2024-02-01T00:00:00Z",
-      "updatedAt": "2026-02-10T08:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EPB",
-      "name": "Ecole Elémentaire Paul Bert",
+      "name": "École Élémentaire Paul Bert (annexe)",
       "aliases": ["EPB", "Paul Bert élémentaire"],
-      "address": "37 avenue Général Leclerc",
+      "address": "37 avenue du Général Leclerc",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8093,
@@ -194,17 +213,18 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "3 locaux techniques (LT-36, LT-37, LT-38). Même adresse que EEPB et EMPB.",
       "source": "interne",
       "createdAt": "2024-02-05T00:00:00Z",
-      "updatedAt": "2026-02-12T10:15:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "CSCL",
       "name": "Cuisine Centrale",
       "aliases": ["CSCL"],
-      "address": "13 avenue Busteau",
+      "address": "11 avenue du Professeur Cadiot",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8021,
@@ -218,11 +238,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": "Adresse à confirmer - conflit entre 11 avenue du Professeur Cadiot et 13 avenue Busteau",
+      "notes": "Adresse à confirmer — conflit entre 11 avenue du Professeur Cadiot et 13 avenue Busteau. Cuisine centrale produisant les repas scolaires.",
       "source": "interne",
       "createdAt": "2024-02-20T00:00:00Z",
-      "updatedAt": "2026-03-01T09:00:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "MQAM",
@@ -242,17 +263,18 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Médiathèque principale de la ville. Collections livres, DVD, ressources numériques.",
       "source": "interne",
       "createdAt": "2024-03-01T00:00:00Z",
-      "updatedAt": "2026-02-18T14:20:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "BQDC",
       "name": "Bibliothèque du Centre",
       "aliases": ["BQDC"],
-      "address": "34 avenue du Professeur Cadiot",
+      "address": "34-36 avenue du Professeur Cadiot",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8045,
@@ -266,11 +288,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": "Adresse publique 34/36 avenue du Professeur Cadiot",
+      "notes": "Bibliothèque de quartier centre-ville. Adresse publique : 34/36 avenue du Professeur Cadiot.",
       "source": "interne",
       "createdAt": "2024-03-05T00:00:00Z",
-      "updatedAt": "2026-02-22T11:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "PCML",
@@ -290,11 +313,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Poste de police municipale avec 2 locaux techniques (LT-15 et LT-16). Priorité d'intégration Zabbix.",
       "source": "interne",
       "createdAt": "2024-03-10T00:00:00Z",
-      "updatedAt": "2026-02-25T13:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "NECC",
@@ -314,11 +338,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Salle de spectacle et espace culturel du quartier Charentonneau. 2 locaux techniques.",
       "source": "interne",
       "createdAt": "2024-03-15T00:00:00Z",
-      "updatedAt": "2026-03-02T15:10:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "THEA_DEB",
@@ -338,17 +363,18 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Théâtre municipal principal. Accolé à l'Hôtel de Ville. Pas de LT recensé.",
       "source": "interne",
       "createdAt": "2024-03-20T00:00:00Z",
-      "updatedAt": "2026-03-05T10:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "CVHD",
       "name": "Conservatoire Henri Dutilleux",
       "aliases": ["CVHD", "Conservatoire"],
-      "address": "83/85 rue Victor Hugo",
+      "address": "83-85 rue Victor Hugo",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8039,
@@ -362,15 +388,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Conservatoire municipal de musique et danse. 2 locaux techniques (LT-30, LT-31).",
       "source": "interne",
       "createdAt": "2024-04-01T00:00:00Z",
-      "updatedAt": "2026-03-08T09:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "MDE",
-      "name": "Maison de l'environnement",
+      "name": "Maison de l'Environnement",
       "aliases": ["MDE"],
       "address": "2 avenue Foch",
       "postalCode": "94700",
@@ -386,11 +413,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Espace dédié à l'éducation environnementale. Gestion non DSI.",
       "source": "interne",
       "createdAt": "2024-04-05T00:00:00Z",
-      "updatedAt": "2026-03-09T16:20:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "MPTA",
@@ -410,11 +438,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Centre socioculturel du quartier Alfort. Activités culturelles et associatives.",
       "source": "interne",
       "createdAt": "2024-04-10T00:00:00Z",
-      "updatedAt": "2026-03-11T14:00:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "BRLO",
@@ -434,11 +463,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Service municipal dédié au logement. LT-46.",
       "source": "interne",
       "createdAt": "2024-04-15T00:00:00Z",
-      "updatedAt": "2026-03-12T11:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "SMAE",
@@ -458,11 +488,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Point d'accueil et orientation emploi pour les habitants. LT-29.",
       "source": "interne",
       "createdAt": "2024-04-20T00:00:00Z",
-      "updatedAt": "2026-03-13T09:20:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "MLBL",
@@ -477,22 +508,23 @@
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
-      "category": "autre",
+      "category": "quartier",
       "addressStatus": "verified",
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Centre de quartier Moulin Brûlé. LT-19.",
       "source": "interne",
       "createdAt": "2024-05-02T00:00:00Z",
-      "updatedAt": "2026-03-14T15:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "CLBT",
-      "name": "Centre de Loisir Busteau",
+      "name": "Centre de Loisirs Busteau",
       "aliases": ["CLBT"],
-      "address": "9 Bis avenue Busteau",
+      "address": "9 bis avenue Busteau",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8028,
@@ -506,15 +538,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Centre de loisirs accueillant enfants et jeunes. LT-20.",
       "source": "interne",
       "createdAt": "2024-05-10T00:00:00Z",
-      "updatedAt": "2026-03-14T16:00:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "MDEF",
-      "name": "Maison de l'enfant",
+      "name": "Maison de l'Enfant",
       "aliases": ["MDEF"],
       "address": "86 avenue Busteau",
       "postalCode": "94700",
@@ -530,11 +563,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Structure petite enfance et accueil parents-enfants. LT-21.",
       "source": "interne",
       "createdAt": "2024-05-15T00:00:00Z",
-      "updatedAt": "2026-03-14T16:15:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "SCDS",
@@ -554,15 +588,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": "Même bâtiment que Palais des Sports",
+      "notes": "Même bâtiment que le Palais des Sports. Administre les équipements sportifs municipaux. LT-22.",
       "source": "interne",
       "createdAt": "2024-05-20T00:00:00Z",
-      "updatedAt": "2026-03-14T16:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EEPM",
-      "name": "Ecole Elémentaire Parmentier",
+      "name": "École Élémentaire Parmentier",
       "aliases": ["EEPM"],
       "address": "8 rue Paul Vaillant Couturier",
       "postalCode": "94700",
@@ -578,15 +613,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "5 locaux techniques recensés (LT-23, LT-42 à LT-45). École élémentaire du centre.",
       "source": "interne",
       "createdAt": "2024-06-01T00:00:00Z",
-      "updatedAt": "2026-03-14T16:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EMPM",
-      "name": "Ecole maternelle Parmentier",
+      "name": "École Maternelle Parmentier",
       "aliases": ["EMPM"],
       "address": "57 avenue du Général de Gaulle",
       "postalCode": "94700",
@@ -602,15 +638,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "École maternelle — pas de LT recensé à ce jour.",
       "source": "interne",
       "createdAt": "2024-06-05T00:00:00Z",
-      "updatedAt": "2026-03-14T17:00:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EERS",
-      "name": "Ecole Elémentaire Raspail",
+      "name": "École Élémentaire Raspail",
       "aliases": ["EERS"],
       "address": "44 avenue Georges Clemenceau",
       "postalCode": "94700",
@@ -626,17 +663,18 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "École élémentaire Raspail. LT-24.",
       "source": "interne",
       "createdAt": "2024-06-10T00:00:00Z",
-      "updatedAt": "2026-03-14T17:15:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EEPN",
-      "name": "Ecole Elémentaire Planètes",
+      "name": "École Élémentaire Planètes",
       "aliases": ["EEPN"],
-      "address": "9 rue de Marne",
+      "address": "9 rue de la Marne",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8049,
@@ -650,11 +688,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "École élémentaire Planètes. LT-25.",
       "source": "interne",
       "createdAt": "2024-06-15T00:00:00Z",
-      "updatedAt": "2026-03-14T17:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "CTSL",
@@ -674,15 +713,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Centre socioculturel du quartier Liberté. 2 locaux techniques (LT-27, LT-28).",
       "source": "interne",
       "createdAt": "2024-07-01T00:00:00Z",
-      "updatedAt": "2026-03-14T17:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EEPS",
-      "name": "Ecole Elementaire Pasteur",
+      "name": "École Élémentaire Pasteur",
       "aliases": ["EEPS"],
       "address": "33 rue Bourgelat",
       "postalCode": "94700",
@@ -698,15 +738,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "École élémentaire Pasteur. LT-32.",
       "source": "interne",
       "createdAt": "2024-07-10T00:00:00Z",
-      "updatedAt": "2026-03-14T18:00:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EESX",
-      "name": "Ecole Elementaire Saint Exupéry",
+      "name": "École Élémentaire Saint-Exupéry",
       "aliases": ["EESX"],
       "address": "57 rue Gabriel Péri",
       "postalCode": "94700",
@@ -722,15 +763,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "3 locaux techniques (LT-33, LT-34, LT-35). École élémentaire du quartier Charentonneau.",
       "source": "interne",
       "createdAt": "2024-07-15T00:00:00Z",
-      "updatedAt": "2026-03-14T18:15:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EEPB",
-      "name": "Ecole Elementaire Paul Bert",
+      "name": "École Élémentaire Paul Bert",
       "aliases": ["EEPB"],
       "address": "37 avenue du Général Leclerc",
       "postalCode": "94700",
@@ -746,15 +788,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "3 locaux techniques (LT-36, LT-37, LT-38). Même bâtiment que EMPB.",
       "source": "interne",
       "createdAt": "2024-07-20T00:00:00Z",
-      "updatedAt": "2026-03-14T18:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EMPB",
-      "name": "Ecole Maternelle Paul Bert",
+      "name": "École Maternelle Paul Bert",
       "aliases": ["EMPB"],
       "address": "37 avenue du Général Leclerc",
       "postalCode": "94700",
@@ -770,15 +813,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": "Même bâtiment que EEPB",
+      "notes": "Même bâtiment que EEPB. LT-39.",
       "source": "interne",
       "createdAt": "2024-07-25T00:00:00Z",
-      "updatedAt": "2026-03-14T18:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "ELCT",
-      "name": "Espace Loisir de Charentonneau",
+      "name": "Espace Loisirs de Charentonneau",
       "aliases": ["ELCT"],
       "address": "122 rue Roger François",
       "postalCode": "94700",
@@ -794,17 +838,18 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Centre de loisirs et animations pour le quartier Charentonneau. LT-40.",
       "source": "interne",
       "createdAt": "2024-08-01T00:00:00Z",
-      "updatedAt": "2026-03-14T19:00:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EEJF",
-      "name": "Ecole Elementaire Jules Ferry",
+      "name": "École Élémentaire Jules Ferry",
       "aliases": ["EEJF"],
-      "address": "218bis rue Jean Jaurès",
+      "address": "218 bis rue Jean Jaurès",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.7992,
@@ -818,15 +863,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "École élémentaire Jules Ferry. LT-41. Salle serveur en alerte — suivi en cours.",
       "source": "interne",
       "createdAt": "2024-08-10T00:00:00Z",
-      "updatedAt": "2026-03-14T19:15:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "EMGS",
-      "name": "Ecole Maternelle Georges Sand",
+      "name": "École Maternelle Georges Sand",
       "aliases": ["EMGS", "George Sand"],
       "address": "1 rue Parmentier",
       "postalCode": "94700",
@@ -842,15 +888,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "École maternelle Georges Sand. Pas de LT recensé.",
       "source": "interne",
       "createdAt": "2024-08-15T00:00:00Z",
-      "updatedAt": "2026-03-14T19:30:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "ECPG",
-      "name": "École élémentaire Charles Péguy",
+      "name": "École Élémentaire Charles Péguy",
       "aliases": ["ECPG", "Charles Peguy"],
       "address": "20 avenue de la Liberté",
       "postalCode": "94700",
@@ -866,15 +913,16 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "École élémentaire Charles Péguy — quartier Liberté. Pas de LT recensé.",
       "source": "interne",
       "createdAt": "2024-08-20T00:00:00Z",
-      "updatedAt": "2026-03-14T19:45:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     },
     {
       "id": "CIMT",
-      "name": "Cimetière communal",
+      "name": "Cimetière Communal",
       "aliases": ["Cimetière"],
       "address": "33 avenue du Professeur Cadiot",
       "postalCode": "94700",
@@ -890,11 +938,12 @@
       "zabbixStatus": "not_connected",
       "sensorsStatus": "none",
       "zabbixEnabled": false,
+      "blackboxInstalled": false,
       "visibleOnMap": true,
-      "notes": null,
+      "notes": "Cimetière communal de Maisons-Alfort. Gestion DSI pour les équipements numériques.",
       "source": "interne",
       "createdAt": "2024-09-01T00:00:00Z",
-      "updatedAt": "2026-03-14T20:00:00Z"
+      "updatedAt": "2026-03-15T10:00:00Z"
     }
   ]
 }
