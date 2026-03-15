@@ -53,7 +53,7 @@ export async function middleware(request: NextRequest) {
       mustChangePassword === true &&
       !pathname.startsWith("/change-password")
     ) {
-      return NextResponse.redirect(new URL("/change-password", request.url));
+      return NextResponse.redirect(new URL("/change-password?forced=true", request.url));
     }
 
     // ── Protection de /admin : super_admin et admin uniquement ─────────

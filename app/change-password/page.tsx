@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Lock,
@@ -11,6 +12,7 @@ import {
   CheckCircle2,
   KeyRound,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 import { AurionLogoFull } from "@/components/aurion-logo";
 import { Button } from "@/components/ui/button";
@@ -31,8 +33,8 @@ function getPasswordStrength(password: string): {
   color: string;
 } {
   let score = 0;
+  if (password.length >= 8) score++;
   if (password.length >= 12) score++;
-  if (password.length >= 16) score++;
   if (/[A-Z]/.test(password)) score++;
   if (/[a-z]/.test(password)) score++;
   if (/[0-9]/.test(password)) score++;
@@ -53,7 +55,7 @@ function PasswordCriteria({
   password: string;
 }) {
   const criteria = [
-    { label: "Au moins 12 caractères", ok: password.length >= 12 },
+    { label: "Au moins 8 caractères", ok: password.length >= 8 },
     { label: "Une lettre majuscule (A–Z)", ok: /[A-Z]/.test(password) },
     { label: "Une lettre minuscule (a–z)", ok: /[a-z]/.test(password) },
     { label: "Un chiffre (0–9)", ok: /[0-9]/.test(password) },
@@ -83,7 +85,10 @@ function PasswordCriteria({
 
 // ─── Page principale ──────────────────────────────────────────────────────────
 
-export default function ChangePasswordPage() {
+function ChangePasswordContent() {
+  const searchParams = useSearchParams();
+  const isForced = searchParams.get("forced") === "true";
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -108,7 +113,14 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    if (strength.score < 5) {
+    const allCriteriaMet =
+      newPassword.length >= 8 &&
+      /[A-Z]/.test(newPassword) &&
+      /[a-z]/.test(newPassword) &&
+      /[0-9]/.test(newPassword) &&
+      /[^A-Za-z0-9]/.test(newPassword);
+
+    if (!allCriteriaMet) {
       setError(
         "Le mot de passe ne respecte pas tous les critères de sécurité"
       );
@@ -165,24 +177,40 @@ export default function ChangePasswordPage() {
         transition={{ duration: 0.6 }}
         className="relative z-10 w-full max-w-md"
       >
-        {/* Bandeau d'avertissement */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3"
-        >
-          <Shield className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-amber-300">
-              Changement de mot de passe requis
-            </p>
-            <p className="text-xs text-amber-400/80 mt-0.5">
-              Pour des raisons de sécurité, vous devez définir un mot de passe
-              personnel avant d'accéder à l'application.
-            </p>
-          </div>
-        </motion.div>
+        {isForced ? (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3"
+          >
+            <Shield className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-amber-300">
+                Changement de mot de passe requis
+              </p>
+              <p className="text-xs text-amber-400/80 mt-0.5">
+                Pour des raisons de sécurité, vous devez définir un mot de passe
+                personnel avant d&#39;accéder à l&#39;application.
+              </p>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-4"
+          >
+            <button
+              onClick={() => window.location.href = "/dashboard"}
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Retour au tableau de bord
+            </button>
+          </motion.div>
+        )}
 
         <Card className="border-white/[0.06] bg-white/[0.02] backdrop-blur-xl shadow-2xl">
           <CardHeader className="text-center pb-6 pt-8">
@@ -243,7 +271,7 @@ export default function ChangePasswordPage() {
                     type={showNew ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Minimum 12 caractères"
+                    placeholder="Minimum 8 caractères"
                     className="w-full pl-10 pr-12 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none focus:border-nebula-violet/50 transition-all font-light"
                     required
                     autoComplete="new-password"
@@ -360,7 +388,7 @@ export default function ChangePasswordPage() {
               {/* Bouton submit */}
               <Button
                 type="submit"
-                disabled={loading || strength.score < 5 || !passwordsMatch}
+                disabled={loading || strength.score < 4 || !passwordsMatch}
                 className="w-full bg-gradient-to-r from-nebula-violet to-nebula-magenta hover:shadow-lg hover:shadow-nebula-violet/20 transition-all py-3 text-sm font-semibold disabled:opacity-50"
               >
                 {loading ? (
@@ -396,5 +424,13 @@ export default function ChangePasswordPage() {
         </p>
       </motion.div>
     </div>
+  );
+}
+
+export default function ChangePasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ChangePasswordContent />
+    </Suspense>
   );
 }
