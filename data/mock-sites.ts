@@ -4,12 +4,12 @@ import type { Site, Bay, Alert, Sensors } from "@/types";
 const MAISONS_ALFORT_CENTER: [number, number] = [48.8064, 2.4379];
 
 /**
- * MOCK_SITES : uniquement les sites réellement supervisés (BlackBox ServSensor ou Zabbix).
- * Les 90% de sites restants n'ont que des données référentiel (pas de baies, pas de capteurs).
+ * MOCK_SITES : UNIQUEMENT les 2 sites avec BlackBox ServSensor physiquement installé.
+ * Tous les autres sites du référentiel ont des baies IT mais sans capteurs actifs.
  */
 export const MOCK_SITES: Site[] = [
   {
-    // BlackBox ServSensor Enterprise — 5 baies
+    // BlackBox ServSensor Enterprise — 5 baies supervisées en temps réel
     id: "HTDV",
     name: "Hôtel de Ville",
     address: "118 avenue du Général de Gaulle, 94700 Maisons-Alfort",
@@ -25,7 +25,7 @@ export const MOCK_SITES: Site[] = [
     powerConsumption: 12.5,
   },
   {
-    // BlackBox ServSensor 4E — 3 baies — alertes actives
+    // BlackBox ServSensor 4E — 3 baies supervisées — 2 alertes actives
     id: "PLDS",
     name: "Palais des Sports",
     address: "4 rue Edouard Herriot, 94700 Maisons-Alfort",
@@ -39,22 +39,6 @@ export const MOCK_SITES: Site[] = [
     humidity: 52,
     uptime: 98.5,
     powerConsumption: 8.3,
-  },
-  {
-    // Site en alerte critique — pas encore BlackBox mais suivi en urgence
-    id: "EEJF",
-    name: "École Élémentaire Jules Ferry",
-    address: "218 bis rue Jean Jaurès, 94700 Maisons-Alfort",
-    type: "education",
-    status: "critical",
-    coordinates: [48.7992, 2.4248],
-    bayCount: 4,
-    alertCount: 3,
-    lastUpdate: new Date().toISOString(),
-    temperature: 31.2,
-    humidity: 68,
-    uptime: 97.2,
-    powerConsumption: 18.5,
   },
 ];
 
@@ -157,45 +141,13 @@ export function generateBaysForSite(siteId: string, siteName: string, count: num
 export const MOCK_ALERTS: Alert[] = [
   {
     id: "alert-1",
-    siteId: "EEJF",
-    siteName: "École Élémentaire Jules Ferry",
-    bayId: "EEJF-bay-1",
-    bayName: "Baie 1",
-    severity: "critical",
-    title: "Température Critique",
-    description: "La température a dépassé le seuil critique de 30°C dans la salle serveur",
-    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
-    acknowledged: false,
-    resolved: false,
-    sensorType: "temperature",
-    value: 31.2,
-    threshold: 30,
-  },
-  {
-    id: "alert-2",
-    siteId: "EEJF",
-    siteName: "École Élémentaire Jules Ferry",
-    bayId: "EEJF-bay-2",
-    bayName: "Baie 2",
-    severity: "major",
-    title: "Humidité Élevée",
-    description: "Le taux d'humidité a dépassé le seuil d'alerte de 60%",
-    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    acknowledged: false,
-    resolved: false,
-    sensorType: "humidity",
-    value: 68,
-    threshold: 60,
-  },
-  {
-    id: "alert-3",
     siteId: "PLDS",
     siteName: "Palais des Sports",
     bayId: "PLDS-bay-1",
     bayName: "Baie BlackBox 1",
     severity: "major",
     title: "Température en hausse — BlackBox ServSensor",
-    description: "Le capteur BlackBox signale une montée en température anormale dans la salle technique",
+    description: "Le capteur BlackBox SignalS une montée en température anormale dans la salle technique (26.8°C > seuil 25°C)",
     timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
     acknowledged: false,
     resolved: false,
@@ -204,14 +156,14 @@ export const MOCK_ALERTS: Alert[] = [
     threshold: 25,
   },
   {
-    id: "alert-4",
+    id: "alert-2",
     siteId: "PLDS",
     siteName: "Palais des Sports",
     bayId: "PLDS-bay-2",
     bayName: "Baie BlackBox 2",
     severity: "minor",
     title: "Porte baie ouverte — BlackBox ServSensor",
-    description: "Le capteur de contact signale que la porte de la baie est restée ouverte",
+    description: "Le capteur de contact signale que la porte de la baie est restée ouverte depuis plus de 30 min",
     timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
     acknowledged: true,
     acknowledgedBy: "Rayan DOB",
@@ -219,31 +171,36 @@ export const MOCK_ALERTS: Alert[] = [
     resolved: false,
   },
   {
-    id: "alert-5",
-    siteId: "EEJF",
-    siteName: "École Élémentaire Jules Ferry",
-    severity: "critical",
-    title: "Climatisation Défaillante",
-    description: "Le système de climatisation de la salle serveur ne répond plus",
-    timestamp: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-    acknowledged: false,
-    resolved: false,
-  },
-  {
-    id: "alert-6",
+    id: "alert-3",
     siteId: "HTDV",
     siteName: "Hôtel de Ville",
     bayId: "HTDV-bay-3",
     bayName: "Baie BlackBox 3",
     severity: "info",
     title: "Rapport hebdomadaire — BlackBox ServSensor",
-    description: "Tous les capteurs fonctionnent normalement. Température stable à 22.5°C.",
+    description: "Tous les capteurs fonctionnent normalement. Température stable à 22.5°C. Humidité 45%. Alimentation 230V OK.",
     timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
     acknowledged: true,
     acknowledgedBy: "Système automatique",
     acknowledgedAt: new Date(Date.now() - 1000 * 60 * 119).toISOString(),
     resolved: true,
     resolvedAt: new Date(Date.now() - 1000 * 60 * 119).toISOString(),
+  },
+  {
+    id: "alert-4",
+    siteId: "HTDV",
+    siteName: "Hôtel de Ville",
+    bayId: "HTDV-bay-1",
+    bayName: "Baie BlackBox 1",
+    severity: "info",
+    title: "Test capteurs effectué",
+    description: "Test mensuel automatique des capteurs BlackBox ServSensor Enterprise. Tous les modules répondent correctement.",
+    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    acknowledged: true,
+    acknowledgedBy: "Système automatique",
+    acknowledgedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 + 1000).toISOString(),
+    resolved: true,
+    resolvedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 + 1000).toISOString(),
   },
 ];
 
