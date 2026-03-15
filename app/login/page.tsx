@@ -43,9 +43,8 @@ export default function LoginPage() {
         description: `Bienvenue ${data.user.name}`,
       });
 
-      // Si changement de mot de passe obligatoire → redirection dédiée
       if (data.mustChangePassword) {
-        window.location.href = "/change-password";
+        window.location.href = "/change-password?forced=true";
         return;
       }
 

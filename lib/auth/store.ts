@@ -115,12 +115,10 @@ function init() {
   if (_initialized) return;
   _initialized = true;
 
-  // Mot de passe temporaire unique pour tous les comptes DSI.
-  // Chaque utilisateur est forcé de le changer à la première connexion.
+  // Mot de passe par défaut pour tous les comptes DSI : @zerty123456789
   const initialPassword =
-    process.env.INITIAL_DSI_PASSWORD ?? "DSI@MaisonsAlfort2026!";
+    process.env.INITIAL_DSI_PASSWORD ?? "@zerty123456789";
 
-  // Un seul hashage pour tous les comptes (même mot de passe initial)
   const sharedHash = bcrypt.hashSync(initialPassword, 12);
 
   for (const member of DSI_MEMBERS) {
@@ -129,7 +127,7 @@ function init() {
       department: "Direction des Systèmes d'Information",
       passwordHash: sharedHash,
       isActive: true,
-      mustChangePassword: true,
+      mustChangePassword: false,
       createdAt: "2026-01-15T10:00:00Z",
       createdBy: "système",
       failedLoginAttempts: 0,

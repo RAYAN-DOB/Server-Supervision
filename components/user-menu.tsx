@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, Settings, Shield } from "lucide-react";
+import { LogOut, Settings, Shield, KeyRound } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -77,6 +77,17 @@ export function UserMenu() {
 
               {/* Menu Items */}
               <div className="space-y-1">
+                <button
+                  onClick={() => {
+                    window.location.href = "/change-password";
+                    setIsOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-left"
+                >
+                  <KeyRound className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm text-gray-300">Changer mon mot de passe</span>
+                </button>
+
                 <button
                   onClick={() => {
                     window.location.href = "/admin";

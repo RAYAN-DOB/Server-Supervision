@@ -7,10 +7,17 @@ import {
   addAuditEntry,
 } from "@/lib/auth/store";
 
-// Validation de la complexité du mot de passe
+/**
+ * Normes de mot de passe :
+ * - Minimum 8 caractères
+ * - Au moins une lettre majuscule
+ * - Au moins une lettre minuscule
+ * - Au moins un chiffre
+ * - Au moins un caractère spécial
+ */
 function validatePasswordStrength(password: string): string | null {
-  if (password.length < 12) {
-    return "Le mot de passe doit contenir au moins 12 caractères";
+  if (password.length < 8) {
+    return "Le mot de passe doit contenir au moins 8 caractères";
   }
   if (!/[A-Z]/.test(password)) {
     return "Le mot de passe doit contenir au moins une lettre majuscule";
