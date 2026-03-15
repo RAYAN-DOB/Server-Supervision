@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Site, Alert, User, ZabbixConfig, DashboardWidget, ChatMessage } from "@/types";
+import type { Site, Alert, User, ZabbixConfig, DashboardWidget, ChatMessage, SiteReference } from "@/types";
 
 interface UIState {
   sidebarOpen: boolean;
@@ -15,9 +15,14 @@ interface StoreState {
   ui: UIState;
   setUIState: (state: Partial<UIState>) => void;
   
-  // Sites
+  // Sites supervision (mock/Zabbix)
   sites: Site[];
   setSites: (sites: Site[]) => void;
+
+  // Référentiel des sites (chargé depuis le hook useSitesReference)
+  siteReferences: SiteReference[];
+  setSiteReferences: (refs: SiteReference[]) => void;
+  updateSiteReference: (id: string, updates: Partial<SiteReference>) => void;
   
   // Alerts
   alerts: Alert[];
@@ -66,9 +71,21 @@ export const useStore = create<StoreState>()(
           ui: { ...prev.ui, ...state },
         })),
 
-      // Sites
+      // Sites supervision
       sites: [],
       setSites: (sites) => set({ sites }),
+
+      // Référentiel des sites
+      siteReferences: [],
+      setSiteReferences: (siteReferences) => set({ siteReferences }),
+      updateSiteReference: (id, updates) =>
+        set((state) => ({
+          siteReferences: state.siteReferences.map((s) =>
+            s.id === id
+              ? { ...s, ...updates, updatedAt: new Date().toISOString() }
+              : s
+          ),
+        })),
 
       // Alerts
       alerts: [],

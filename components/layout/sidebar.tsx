@@ -14,6 +14,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  Server,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AurionLogo } from "@/components/aurion-logo";
@@ -26,13 +28,18 @@ const navigation = [
     name: "Vue d'Ensemble",
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Vue globale" },
-      { name: "Carte Interactive", href: "/carte", icon: MapPin, description: "Carte des sites" },
+      { name: "Carte des sites", href: "/carte", icon: MapPin, description: "Tous les sites" },
     ],
   },
   {
-    name: "Infrastructure",
+    name: "Référentiel",
     items: [
-      { name: "Tous les Sites", href: "/sites", icon: Building2, description: "" },
+      { name: "Référentiel des sites", href: "/sites", icon: BookOpen, description: "Inventaire complet" },
+    ],
+  },
+  {
+    name: "Supervision",
+    items: [
       { name: "Alertes", href: "/alertes", icon: AlertTriangle, description: "Centre d'alertes" },
       { name: "Historique", href: "/historique", icon: History, description: "Timeline" },
     ],
@@ -47,6 +54,7 @@ const navigation = [
   {
     name: "Configuration",
     items: [
+      { name: "Intégration Zabbix", href: "/admin#zabbix", icon: Server, description: "Liaison hosts" },
       { name: "Administration", href: "/admin", icon: Settings, description: "Paramètres" },
     ],
   },
@@ -161,9 +169,7 @@ export function Sidebar() {
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">{item.name}</p>
                               <p className="text-xs text-gray-600 truncate">
-                                {item.href === "/sites"
-                                  ? `${sites.length} site${sites.length !== 1 ? "s" : ""}`
-                                  : item.description}
+                                {item.description}
                               </p>
                             </div>
                             

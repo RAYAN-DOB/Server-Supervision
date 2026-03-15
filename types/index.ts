@@ -3,6 +3,68 @@ export type Severity = "info" | "minor" | "major" | "critical";
 export type SiteType = "administratif" | "sport" | "education" | "culture" | "securite" | "technique";
 export type UserRole = "super_admin" | "admin" | "tech" | "viewer";
 
+// ─── Référentiel des sites — nouveaux types ───────────────────────────────────
+export type AddressStatus = "verified" | "internal_only" | "needs_manual_validation";
+export type ZabbixStatus = "not_connected" | "pending" | "partial" | "connected";
+export type SensorsStatus = "none" | "partial" | "active";
+
+export type SiteCategory =
+  | "administratif"
+  | "école"
+  | "culture"
+  | "sport"
+  | "service municipal"
+  | "sécurité"
+  | "quartier"
+  | "restauration municipale"
+  | "technique"
+  | "autre";
+
+/** Interface principale du référentiel des sites municipaux */
+export interface SiteReference {
+  id: string;
+  name: string;
+  aliases?: string[];
+
+  address: string | null;
+  postalCode: string;
+  city: string;
+  lat?: number | null;
+  lng?: number | null;
+  addressStatus: AddressStatus;
+  geocodingAttempts?: number;
+  geocodingLastAttempt?: string | null;
+
+  ltNames: string[];
+  ltCount?: number;
+  telephonyEquipment?: string | null;
+
+  likelyManagedByDSI: boolean;
+  category?: SiteCategory;
+
+  zabbixStatus: ZabbixStatus;
+  sensorsStatus: SensorsStatus;
+  zabbixEnabled: boolean;
+  zabbixHostId?: string | null;
+  zabbixHostName?: string | null;
+  zabbixTemplate?: string | null;
+  zabbixLastSync?: string | null;
+  zabbixError?: string | null;
+
+  visibleOnMap: boolean;
+  notes?: string | null;
+  source?: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
+  updatedBy?: string;
+
+  /** Données de supervision live (fusion avec mock/Zabbix) */
+  supervisionStatus?: SiteStatus;
+  supervisionLastUpdate?: string;
+}
+
+// ─── Modèle legacy supervision (inchangé pour compatibilité) ─────────────────
 export interface Site {
   id: string;
   name: string;
