@@ -10,7 +10,6 @@ import {
   BarChart3,
   PieChart,
   Activity,
-  Building2,
   BookOpen,
   Wifi,
 } from "lucide-react";
@@ -136,11 +135,11 @@ export default function AnalyticsPage() {
                     <p className="text-xs text-gray-500 mb-1">{label}</p>
                     <p className="text-2xl font-bold text-white">{value}</p>
                     <div className={cn("flex items-center gap-1 mt-1 text-xs", up ? "text-green-400" : "text-red-400")}>
-                      {up ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
+                      {up ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                       <span>{trend}</span>
                     </div>
                   </div>
-                  <Icon className={`w-7 h-7 text-${color}-400 opacity-40`} />
+                  <Icon className={cn("w-7 h-7 opacity-40", color === "cyan" && "text-cyan-400", color === "orange" && "text-orange-400", color === "green" && "text-green-400", color === "purple" && "text-purple-400")} />
                 </div>
               </CardContent>
             </Card>

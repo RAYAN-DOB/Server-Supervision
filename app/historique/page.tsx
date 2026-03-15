@@ -194,7 +194,12 @@ export default function HistoriquePage() {
                   className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
                     active
-                      ? `bg-${cfg.color}-500/15 text-${cfg.color}-400 border-${cfg.color}-500/20`
+                      ? cn(
+                          cfg.color === "red" && "bg-red-500/15 text-red-400 border-red-500/20",
+                          cfg.color === "blue" && "bg-blue-500/15 text-blue-400 border-blue-500/20",
+                          cfg.color === "purple" && "bg-purple-500/15 text-purple-400 border-purple-500/20",
+                          cfg.color === "gray" && "bg-gray-500/15 text-gray-400 border-gray-500/20",
+                        )
                       : "bg-white/[0.03] text-gray-500 border-white/[0.06] hover:bg-white/[0.06]"
                   )}
                 >

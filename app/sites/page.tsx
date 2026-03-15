@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { AddressBadge, ZabbixBadge, SensorsBadge, DsiBadge } from "@/components/ui/status-badge";
 import { useSitesReference } from "@/hooks/useSitesReference";
 import type { SiteReference, AddressStatus, ZabbixStatus, SensorsStatus } from "@/types";
@@ -261,7 +262,14 @@ export default function SitesPage() {
           <Card key={label} className="bg-white/[0.03] border-white/[0.06]">
             <CardContent className="p-3">
               <div className="flex items-center gap-2">
-                <Icon className={`w-4 h-4 text-${color}-400`} />
+                <Icon className={cn("w-4 h-4",
+                  color === "purple" && "text-purple-400",
+                  color === "violet" && "text-violet-400",
+                  color === "blue" && "text-blue-400",
+                  color === "gray" && "text-gray-400",
+                  color === "green" && "text-green-400",
+                  color === "orange" && "text-orange-400",
+                )} />
                 <span className="text-[11px] text-gray-500">{label}</span>
               </div>
               <p className="text-xl font-bold text-white mt-1">{value}</p>
