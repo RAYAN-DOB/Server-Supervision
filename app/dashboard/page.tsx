@@ -136,7 +136,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 flex-1">
+    <div className="p-4 sm:p-6 lg:p-8 flex-1 scan-line">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -144,7 +144,9 @@ export default function DashboardPage() {
         className="mb-8 flex items-start justify-between gap-4 flex-wrap"
       >
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Tableau de bord</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-1">
+            <span className="gradient-text-color">Command Center</span>
+          </h1>
           <p className="text-sm text-gray-500 font-light flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -168,7 +170,7 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards — Holographic */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
@@ -178,17 +180,17 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
-              whileHover={{ y: -3 }}
             >
               <Link href={stat.href}>
                 <div className={cn(
-                  "relative overflow-hidden rounded-2xl border p-5 cursor-pointer group transition-all bg-gradient-to-br",
+                  "holo-card relative overflow-hidden rounded-2xl border p-5 cursor-pointer group bg-gradient-to-br",
                   stat.accent,
-                  stat.border
+                  stat.border,
+                  stat.label === "Alertes actives" && criticalAlerts.length > 0 && "alert-glow-critical"
                 )}>
                   <div className="flex items-start justify-between mb-4">
-                    <div className={cn("p-2 rounded-xl bg-white/[0.05]", stat.iconColor)}>
-                      <Icon className="w-5 h-5" />
+                    <div className={cn("p-2.5 rounded-xl bg-white/[0.06] relative", stat.iconColor)}>
+                      <Icon className="w-5 h-5 gauge-glow" />
                     </div>
                     <div className="flex items-center gap-1 text-xs">
                       {stat.trendUp ? (
@@ -201,10 +203,10 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-white tracking-tight mb-0.5">{stat.value}</div>
+                  <div className="text-3xl font-bold text-white tracking-tight mb-0.5 neon-text">{stat.value}</div>
                   <div className="text-sm font-medium text-gray-300 mb-1">{stat.label}</div>
                   <div className="text-xs text-gray-500 font-light">{stat.sub}</div>
-                  <ChevronRight className="absolute right-4 bottom-4 w-4 h-4 text-gray-700 group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="absolute right-4 bottom-4 w-4 h-4 text-gray-700 group-hover:text-gray-400 group-hover:translate-x-1 transition-all" />
                 </div>
               </Link>
             </motion.div>
@@ -333,7 +335,7 @@ export default function DashboardPage() {
               <div className="space-y-2">
                 {recentAlerts.map((alert, i) => (
                   <motion.div key={alert.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors group cursor-default">
-                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0", SEVERITY_DOT[alert.severity] ?? "bg-gray-500")} />
+                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0 relative", SEVERITY_DOT[alert.severity] ?? "bg-gray-500", (alert.severity === "critical" || alert.severity === "major") && "status-dot-pulse")} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-200 truncate">{alert.title}</p>
                       <p className="text-xs text-gray-600 font-light truncate">{alert.siteName}</p>

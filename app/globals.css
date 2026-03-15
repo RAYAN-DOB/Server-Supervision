@@ -149,3 +149,148 @@ h1, h2, h3, h4, h5, h6 {
 .leaflet-popup-content-wrapper { background: #0f0f14; color: #e5e5e5; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 .leaflet-popup-tip { background: #0f0f14; }
 .leaflet-container { font-family: inherit; }
+
+/* ══════ NEBULA OS — Next-Gen Effects ══════ */
+
+/* Holographic Card Hover */
+.holo-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+}
+
+.holo-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    rgba(106, 0, 255, 0) 0%,
+    rgba(106, 0, 255, 0.06) 40%,
+    rgba(0, 240, 255, 0.08) 60%,
+    rgba(106, 0, 255, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.holo-card:hover::before {
+  opacity: 1;
+}
+
+.holo-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 40px -10px rgba(106, 0, 255, 0.25),
+              0 0 20px -5px rgba(0, 240, 255, 0.15);
+}
+
+/* Neon Glow Text */
+.neon-text {
+  text-shadow: 0 0 7px rgba(106, 0, 255, 0.5),
+               0 0 20px rgba(106, 0, 255, 0.3),
+               0 0 40px rgba(106, 0, 255, 0.15);
+}
+
+.neon-text-cyan {
+  text-shadow: 0 0 7px rgba(0, 240, 255, 0.5),
+               0 0 20px rgba(0, 240, 255, 0.3),
+               0 0 40px rgba(0, 240, 255, 0.15);
+}
+
+/* Pulse Ring Animation for KPIs */
+@keyframes pulseRing {
+  0% { transform: scale(0.95); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.6; }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+
+.pulse-ring {
+  animation: pulseRing 3s ease-in-out infinite;
+}
+
+/* Alert Glow Animation */
+@keyframes alertGlow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 51, 0, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 51, 0, 0.6), 0 0 50px rgba(255, 51, 0, 0.2); }
+}
+
+.alert-glow-critical {
+  animation: alertGlow 2s ease-in-out infinite;
+}
+
+@keyframes alertGlowWarning {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 165, 0, 0.2); }
+  50% { box-shadow: 0 0 20px rgba(255, 165, 0, 0.5), 0 0 40px rgba(255, 165, 0, 0.15); }
+}
+
+.alert-glow-warning {
+  animation: alertGlowWarning 3s ease-in-out infinite;
+}
+
+/* Data Scan Line */
+@keyframes scanLine {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.scan-line::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.15), transparent);
+  animation: scanLine 8s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Holographic Border */
+@keyframes borderShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.holo-border {
+  position: relative;
+}
+
+.holo-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(60deg, #6A00FF, #00F0FF, #C300FF, #FF00E5, #6A00FF);
+  background-size: 300% 300%;
+  animation: borderShift 6s ease infinite;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.holo-border:hover::after {
+  opacity: 0.5;
+}
+
+/* Gauge glow */
+.gauge-glow {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* Status dot pulse */
+@keyframes statusPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.8); opacity: 0; }
+}
+
+.status-dot-pulse::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: statusPulse 2s ease-out infinite;
+}
