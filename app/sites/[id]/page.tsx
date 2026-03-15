@@ -337,6 +337,53 @@ export default function SiteDetailPage() {
                     </Card>
                   )}
 
+                  {/* Infrastructure Baies */}
+                  {(refSite.ltCount ?? 0) > 0 && (
+                    <Card className="bg-white/[0.02] border-white/[0.06]">
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <HardDrive className="w-4 h-4 text-gray-400" />
+                          Baies / Infrastructure IT
+                          <span className={`ml-auto text-[10px] border rounded-full px-2 py-0.5 ${
+                            refSite.blackboxInstalled
+                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                              : "bg-gray-500/10 text-gray-500 border-gray-500/20"
+                          }`}>
+                            {refSite.blackboxInstalled ? "Supervisé — BlackBox" : "Non supervisé"}
+                          </span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-3 gap-2">
+                          {refSite.ltNames.map((lt, i) => (
+                            <div
+                              key={lt}
+                              className={`p-3 rounded-xl border text-center ${
+                                refSite.blackboxInstalled
+                                  ? "bg-emerald-500/5 border-emerald-500/20"
+                                  : "bg-white/[0.02] border-white/[0.06]"
+                              }`}
+                            >
+                              <HardDrive className={`w-5 h-5 mx-auto mb-1 ${refSite.blackboxInstalled ? "text-emerald-400" : "text-gray-600"}`} />
+                              <p className="text-xs font-mono text-gray-300">{lt}</p>
+                              <p className="text-[10px] text-gray-600 mt-0.5">
+                                {refSite.blackboxInstalled ? "Baie BlackBox" : `Baie ${i + 1}`}
+                              </p>
+                              {!refSite.blackboxInstalled && (
+                                <span className="text-[9px] text-gray-600 italic">non supervisé</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        {!refSite.blackboxInstalled && (
+                          <p className="text-xs text-gray-600 mt-3 text-center italic">
+                            Ces baies existent physiquement mais ne sont pas encore équipées de capteurs.
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* BlackBox ServSensor */}
                   {refSite.blackboxInstalled && (
                     <Card className="bg-emerald-500/5 border-emerald-500/20">
