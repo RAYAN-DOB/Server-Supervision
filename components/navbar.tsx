@@ -13,7 +13,6 @@ import {
   Bell,
   History,
   FileText,
-  Server,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AurionLogo } from "@/components/aurion-logo";

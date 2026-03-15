@@ -14,7 +14,6 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Server,
   BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -54,8 +53,7 @@ const navigation = [
   {
     name: "Configuration",
     items: [
-      { name: "Intégration Zabbix", href: "/admin#zabbix", icon: Server, description: "Liaison hosts" },
-      { name: "Administration", href: "/admin", icon: Settings, description: "Paramètres" },
+      { name: "Administration", href: "/admin", icon: Settings, description: "Paramètres & Zabbix" },
     ],
   },
 ];

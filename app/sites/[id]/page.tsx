@@ -14,36 +14,25 @@ import {
   ChevronRight,
   RefreshCw,
   Download,
-  Network,
   HardDrive,
-  Clock,
-  Wifi,
-  WifiOff,
   Phone,
-  Tag,
   Info,
-  Server,
   History,
   AlertCircle,
   CheckCircle2,
-  ExternalLink,
   Cpu,
-  Radio,
-  CalendarClock,
-  User,
 } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { GradientBackground } from "@/components/ui/gradient-background";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SensorGauge } from "@/components/ui/sensor-gauge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddressBadge, ZabbixBadge, SensorsBadge, DsiBadge, SupervisionBadge } from "@/components/ui/status-badge";
 import { useStore } from "@/store/useStore";
 import { useSitesReference } from "@/hooks/useSitesReference";
 import { MOCK_SITES, generateBaysForSite } from "@/data/mock-sites";
-import { formatTemperature, formatHumidity, formatRelativeTime } from "@/lib/utils";
+import { formatTemperature } from "@/lib/utils";
 import type { Bay } from "@/types";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -210,12 +199,6 @@ export default function SiteDetailPage() {
               <TabsTrigger value="supervision" className="data-[state=active]:bg-purple-600/30">
                 <Activity className="w-4 h-4 mr-2" />
                 État technique
-              </TabsTrigger>
-            )}
-            {refSite && (
-              <TabsTrigger value="zabbix" className="data-[state=active]:bg-purple-600/30">
-                <Server className="w-4 h-4 mr-2" />
-                Intégration Zabbix
               </TabsTrigger>
             )}
             {refSite && (
@@ -611,91 +594,6 @@ export default function SiteDetailPage() {
                   </CardContent>
                 </Card>
               )}
-            </TabsContent>
-          )}
-
-          {/* ─── Onglet : Intégration Zabbix ─────────────────────────────────── */}
-          {refSite && (
-            <TabsContent value="zabbix" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-white/[0.02] border-white/[0.06]">
-                  <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Server className="w-5 h-5 text-blue-400" />
-                      Configuration Zabbix
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03]">
-                      <span className="text-sm text-gray-400">Statut</span>
-                      <ZabbixBadge status={refSite.zabbixStatus} size="md" />
-                    </div>
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03]">
-                      <span className="text-sm text-gray-400">Activé</span>
-                      <span className={`text-sm font-medium ${refSite.zabbixEnabled ? "text-green-400" : "text-gray-500"}`}>
-                        {refSite.zabbixEnabled ? "Oui" : "Non"}
-                      </span>
-                    </div>
-                    {refSite.zabbixHostId && (
-                      <InfoRow label="Host ID" value={refSite.zabbixHostId} mono />
-                    )}
-                    {refSite.zabbixHostName && (
-                      <InfoRow label="Host Name" value={refSite.zabbixHostName} />
-                    )}
-                    {refSite.zabbixTemplate && (
-                      <InfoRow label="Template" value={refSite.zabbixTemplate} />
-                    )}
-                    {refSite.zabbixLastSync && (
-                      <InfoRow
-                        label="Dernière synchro"
-                        value={new Date(refSite.zabbixLastSync).toLocaleString("fr-FR")}
-                      />
-                    )}
-                    {refSite.zabbixError && (
-                      <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                        <p className="text-xs text-red-400">{refSite.zabbixError}</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-white/[0.02] border-white/[0.06]">
-                  <CardHeader>
-                    <CardTitle className="text-base">Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {refSite.zabbixStatus === "not_connected" ? (
-                      <>
-                        <p className="text-sm text-gray-500">
-                          Ce site n&apos;est pas encore connecté à Zabbix.
-                          Vous pouvez lier manuellement un host depuis la page d&apos;intégration.
-                        </p>
-                        <Link href="/admin">
-                          <Button variant="glass" className="w-full">
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Aller à la configuration Zabbix
-                          </Button>
-                        </Link>
-                      </>
-                    ) : (
-                      <div className="space-y-2">
-                        <Button variant="glass" className="w-full justify-start">
-                          <RefreshCw className="w-4 h-4 mr-2" />
-                          Synchroniser ce site
-                        </Button>
-                        <Button variant="glass" className="w-full justify-start">
-                          <Activity className="w-4 h-4 mr-2" />
-                          Tester la connexion
-                        </Button>
-                        <Button variant="glass" className="w-full justify-start text-red-400 hover:text-red-300">
-                          <WifiOff className="w-4 h-4 mr-2" />
-                          Délier ce host
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
             </TabsContent>
           )}
 

@@ -16,7 +16,6 @@ import {
   WifiOff,
   CheckCircle2,
   BookOpen,
-  Server,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/store/useStore";

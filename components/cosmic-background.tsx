@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 let globalIntensity = 0;
@@ -11,13 +11,6 @@ export function setCosmicIntensity(level: number) {
 export function CosmicBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    mouseRef.current = {
-      x: (e.clientX / window.innerWidth - 0.5) * 2,
-      y: (e.clientY / window.innerHeight - 0.5) * 2,
-    };
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -91,14 +84,14 @@ export function CosmicBackground() {
       });
       ctx.globalAlpha = 1;
 
-      // Stars with parallax
+      // Stars (static, no parallax)
       stars.forEach((star) => {
         star.opacity += star.twinkleSpeed;
         if (star.opacity > star.baseOpacity + 0.3 || star.opacity < star.baseOpacity - 0.2) {
           star.twinkleSpeed = -star.twinkleSpeed;
         }
-        const px = star.x + mx * star.size * 8;
-        const py = star.y + my * star.size * 8;
+        const px = star.x;
+        const py = star.y;
         const glow = star.size > 1.2;
         if (glow) {
           ctx.shadowBlur = 6;
@@ -150,15 +143,13 @@ export function CosmicBackground() {
     };
 
     animate();
-    window.addEventListener("mousemove", handleMouseMove);
     const onResize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
     window.addEventListener("resize", onResize);
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("resize", onResize);
     };
-  }, [handleMouseMove]);
+  }, []);
 
   return (
     <>
