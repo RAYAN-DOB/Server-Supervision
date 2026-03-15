@@ -13,10 +13,14 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Wifi,
+  WifiOff,
   CheckCircle2,
+  BookOpen,
+  Server,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/store/useStore";
+import { useSitesReference } from "@/hooks/useSitesReference";
 import { MOCK_SITES, MOCK_ALERTS } from "@/data/mock-sites";
 import { formatRelativeTime, cn } from "@/lib/utils";
 import Link from "next/link";
@@ -30,7 +34,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Données de temp stables (useMemo + valeurs déterministes)
 const BASE_TEMP_DATA = Array.from({ length: 24 }, (_, i) => ({
   time: `${String(i).padStart(2, "0")}h`,
   temperature: +(22 + Math.sin((i / 24) * Math.PI * 2) * 2 + ((i * 7 + 3) % 10) / 20).toFixed(1),
@@ -38,6 +41,7 @@ const BASE_TEMP_DATA = Array.from({ length: 24 }, (_, i) => ({
 
 export default function DashboardPage() {
   const { sites, alerts, setSites, setAlerts } = useStore();
+  const { stats: refStats, loading: refLoading } = useSitesReference();
   const [avgTemp, setAvgTemp] = useState(22.5);
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
@@ -49,7 +53,6 @@ export default function DashboardPage() {
       setAvgTemp(+(22 + Math.sin(Date.now() / 10000) * 2).toFixed(1));
       setLastUpdate(new Date());
     }, 5000);
-
     return () => clearInterval(interval);
   }, [sites.length, alerts.length, setSites, setAlerts]);
 
@@ -76,15 +79,15 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      label: "Sites",
-      value: sites.length,
-      sub: `${totalBays} baies réseau`,
-      icon: Building2,
-      trend: "+0",
+      label: "Référentiel",
+      value: refStats.total,
+      sub: `${refStats.dsiManaged} gérés par la DSI`,
+      icon: BookOpen,
+      trend: `${refStats.connectedZabbix} Zabbix`,
       trendUp: true,
-      accent: "from-cyan-500/20 to-cyan-500/5",
-      border: "border-cyan-500/20",
-      iconColor: "text-cyan-400",
+      accent: "from-purple-500/20 to-purple-500/5",
+      border: "border-purple-500/20",
+      iconColor: "text-purple-400",
       href: "/sites",
     },
     {
@@ -102,7 +105,7 @@ export default function DashboardPage() {
     {
       label: "Température moy.",
       value: `${avgTemp}°C`,
-      sub: "Tous sites confondus",
+      sub: "Sites supervisés",
       icon: Thermometer,
       trend: avgTemp > 24 ? "Élevée" : "Normale",
       trendUp: avgTemp <= 24,
@@ -118,9 +121,9 @@ export default function DashboardPage() {
       icon: Activity,
       trend: parseFloat(avgUptime) >= 99.5 ? "Objectif atteint" : "À surveiller",
       trendUp: parseFloat(avgUptime) >= 99.5,
-      accent: "from-nebula-violet/20 to-nebula-violet/5",
-      border: "border-nebula-violet/20",
-      iconColor: "text-nebula-violet",
+      accent: "from-cyan-500/20 to-cyan-500/5",
+      border: "border-cyan-500/20",
+      iconColor: "text-cyan-400",
       href: "/analytics",
     },
   ];
@@ -134,7 +137,6 @@ export default function DashboardPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 flex-1">
-
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -142,9 +144,7 @@ export default function DashboardPage() {
         className="mb-8 flex items-start justify-between gap-4 flex-wrap"
       >
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-1">
-            Tableau de bord
-          </h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Tableau de bord</h1>
           <p className="text-sm text-gray-500 font-light flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -154,8 +154,6 @@ export default function DashboardPage() {
             <span>Mis à jour {formatRelativeTime(lastUpdate.toISOString())}</span>
           </p>
         </div>
-
-        {/* Statut global */}
         <div className={cn(
           "flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-medium",
           criticalAlerts.length > 0
@@ -184,8 +182,7 @@ export default function DashboardPage() {
             >
               <Link href={stat.href}>
                 <div className={cn(
-                  "relative overflow-hidden rounded-2xl border p-5 cursor-pointer group transition-all",
-                  "bg-gradient-to-br",
+                  "relative overflow-hidden rounded-2xl border p-5 cursor-pointer group transition-all bg-gradient-to-br",
                   stat.accent,
                   stat.border
                 )}>
@@ -204,13 +201,9 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   </div>
-
-                  <div className="text-3xl font-bold text-white tracking-tight mb-0.5">
-                    {stat.value}
-                  </div>
+                  <div className="text-3xl font-bold text-white tracking-tight mb-0.5">{stat.value}</div>
                   <div className="text-sm font-medium text-gray-300 mb-1">{stat.label}</div>
                   <div className="text-xs text-gray-500 font-light">{stat.sub}</div>
-
                   <ChevronRight className="absolute right-4 bottom-4 w-4 h-4 text-gray-700 group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all" />
                 </div>
               </Link>
@@ -221,14 +214,8 @@ export default function DashboardPage() {
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-
         {/* Graphique température */}
-        <motion.div
-          className="lg:col-span-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-        >
+        <motion.div className="lg:col-span-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
           <div className="clean-card p-6 h-full">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -261,50 +248,60 @@ export default function DashboardPage() {
                   }}
                   formatter={(v: number) => [`${v}°C`, "Température"]}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="temperature"
-                  stroke="#6A00FF"
-                  strokeWidth={2}
-                  fill="url(#tempGrad)"
-                  dot={false}
-                  activeDot={{ r: 4, fill: "#6A00FF" }}
-                />
+                <Area type="monotone" dataKey="temperature" stroke="#6A00FF" strokeWidth={2} fill="url(#tempGrad)" dot={false} activeDot={{ r: 4, fill: "#6A00FF" }} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </motion.div>
 
-        {/* Navigation rapide */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="space-y-3"
-        >
+        {/* Résumé référentiel + accès rapide */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-3">
+          {/* Référentiel summary */}
+          {!refLoading && (
+            <div className="clean-card p-5">
+              <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-purple-400" />
+                Référentiel
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "Total sites", value: refStats.total, color: "text-white" },
+                  { label: "Gérés DSI", value: refStats.dsiManaged, color: "text-violet-400" },
+                  { label: "Avec Zabbix", value: refStats.connectedZabbix, color: "text-blue-400" },
+                  { label: "Avec LT", value: refStats.withLT, color: "text-cyan-400" },
+                  { label: "Adresses OK", value: refStats.addressVerified, color: "text-green-400" },
+                  { label: "Sans GPS", value: refStats.withoutCoordinates, color: "text-orange-400" },
+                ].map(({ label, value, color }) => (
+                  <div key={label} className="p-2 rounded-lg bg-white/[0.03]">
+                    <p className="text-[10px] text-gray-600">{label}</p>
+                    <p className={cn("text-lg font-bold", color)}>{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Accès rapide */}
           <div className="clean-card p-5">
-            <h3 className="text-sm font-semibold text-white mb-4">Accès rapide</h3>
-            <div className="space-y-1.5">
+            <h3 className="text-sm font-semibold text-white mb-3">Accès rapide</h3>
+            <div className="space-y-1">
               {[
-                { label: "Carte Interactive", href: "/carte", icon: MapPin, sub: "Voir tous les sites" },
-                { label: "Sites Municipaux", href: "/sites", icon: Building2, sub: `${sites.length} sites surveillés` },
-                { label: "Centre d'Alertes", href: "/alertes", icon: AlertTriangle, sub: `${activeAlerts.length} active${activeAlerts.length !== 1 ? "s" : ""}` },
-                { label: "Analytics", href: "/analytics", icon: Activity, sub: "Graphiques & tendances" },
-                { label: "Rapports", href: "/rapports", icon: Zap, sub: "Exporter PDF / Excel" },
+                { label: "Carte des sites", href: "/carte", icon: MapPin, sub: `${refStats.withCoordinates} géolocalisés` },
+                { label: "Référentiel", href: "/sites", icon: BookOpen, sub: `${refStats.total} sites` },
+                { label: "Centre d'alertes", href: "/alertes", icon: AlertTriangle, sub: `${activeAlerts.length} active${activeAlerts.length !== 1 ? "s" : ""}` },
+                { label: "Analytics", href: "/analytics", icon: Activity, sub: "Graphiques" },
+                { label: "Rapports", href: "/rapports", icon: Zap, sub: "Exports PDF / CSV" },
               ].map((link) => {
                 const Icon = link.icon;
                 return (
                   <Link key={link.href} href={link.href}>
-                    <motion.div
-                      whileHover={{ x: 3 }}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.05] transition-colors group"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:bg-nebula-violet/10 transition-colors">
-                        <Icon className="w-4 h-4 text-gray-500 group-hover:text-nebula-violet transition-colors" />
+                    <motion.div whileHover={{ x: 3 }} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/[0.05] transition-colors group">
+                      <div className="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:bg-purple-500/10 transition-colors">
+                        <Icon className="w-3.5 h-3.5 text-gray-500 group-hover:text-purple-400 transition-colors" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors truncate">{link.label}</p>
-                        <p className="text-xs text-gray-600 font-light truncate">{link.sub}</p>
+                        <p className="text-[11px] text-gray-600 font-light truncate">{link.sub}</p>
                       </div>
                       <ChevronRight className="w-3.5 h-3.5 text-gray-700 group-hover:text-gray-400 transition-colors flex-shrink-0" />
                     </motion.div>
@@ -318,23 +315,15 @@ export default function DashboardPage() {
 
       {/* Bottom Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
         {/* Alertes récentes */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
           <div className="clean-card p-6 h-full">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-base font-semibold text-white">Alertes récentes</h3>
               <Link href="/alertes">
-                <span className="text-xs text-gray-500 hover:text-nebula-violet transition-colors">
-                  Tout voir →
-                </span>
+                <span className="text-xs text-gray-500 hover:text-purple-400 transition-colors">Tout voir →</span>
               </Link>
             </div>
-
             {recentAlerts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <CheckCircle2 className="w-10 h-10 text-green-500/40" />
@@ -343,13 +332,7 @@ export default function DashboardPage() {
             ) : (
               <div className="space-y-2">
                 {recentAlerts.map((alert, i) => (
-                  <motion.div
-                    key={alert.id}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04 }}
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors group cursor-default"
-                  >
+                  <motion.div key={alert.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors group cursor-default">
                     <div className={cn("w-2 h-2 rounded-full flex-shrink-0", SEVERITY_DOT[alert.severity] ?? "bg-gray-500")} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-200 truncate">{alert.title}</p>
@@ -365,9 +348,7 @@ export default function DashboardPage() {
                       )}>
                         {alert.severity}
                       </span>
-                      <span className="text-xs text-gray-600 whitespace-nowrap">
-                        {formatRelativeTime(alert.timestamp)}
-                      </span>
+                      <span className="text-xs text-gray-600 whitespace-nowrap">{formatRelativeTime(alert.timestamp)}</span>
                     </div>
                   </motion.div>
                 ))}
@@ -377,21 +358,14 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Sites à surveiller */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <div className="clean-card p-6 h-full">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-base font-semibold text-white">Sites à surveiller</h3>
               <Link href="/sites">
-                <span className="text-xs text-gray-500 hover:text-nebula-violet transition-colors">
-                  Tout voir →
-                </span>
+                <span className="text-xs text-gray-500 hover:text-purple-400 transition-colors">Tout voir →</span>
               </Link>
             </div>
-
             {criticalSites.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <CheckCircle2 className="w-10 h-10 text-green-500/40" />
@@ -401,25 +375,15 @@ export default function DashboardPage() {
               <div className="space-y-2">
                 {criticalSites.map((site, i) => (
                   <Link key={site.id} href={`/sites/${site.id}`}>
-                    <motion.div
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.04 }}
-                      whileHover={{ x: 3 }}
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer group"
-                    >
-                      <div className="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center flex-shrink-0 group-hover:bg-nebula-violet/10 transition-colors">
-                        <Building2 className="w-4 h-4 text-gray-500 group-hover:text-nebula-violet transition-colors" />
+                    <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }} whileHover={{ x: 3 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer group">
+                      <div className="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500/10 transition-colors">
+                        <Building2 className="w-4 h-4 text-gray-500 group-hover:text-purple-400 transition-colors" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-200 truncate">{site.name}</p>
-                        <p className="text-xs text-gray-600 font-light">
-                          {site.alertCount} alerte{site.alertCount > 1 ? "s" : ""} · {site.temperature.toFixed(1)}°C
-                        </p>
+                        <p className="text-xs text-gray-600 font-light">{site.alertCount} alerte{site.alertCount > 1 ? "s" : ""} · {site.temperature.toFixed(1)}°C</p>
                       </div>
-                      <Badge variant={site.status as "ok" | "warning" | "critical" | "info" | "default"} className="text-[10px] flex-shrink-0">
-                        {site.status}
-                      </Badge>
+                      <Badge variant={site.status as "ok" | "warning" | "critical" | "info" | "default"} className="text-[10px] flex-shrink-0">{site.status}</Badge>
                     </motion.div>
                   </Link>
                 ))}
