@@ -478,7 +478,7 @@ export default function SitesPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.02 }}
-                      className="hover:bg-white/[0.04] transition-colors group cursor-pointer"
+                      className="hover:bg-white/[0.04] hover:shadow-[inset_0_0_30px_rgba(106,0,255,0.05)] transition-all group cursor-pointer"
                     >
                       <td className="px-4 py-3">
                         <span className="font-mono text-xs text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">

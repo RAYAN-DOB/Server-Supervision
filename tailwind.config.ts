@@ -61,6 +61,8 @@ const config: Config = {
         "slide-down": "slideDown 0.3s ease-out",
         "fade-in": "fadeIn 0.5s ease-in",
         "spin-slow": "spin 8s linear infinite",
+        "shimmer": "shimmer 2.5s linear infinite",
+        "border-flow": "borderFlow 4s ease infinite",
       },
       keyframes: {
         float: {
@@ -82,6 +84,14 @@ const config: Config = {
         fadeIn: {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        borderFlow: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
         },
       },
       backdropBlur: {

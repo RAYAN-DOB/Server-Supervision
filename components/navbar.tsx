@@ -88,6 +88,7 @@ export function Navbar() {
                       <motion.div
                         layoutId="navbar-indicator"
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-cyan-500"
+                        style={{ boxShadow: "0 0 12px rgba(106,0,255,0.6), 0 0 24px rgba(0,240,255,0.3)" }}
                         transition={{ type: "spring", stiffness: 380, damping: 30 }}
                       />
                     )}
