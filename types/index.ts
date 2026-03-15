@@ -59,6 +59,15 @@ export interface SiteReference {
   createdBy?: string;
   updatedBy?: string;
 
+  /** BlackBox ServSensor installé sur site */
+  blackboxInstalled?: boolean;
+  blackboxModel?: string | null;
+  blackboxSerial?: string | null;
+  blackboxInstalledAt?: string | null;
+  blackboxInstalledBy?: string | null;
+  blackboxFirmware?: string | null;
+  blackboxBayCount?: number;
+
   /** Données de supervision live (fusion avec mock/Zabbix) */
   supervisionStatus?: SiteStatus;
   supervisionLastUpdate?: string;
