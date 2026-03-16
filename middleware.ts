@@ -91,6 +91,7 @@ export const config = {
     "/analytics/:path*",
     "/historique/:path*",
     "/rapports/:path*",
+    "/maintenance/:path*",
     "/admin/:path*",
     "/change-password",
   ],
