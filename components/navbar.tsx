@@ -13,6 +13,7 @@ import {
   Bell,
   History,
   FileText,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AurionLogo } from "@/components/aurion-logo";
@@ -26,6 +27,7 @@ const navigation = [
   { name: "Alertes", href: "/alertes", icon: AlertTriangle },
   { name: "Historique", href: "/historique", icon: History },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Maintenance", href: "/maintenance", icon: Wrench },
   { name: "Rapports", href: "/rapports", icon: FileText },
   { name: "Admin", href: "/admin", icon: Settings },
 ];

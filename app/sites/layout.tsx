@@ -1,6 +1,12 @@
-﻿import { Sidebar } from "@/components/layout/sidebar";
+﻿import type { Metadata } from "next";
+import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/top-bar";
 import { ProtectedRoute } from "@/components/protected-route";
+
+export const metadata: Metadata = {
+  title: "Référentiel des Sites — AURION",
+  description: "Inventaire et référentiel des 36 sites municipaux de Maisons-Alfort",
+};
 
 export default function Layout({
   children,
