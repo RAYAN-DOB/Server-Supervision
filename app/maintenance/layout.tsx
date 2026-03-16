@@ -4,11 +4,11 @@ import { TopBar } from "@/components/layout/top-bar";
 import { ProtectedRoute } from "@/components/protected-route";
 
 export const metadata: Metadata = {
-  title: "Dashboard — AURION",
-  description: "Tableau de bord de supervision des infrastructures IT de Maisons-Alfort",
+  title: "Gestion des Maintenances — AURION",
+  description: "Planification et suivi des interventions sur les sites municipaux de Maisons-Alfort",
 };
 
-export default function DashboardLayout({
+export default function MaintenanceLayout({
   children,
 }: {
   children: React.ReactNode;
