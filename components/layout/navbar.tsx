@@ -15,8 +15,8 @@ import {
   FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AurionLogo } from "@/components/aurion-logo";
-import { UserMenu } from "@/components/user-menu";
+import { AurionLogo } from "@/components/features/aurion-logo";
+import { UserMenu } from "@/components/layout/user-menu";
 import { useStore } from "@/store/useStore";
 
 const navigation = [

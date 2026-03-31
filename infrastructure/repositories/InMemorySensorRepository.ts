@@ -1,6 +1,6 @@
 import type { ISensorRepository } from "@/core/domain/repositories";
 import type { SensorReading, SensorHistory, BayEntity, SensorType, SensorStatus } from "@/core/domain/entities";
-import { generateSensors, generateBaysForSite, MOCK_SITES } from "@/data/mock-sites";
+import { generateSensors, generateBaysForSite, MOCK_SITES } from "@/data/mocks";
 import type { Sensors, SensorReading as LegacySensorReading, BinarySensor } from "@/types";
 
 function mapSensorStatus(status: string): SensorStatus {

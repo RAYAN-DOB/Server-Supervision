@@ -1,8 +1,8 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/top-bar";
-import { ProtectedRoute } from "@/components/protected-route";
+import { ProtectedRoute } from "@/components/features/protected-route";
 
-export default function CarteLayout({
+export default function DashboardGroupLayout({
   children,
 }: {
   children: React.ReactNode;

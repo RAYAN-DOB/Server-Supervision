@@ -20,7 +20,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/store/useStore";
 import { useSitesReference } from "@/hooks/useSitesReference";
-import { MOCK_SITES, MOCK_ALERTS } from "@/data/mock-sites";
+import { MOCK_SITES, MOCK_ALERTS } from "@/data/mocks";
 import { formatRelativeTime, cn } from "@/lib/utils";
 import Link from "next/link";
 import {

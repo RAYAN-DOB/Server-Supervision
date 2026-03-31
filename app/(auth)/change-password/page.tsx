@@ -14,7 +14,7 @@ import {
   LogOut,
   ArrowLeft,
 } from "lucide-react";
-import { AurionLogoFull } from "@/components/aurion-logo";
+import { AurionLogoFull } from "@/components/features/aurion-logo";
 import { Button } from "@/components/ui/button";
 import {
   Card,

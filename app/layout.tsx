@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/providers";
-import { AurionAIChat } from "@/components/aurion-ai-chat";
-import { KeyboardShortcutsHelp } from "@/components/keyboard-shortcuts-help";
-import { PerformanceMonitor } from "@/components/performance-monitor";
-import { EasterEgg } from "@/components/easter-egg";
-import { ScrollToTop } from "@/components/scroll-to-top";
-import { CommandPalette } from "@/components/command-palette";
-import { CosmicBackground } from "@/components/cosmic-background";
+import { Providers } from "@/components/layout/providers";
+import { AurionAIChat } from "@/components/features/aurion-ai-chat";
+import { KeyboardShortcutsHelp } from "@/components/features/keyboard-shortcuts-help";
+import { PerformanceMonitor } from "@/components/features/performance-monitor";
+import { EasterEgg } from "@/components/features/easter-egg";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { CommandPalette } from "@/components/features/command-palette";
+import { CosmicBackground } from "@/components/ui/cosmic-background";
 import { Toaster } from "sonner";
 
 const inter = Inter({

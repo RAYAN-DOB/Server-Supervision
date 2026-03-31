@@ -19,14 +19,14 @@ import {
   Download,
   AlertTriangle,
 } from "lucide-react";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/layout/navbar";
 import { GradientBackground } from "@/components/ui/gradient-background";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SensorGauge } from "@/components/ui/sensor-gauge";
 import { useStore } from "@/store/useStore";
-import { MOCK_SITES, generateBaysForSite } from "@/data/mock-sites";
+import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
 import { formatRelativeTime } from "@/lib/utils";
 import type { Bay } from "@/types";
 

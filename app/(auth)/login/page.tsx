@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Lock, Mail, Eye, EyeOff, Shield, AlertCircle } from "lucide-react";
-import { AurionLogoFull } from "@/components/aurion-logo";
+import { AurionLogoFull } from "@/components/features/aurion-logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useStore } from "@/store/useStore";

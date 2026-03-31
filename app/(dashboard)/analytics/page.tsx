@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/store/useStore";
 import { useSitesReference } from "@/hooks/useSitesReference";
-import { MOCK_SITES } from "@/data/mock-sites";
+import { MOCK_SITES } from "@/data/mocks";
 import { cn } from "@/lib/utils";
 import {
   LineChart,
