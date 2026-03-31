@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/store/useStore";
-import { MOCK_ALERTS } from "@/data/mock-sites";
+import { MOCK_ALERTS } from "@/data/mocks";
 import { formatRelativeTime, cn } from "@/lib/utils";
 import { toast } from "sonner";
 

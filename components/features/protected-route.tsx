@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
-import { LoadingScreen } from "@/components/loading-screen";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

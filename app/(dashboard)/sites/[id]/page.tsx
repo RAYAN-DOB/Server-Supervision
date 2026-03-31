@@ -22,7 +22,7 @@ import {
   CheckCircle2,
   Cpu,
 } from "lucide-react";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/layout/navbar";
 import { GradientBackground } from "@/components/ui/gradient-background";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddressBadge, ZabbixBadge, SensorsBadge, DsiBadge, SupervisionBadge } from "@/components/ui/status-badge";
 import { useStore } from "@/store/useStore";
 import { useSitesReference } from "@/hooks/useSitesReference";
-import { MOCK_SITES, generateBaysForSite } from "@/data/mock-sites";
+import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
 import { formatTemperature } from "@/lib/utils";
 import type { Bay } from "@/types";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
