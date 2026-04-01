@@ -11,11 +11,14 @@ const dbPath = path.join(process.cwd(), "prisma", "dev.db");
 const rawDb = new Database(dbPath);
 rawDb.pragma("journal_mode = WAL");
 const migrationPath = path.join(process.cwd(), "prisma", "migrations", "20260315143725_init", "migration.sql");
-if (fs.existsSync(migrationPath)) {
-  const sql = fs.readFileSync(migrationPath, "utf-8");
-  const statements = sql.split(";").filter(s => s.trim().length > 0);
-  for (const stmt of statements) {
-    try { rawDb.exec(stmt + ";"); } catch { /* already exists */ }
+const migration2Path = path.join(process.cwd(), "prisma", "migrations", "20260401000000_add_inventory_models", "migration.sql");
+for (const mPath of [migrationPath, migration2Path]) {
+  if (fs.existsSync(mPath)) {
+    const sql = fs.readFileSync(mPath, "utf-8");
+    const statements = sql.split(";").filter(s => s.trim().length > 0);
+    for (const stmt of statements) {
+      try { rawDb.exec(stmt + ";"); } catch { /* already exists */ }
+    }
   }
 }
 rawDb.close();
