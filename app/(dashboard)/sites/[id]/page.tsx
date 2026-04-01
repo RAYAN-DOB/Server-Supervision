@@ -21,6 +21,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Cpu,
+  Images,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { GradientBackground } from "@/components/ui/gradient-background";
@@ -31,10 +32,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddressBadge, ZabbixBadge, SensorsBadge, DsiBadge, SupervisionBadge } from "@/components/ui/status-badge";
 import { useStore } from "@/store/useStore";
 import { useSitesReference } from "@/hooks/useSitesReference";
+import { useSiteMedia } from "@/hooks/useSiteMedia";
 import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
 import { formatTemperature } from "@/lib/utils";
 import type { Bay } from "@/types";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { MediaGallery } from "@/components/features/media-gallery";
 
 export default function SiteDetailPage() {
   const params = useParams();
@@ -49,6 +52,7 @@ export default function SiteDetailPage() {
 
   const supervisionSite = sites.find((s) => s.id === siteId);
   const refSite = getSiteById(siteId);
+  const { media, loading: mediaLoading, error: mediaError } = useSiteMedia(siteId);
 
   useEffect(() => {
     if (sites.length === 0) setSites(MOCK_SITES);
@@ -207,6 +211,15 @@ export default function SiteDetailPage() {
                 Historique
               </TabsTrigger>
             )}
+            <TabsTrigger value="gallery" className="data-[state=active]:bg-purple-600/30">
+              <Images className="w-4 h-4 mr-2" />
+              Galerie
+              {media.length > 0 && (
+                <span className="ml-1.5 text-[10px] bg-purple-500/30 text-purple-300 rounded-full px-1.5 py-0.5">
+                  {media.length}
+                </span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           {/* ─── Onglet : Informations générales ─────────────────────────────── */}
@@ -598,6 +611,31 @@ export default function SiteDetailPage() {
           )}
 
           {/* ─── Onglet : Historique ─────────────────────────────────────────── */}
+          {/* ─── Onglet : Galerie multimédia ─────────────────────────────────── */}
+          <TabsContent value="gallery">
+            <Card className="bg-white/[0.02] border-white/[0.06]">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Images className="w-4 h-4 text-purple-400" />
+                  Galerie multimédia
+                  {media.length > 0 && (
+                    <span className="text-xs bg-purple-500/20 text-purple-300 rounded-full px-2 py-0.5">
+                      {media.length} fichier{media.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MediaGallery
+                  siteId={siteId}
+                  media={media}
+                  loading={mediaLoading}
+                  error={mediaError}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {refSite && (
             <TabsContent value="history">
               <Card className="bg-white/[0.02] border-white/[0.06]">

@@ -19,6 +19,7 @@ import {
   Server,
   X,
   RefreshCw,
+  CalendarClock,
 } from "lucide-react";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -494,7 +495,15 @@ export default function SitesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="font-medium text-white leading-tight">{site.name}</p>
+                        <p className="font-medium text-white leading-tight flex items-center gap-1.5 flex-wrap">
+                          {site.name}
+                          {site.inventoryStatus === "planned" || (!site.blackboxInstalled && site.likelyManagedByDSI) ? (
+                            <span className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded border bg-amber-500/10 text-amber-400 border-amber-500/20 font-medium">
+                              <CalendarClock className="w-2.5 h-2.5" />
+                              Installation prévue
+                            </span>
+                          ) : null}
+                        </p>
                         {site.aliases && site.aliases.length > 0 && (
                           <p className="text-[11px] text-gray-600 truncate max-w-[160px]">
                             {site.aliases.join(", ")}
