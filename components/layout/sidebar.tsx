@@ -17,7 +17,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AurionLogo } from "@/components/aurion-logo";
+import { AurionLogo } from "@/components/features/aurion-logo";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/store/useStore";
 import { useState } from "react";
