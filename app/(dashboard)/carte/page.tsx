@@ -11,7 +11,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 
 const InteractiveMap = dynamic(
-  () => import("@/components/interactive-map").then((mod) => mod.InteractiveMap),
+  () => import("@/components/features/interactive-map").then((mod) => mod.InteractiveMap),
   {
     ssr: false,
     loading: () => (

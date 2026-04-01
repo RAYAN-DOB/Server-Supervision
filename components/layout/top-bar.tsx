@@ -3,8 +3,8 @@
 import { Bell, Search, Command } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { UserMenu } from "@/components/user-menu";
-import { StatusIndicator } from "@/components/status-indicator";
+import { UserMenu } from "@/components/layout/user-menu";
+import { StatusIndicator } from "@/components/features/status-indicator";
 import { useStore } from "@/store/useStore";
 
 export function TopBar() {
