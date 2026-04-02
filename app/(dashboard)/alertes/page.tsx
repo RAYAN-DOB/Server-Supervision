@@ -61,6 +61,14 @@ export default function AlertesPage() {
     setExpandedId(null);
   };
 
+  const handleAcknowledgeAll = () => {
+    if (!currentUser) { toast.error("Vous devez être connecté"); return; }
+    const unacked = alerts.filter(a => !a.acknowledged && !a.resolved);
+    if (unacked.length === 0) { toast.info("Aucune alerte à acquitter"); return; }
+    unacked.forEach(a => acknowledgeAlert(a.id, currentUser.name));
+    toast.success(`${unacked.length} alerte${unacked.length > 1 ? "s" : ""} acquittée${unacked.length > 1 ? "s" : ""}`);
+  };
+
   const toggleSeverity = (s: string) => {
     setFilterSeverity((prev) =>
       prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
@@ -149,6 +157,17 @@ export default function AlertesPage() {
           >
             {showAcknowledged ? "Masquer acquittées" : "Voir acquittées"}
           </button>
+          {activeAlerts.length > 0 && (
+            <Button
+              variant="glass"
+              size="sm"
+              onClick={handleAcknowledgeAll}
+              className="text-green-400 border-green-500/20 hover:bg-green-500/10"
+            >
+              <CheckCircle2 className="w-4 h-4 mr-1.5" />
+              Tout acquitter ({activeAlerts.length})
+            </Button>
+          )}
           <Button variant="glass" size="sm" onClick={() => toast.info("Export en cours...")}>
             <Download className="w-4 h-4 mr-1.5" />
             Exporter

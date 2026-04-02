@@ -1,8 +1,9 @@
 "use client";
 
-import { Bell, Search, Command } from "lucide-react";
+import { Bell, Search, Command, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { UserMenu } from "@/components/layout/user-menu";
 import { StatusIndicator } from "@/components/features/status-indicator";
 import { useStore } from "@/store/useStore";
@@ -10,6 +11,15 @@ import { useStore } from "@/store/useStore";
 export function TopBar() {
   const { alerts } = useStore();
   const router = useRouter();
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const timeStr = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const dateStr = now.toLocaleDateString("fr-FR", { weekday: "short", day: "2-digit", month: "short" });
 
   const activeAlerts = alerts.filter(a => !a.acknowledged && !a.resolved);
   const criticalAlerts = activeAlerts.filter(a => a.severity === "critical");
@@ -45,6 +55,15 @@ export function TopBar() {
 
         {/* Right: status + notifications + user — tout en ligne, sans chevauchement */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Live Clock */}
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] shrink-0">
+            <Clock className="w-3.5 h-3.5 text-gray-500" />
+            <div className="text-right">
+              <p className="text-xs font-mono font-medium text-gray-300 leading-none">{timeStr}</p>
+              <p className="text-[10px] text-gray-600 leading-none mt-0.5 capitalize">{dateStr}</p>
+            </div>
+          </div>
+
           {/* En Direct */}
           <div className="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 shrink-0">
             <motion.div
