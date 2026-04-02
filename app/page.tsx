@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Activity, Shield, MapPin, Building2, Zap } from "lucide-react";
-import { AurionLogo } from "@/components/aurion-logo";
+import { AurionLogo } from "@/components/features/aurion-logo";
 
 export default function HomePage() {
   return (

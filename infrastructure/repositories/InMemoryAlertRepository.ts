@@ -1,7 +1,7 @@
 import type { IAlertRepository } from "@/core/domain/repositories";
 import type { AlertEntity, AlertStatus } from "@/core/domain/entities";
 import { alertStatusFromLegacy } from "@/core/domain/entities";
-import { MOCK_ALERTS } from "@/data/mock-sites";
+import { MOCK_ALERTS } from "@/data/mocks";
 import type { Alert } from "@/types";
 
 function legacyToEntity(alert: Alert): AlertEntity {

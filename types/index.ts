@@ -20,6 +20,25 @@ export type SiteCategory =
   | "technique"
   | "autre";
 
+/** Statut d'inventaire d'un site */
+export type InventoryStatus = "active" | "planned" | "maintenance";
+
+/** Entrée média liée à un site */
+export interface SiteMedia {
+  id: string;
+  url: string;
+  /** PHOTO_LOCAL | PHOTO_BAY | ZOOM_EQUIPMENT | PLAN_PDF */
+  type: string;
+  confidence: number | null;
+  siteId: string | null;
+  localId: string | null;
+  bayId: string | null;
+  equipmentId: string | null;
+  createdAt: string;
+  local?: { id: string; name: string } | null;
+  bay?: { id: string; name: string } | null;
+}
+
 /** Interface principale du référentiel des sites municipaux */
 export interface SiteReference {
   id: string;
@@ -67,6 +86,9 @@ export interface SiteReference {
   blackboxInstalledBy?: string | null;
   blackboxFirmware?: string | null;
   blackboxBayCount?: number;
+
+  /** Statut d'inventaire (issu du seed-inventory) */
+  inventoryStatus?: InventoryStatus;
 
   /** Données de supervision live (fusion avec mock/Zabbix) */
   supervisionStatus?: SiteStatus;
