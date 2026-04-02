@@ -29,6 +29,7 @@ import { useStore } from "@/store/useStore";
 import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
 import { formatRelativeTime } from "@/lib/utils";
 import type { Bay } from "@/types";
+import { hasSensorType, SITE_BB_EQUIPMENT, BB_LABELS } from "@/lib/blackbox-refs";
 
 export default function BayDetailPage() {
   const params = useParams();
@@ -37,6 +38,19 @@ export default function BayDetailPage() {
   const [loading, setLoading] = useState(true);
 
   const site = sites.find(s => s.id === params.id);
+  const siteId = params.id as string;
+  const hasKnownBB = siteId in SITE_BB_EQUIPMENT;
+  // Si le site a des équipements BB connus, n'afficher que ce qui est installé
+  const show = {
+    temperature: !hasKnownBB || hasSensorType(siteId, "temperature"),
+    humidity:    !hasKnownBB || hasSensorType(siteId, "humidity"),
+    smoke:       !hasKnownBB || hasSensorType(siteId, "smoke"),
+    water:       !hasKnownBB || hasSensorType(siteId, "water"),
+    door:        !hasKnownBB || hasSensorType(siteId, "door"),
+    power:       !hasKnownBB || hasSensorType(siteId, "power"),
+    airflow:     !hasKnownBB, // Pas de capteur BB pour le flux d'air
+    pressure:    !hasKnownBB, // Pas de capteur BB pour la pression
+  };
 
   useEffect(() => {
     if (sites.length === 0) {
@@ -119,99 +133,103 @@ export default function BayDetailPage() {
 
           {/* Sensors Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Temperature */}
-            <Card glow>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm">Température</CardTitle>
-                  <Thermometer className="w-5 h-5 text-nebula-magenta" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <SensorGauge
-                  value={bay.sensors.temperature.value}
-                  maxValue={40}
-                  unit="°C"
-                  label=""
-                  status={bay.sensors.temperature.status}
-                  size="sm"
-                />
-                <div className="mt-3 text-xs text-gray-400">
-                  <p>Seuil Warning: {bay.sensors.temperature.threshold.warning}°C</p>
-                  <p>Seuil Critical: {bay.sensors.temperature.threshold.critical}°C</p>
-                </div>
-              </CardContent>
-            </Card>
+            {show.temperature && (
+              <Card glow>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm">Température</CardTitle>
+                    <Thermometer className="w-5 h-5 text-nebula-magenta" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <SensorGauge
+                    value={bay.sensors.temperature.value}
+                    maxValue={40}
+                    unit="°C"
+                    label=""
+                    status={bay.sensors.temperature.status}
+                    size="sm"
+                  />
+                  <div className="mt-3 text-xs text-gray-400">
+                    <p>Seuil Warning: {bay.sensors.temperature.threshold.warning}°C</p>
+                    <p>Seuil Critical: {bay.sensors.temperature.threshold.critical}°C</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Humidity */}
-            <Card glow>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm">Humidité</CardTitle>
-                  <Droplets className="w-5 h-5 text-nebula-cyan" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <SensorGauge
-                  value={bay.sensors.humidity.value}
-                  maxValue={100}
-                  unit="%"
-                  label=""
-                  status={bay.sensors.humidity.status}
-                  size="sm"
-                />
-                <div className="mt-3 text-xs text-gray-400">
-                  <p>Seuil Warning: {bay.sensors.humidity.threshold.warning}%</p>
-                  <p>Seuil Critical: {bay.sensors.humidity.threshold.critical}%</p>
-                </div>
-              </CardContent>
-            </Card>
+            {show.humidity && (
+              <Card glow>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm">Humidité</CardTitle>
+                    <Droplets className="w-5 h-5 text-nebula-cyan" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <SensorGauge
+                    value={bay.sensors.humidity.value}
+                    maxValue={100}
+                    unit="%"
+                    label=""
+                    status={bay.sensors.humidity.status}
+                    size="sm"
+                  />
+                  <div className="mt-3 text-xs text-gray-400">
+                    <p>Seuil Warning: {bay.sensors.humidity.threshold.warning}%</p>
+                    <p>Seuil Critical: {bay.sensors.humidity.threshold.critical}%</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Airflow */}
-            <Card glow>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm">Flux d'Air</CardTitle>
-                  <Wind className="w-5 h-5 text-green-500" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <SensorGauge
-                  value={bay.sensors.airflow.value}
-                  maxValue={200}
-                  unit="m³/h"
-                  label=""
-                  status={bay.sensors.airflow.status}
-                  size="sm"
-                />
-                <div className="mt-3 text-xs text-gray-400">
-                  <p>Flux normal: 120-150 m³/h</p>
-                </div>
-              </CardContent>
-            </Card>
+            {show.airflow && (
+              <Card glow>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm">Flux d&apos;Air</CardTitle>
+                    <Wind className="w-5 h-5 text-green-500" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <SensorGauge
+                    value={bay.sensors.airflow.value}
+                    maxValue={200}
+                    unit="m³/h"
+                    label=""
+                    status={bay.sensors.airflow.status}
+                    size="sm"
+                  />
+                  <div className="mt-3 text-xs text-gray-400">
+                    <p>Flux normal: 120-150 m³/h</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Pressure */}
-            <Card glow>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm">Pression</CardTitle>
-                  <Gauge className="w-5 h-5 text-yellow-500" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <SensorGauge
-                  value={bay.sensors.pressure.value}
-                  maxValue={1050}
-                  unit="hPa"
-                  label=""
-                  status={bay.sensors.pressure.status}
-                  size="sm"
-                />
-                <div className="mt-3 text-xs text-gray-400">
-                  <p>Pression standard: ~1013 hPa</p>
-                </div>
-              </CardContent>
-            </Card>
+            {show.pressure && (
+              <Card glow>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm">Pression</CardTitle>
+                    <Gauge className="w-5 h-5 text-yellow-500" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <SensorGauge
+                    value={bay.sensors.pressure.value}
+                    maxValue={1050}
+                    unit="hPa"
+                    label=""
+                    status={bay.sensors.pressure.status}
+                    size="sm"
+                  />
+                  <div className="mt-3 text-xs text-gray-400">
+                    <p>Pression standard: ~1013 hPa</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Binary Sensors & Status */}
@@ -224,11 +242,11 @@ export default function BayDetailPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {[
-                  { icon: Flame, label: "Détecteur Fumée", sensor: bay.sensors.smoke, critical: true },
-                  { icon: Droplets, label: "Détecteur Eau", sensor: bay.sensors.water, critical: true },
-                  { icon: DoorOpen, label: "Capteur Porte", sensor: bay.sensors.door, critical: false },
-                  { icon: Zap, label: "Alimentation 230V", sensor: bay.sensors.power230v, critical: false },
-                ].map((item) => {
+                  { key: "smoke", icon: Flame,    label: "Détecteur Fumée",  sensor: bay.sensors.smoke,    critical: true },
+                  { key: "water", icon: Droplets,  label: "Détecteur Eau",    sensor: bay.sensors.water,    critical: true },
+                  { key: "door",  icon: DoorOpen,  label: "Capteur Porte",    sensor: bay.sensors.door,     critical: false },
+                  { key: "power", icon: Zap,       label: "Alimentation 230V",sensor: bay.sensors.power230v,critical: false },
+                ].filter(item => show[item.key as keyof typeof show]).map((item) => {
                   const Icon = item.icon;
                   return (
                     <div
@@ -312,6 +330,32 @@ export default function BayDetailPage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Équipements Black Box installés */}
+          {hasKnownBB && (
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
+                  Équipements Black Box ServSensor
+                </CardTitle>
+                <CardDescription>Capteurs physiquement installés sur ce site</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {(SITE_BB_EQUIPMENT[siteId] ?? []).flatMap(b => b.refs).map(ref => (
+                    <span
+                      key={ref}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs text-purple-300"
+                    >
+                      <span className="font-mono font-semibold">{ref}</span>
+                      <span className="text-gray-500">— {BB_LABELS[ref]?.split(" — ")[0] ?? ""}</span>
+                    </span>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Alerts for this Bay */}
           {bay.status !== "ok" && (

@@ -100,11 +100,12 @@ model Bay {
 // ─── Équipements ─────────────────────────────────────────────────────────────
 
 model Equipment {
-  id    String  @id @default(cuid())
-  bayId String
-  name  String
-  model String?
-  type  String  // SWITCH | SERVER | UPS | SENSOR_HUB | OTHER
+  id             String  @id @default(cuid())
+  bayId          String
+  name           String
+  model          String?
+  modelReference String?  // ex: EME1-168A, EME1TH2-005, EME1A1-005
+  type           String   // SWITCH | SERVER | UPS | SENSOR_HUB | OTHER
 
   bay   Bay     @relation(fields: [bayId], references: [id], onDelete: Cascade)
   media Media[]

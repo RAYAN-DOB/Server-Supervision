@@ -15,6 +15,7 @@
     "db:seed": "npx tsx prisma/seed.ts",
     "db:seed-inventory": "npx tsx prisma/seed-inventory.ts",
     "inventory:map": "npx tsx scripts/generate-mapping.ts",
+    "inventory:map-js": "node scripts/generate-media-mapping.js",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
