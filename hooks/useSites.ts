@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "@/store/useStore";
-import { MOCK_SITES } from "@/data/mock-sites";
+import { MOCK_SITES } from "@/data/mocks";
 import { useEffect } from "react";
 
 export function useSites() {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getZabbixClient, getZabbixStatus, mapZabbixHostToSite } from "@/lib/zabbix/client";
-import { MOCK_SITES } from "@/data/mock-sites";
+import { MOCK_SITES } from "@/data/mocks";
 
 export async function GET() {
   const status = await getZabbixStatus();

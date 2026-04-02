@@ -1,7 +1,7 @@
 import type { ISiteRepository, SiteStats } from "@/core/domain/repositories";
 import type { SiteEntity, SiteWithSupervision } from "@/core/domain/entities";
 import type { SiteReference, Site } from "@/types";
-import { MOCK_SITES } from "@/data/mock-sites";
+import { MOCK_SITES } from "@/data/mocks";
 import fs from "fs";
 import path from "path";
 

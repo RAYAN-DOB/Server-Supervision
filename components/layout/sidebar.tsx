@@ -17,7 +17,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AurionLogo } from "@/components/aurion-logo";
+import { AurionLogo } from "@/components/features/aurion-logo";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/store/useStore";
 import { useState } from "react";
@@ -141,9 +141,11 @@ export function Sidebar() {
                   return (
                     <Link key={item.href} href={item.href} onClick={handleNavigation}>
                       <motion.div
-                        whileHover={{ x: 4 }}
+                        whileHover={{ x: collapsed ? 0 : 4 }}
+                        title={collapsed ? item.name : undefined}
                         className={cn(
                           "relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                          collapsed && "justify-center",
                           isActive
                             ? "bg-gradient-to-r from-purple-600/20 to-cyan-600/20 border border-purple-500/30 text-white"
                             : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
@@ -156,12 +158,12 @@ export function Sidebar() {
                             transition={{ type: "spring", stiffness: 380, damping: 30 }}
                           />
                         )}
-                        
+
                         <Icon className={cn(
                           "w-5 h-5 flex-shrink-0",
                           isActive && "text-purple-400"
                         )} />
-                        
+
                         {!collapsed && (
                           <>
                             <div className="flex-1 min-w-0">
@@ -170,7 +172,7 @@ export function Sidebar() {
                                 {item.description}
                               </p>
                             </div>
-                            
+
                             {alertCount > 0 && (
                               <Badge
                                 variant={criticalAlerts.length > 0 ? "critical" : "warning"}
