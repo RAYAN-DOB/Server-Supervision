@@ -57,6 +57,7 @@ export const BB_LABELS: Record<string, string> = {
  * Si un site n'a que EME1TH2-005, seules les jauges Temp/Humidité s'affichent.
  */
 export const SITE_BB_EQUIPMENT: Record<string, { bayPrefix: string; refs: BBRef[] }[]> = {
+  // ── Sites avec capteurs ACTIFS ─────────────────────────────────────────────
   HTDV: [
     {
       bayPrefix: "LT-01",
@@ -85,16 +86,7 @@ export const SITE_BB_EQUIPMENT: Record<string, { bayPrefix: string; refs: BBRef[
       ],
     },
   ],
-  NECC: [
-    {
-      bayPrefix: "LT-13",
-      refs: [BB.TEMP_HUMIDITY],
-    },
-    {
-      bayPrefix: "LT-14",
-      refs: [BB.TEMP_HUMIDITY],
-    },
-  ],
+  // Ajouter ici les futurs sites lors de leur mise en service
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
