@@ -19,8 +19,6 @@ import {
   Download,
   AlertTriangle,
 } from "lucide-react";
-import { Navbar } from "@/components/layout/navbar";
-import { GradientBackground } from "@/components/ui/gradient-background";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,8 +65,7 @@ export default function BayDetailPage() {
 
   if (loading || !site || !bay) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <GradientBackground />
+      <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 mx-auto mb-4 text-nebula-cyan animate-spin" />
           <p className="text-gray-400">Chargement...</p>
@@ -78,12 +75,8 @@ export default function BayDetailPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <GradientBackground />
-      <Navbar />
-
-      <div className="relative">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-1 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-7xl">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
             <Link href="/sites" className="hover:text-white transition-colors">Sites</Link>
@@ -381,7 +374,6 @@ export default function BayDetailPage() {
               </CardContent>
             </Card>
           )}
-        </div>
       </div>
     </div>
   );

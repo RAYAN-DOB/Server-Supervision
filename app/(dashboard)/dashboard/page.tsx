@@ -16,7 +16,12 @@ import {
   WifiOff,
   CheckCircle2,
   BookOpen,
+  Droplets,
+  Flame,
+  DoorOpen,
+  ShieldCheck,
 } from "lucide-react";
+import { SITE_BB_EQUIPMENT, BB_LABELS, hasSensorType } from "@/lib/blackbox-refs";
 import { Badge } from "@/components/ui/badge";
 import { useStore } from "@/store/useStore";
 import { useSitesReference } from "@/hooks/useSitesReference";
@@ -212,6 +217,110 @@ export default function DashboardPage() {
           );
         })}
       </div>
+
+      {/* Sites en Supervision Active */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.32 }}
+        className="mb-6"
+      >
+        <div className="clean-card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-sm font-semibold text-white">Sites en Supervision Active</h3>
+              <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full px-2 py-0.5">
+                {Object.keys(SITE_BB_EQUIPMENT).length} site{Object.keys(SITE_BB_EQUIPMENT).length > 1 ? "s" : ""}
+              </span>
+            </div>
+            <Link href="/sites">
+              <span className="text-xs text-gray-500 hover:text-purple-400 transition-colors">Détails →</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {Object.entries(SITE_BB_EQUIPMENT).map(([siteId, bays]) => {
+              const liveSite = sites.find(s => s.id === siteId);
+              const temp = liveSite?.temperature ?? 22.5;
+              const tempStatus = temp > 27 ? "critical" : temp > 24 ? "warning" : "ok";
+              const sensors = {
+                temperature: hasSensorType(siteId, "temperature"),
+                humidity: hasSensorType(siteId, "humidity"),
+                smoke: hasSensorType(siteId, "smoke"),
+                water: hasSensorType(siteId, "water"),
+                door: hasSensorType(siteId, "door"),
+                power: hasSensorType(siteId, "power"),
+              };
+              return (
+                <Link key={siteId} href={`/sites/${siteId}`}>
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15 hover:border-emerald-500/30 transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                          <Building2 className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-white">{siteId}</p>
+                          <p className="text-[10px] text-gray-500">{bays[0]?.bayPrefix ?? "—"}</p>
+                        </div>
+                      </div>
+                      <div className={cn(
+                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border",
+                        tempStatus === "critical" ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                        tempStatus === "warning" ? "bg-orange-500/10 text-orange-400 border-orange-500/20" :
+                        "bg-green-500/10 text-green-400 border-green-500/20"
+                      )}>
+                        <span className={cn(
+                          "w-1.5 h-1.5 rounded-full",
+                          tempStatus === "critical" ? "bg-red-500 animate-pulse" :
+                          tempStatus === "warning" ? "bg-orange-500 animate-pulse" :
+                          "bg-green-500"
+                        )} />
+                        {liveSite ? (tempStatus === "ok" ? "Nominal" : tempStatus === "warning" ? "Attention" : "Critique") : "En ligne"}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      {sensors.temperature && (
+                        <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                          <Thermometer className="w-3 h-3 text-orange-400" />
+                          {liveSite ? `${temp.toFixed(1)}°C` : "—"}
+                        </span>
+                      )}
+                      {sensors.humidity && (
+                        <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                          <Droplets className="w-3 h-3 text-cyan-400" />
+                          {liveSite ? `${liveSite.humidity.toFixed(0)}%` : "—"}
+                        </span>
+                      )}
+                      {sensors.smoke && (
+                        <span className="flex items-center gap-1 text-[11px] text-gray-500">
+                          <Flame className="w-3 h-3 text-gray-500" />
+                          Fumée
+                        </span>
+                      )}
+                      {sensors.door && (
+                        <span className="flex items-center gap-1 text-[11px] text-gray-500">
+                          <DoorOpen className="w-3 h-3 text-gray-500" />
+                          Porte
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-[10px] text-gray-600">
+                        {bays.flatMap(b => b.refs).length} capteur{bays.flatMap(b => b.refs).length > 1 ? "s" : ""} BlackBox
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-gray-700 group-hover:text-gray-400 transition-colors" />
+                    </div>
+                  </motion.div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </motion.div>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
