@@ -38,6 +38,7 @@ import { formatTemperature } from "@/lib/utils";
 import type { Bay } from "@/types";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { MediaGallery } from "@/components/features/media-gallery";
+import { hasSensorType } from "@/lib/blackbox-refs";
 
 export default function SiteDetailPage() {
   const params = useParams();
@@ -105,10 +106,10 @@ export default function SiteDetailPage() {
   const displayAddress = refSite?.address ?? supervisionSite?.address ?? "—";
 
   // KPIs supervision
-  const avgTemp = supervisionSite
+  const avgTemp = supervisionSite && hasSensorType(siteId, "temperature")
     ? bays.reduce((sum, b) => sum + b.sensors.temperature.value, 0) / (bays.length || 1)
     : null;
-  const avgHumidity = supervisionSite
+  const avgHumidity = supervisionSite && hasSensorType(siteId, "humidity")
     ? bays.reduce((sum, b) => sum + b.sensors.humidity.value, 0) / (bays.length || 1)
     : null;
   const totalPower = supervisionSite
@@ -520,6 +521,19 @@ export default function SiteDetailPage() {
                         </p>
                       </div>
                       <Thermometer className="w-8 h-8 text-orange-400 opacity-30" />
+                    </CardContent>
+                  </Card>
+                )}
+                {avgHumidity != null && (
+                  <Card className="bg-white/[0.02] border-white/[0.06]">
+                    <CardContent className="p-4 flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-400 mb-1">Humidité</p>
+                        <p className="text-2xl font-bold text-cyan-400">
+                          {avgHumidity.toFixed(0)}%
+                        </p>
+                      </div>
+                      <Droplets className="w-8 h-8 text-cyan-400 opacity-30" />
                     </CardContent>
                   </Card>
                 )}

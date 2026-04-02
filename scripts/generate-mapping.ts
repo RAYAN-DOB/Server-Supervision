@@ -23,7 +23,7 @@ function getArg(name: string, fallback: string): string {
 
 const INVENTORY_PATH = getArg("--inventory-path", path.join(process.cwd(), "..", "aurion-sites-inventory"));
 const OUTPUT_PATH = getArg("--output", path.join(process.cwd(), "data", "inventory-mapping.json"));
-const PUBLIC_BASE = "/inventory"; // URL base publique dans Next.js (/public/inventory/)
+const PUBLIC_BASE = "/api/media"; // Servi via app/api/media/[...path]/route.ts (pas de copie dans /public)
 
 // ─── Correspondances codes sites ──────────────────────────────────────────────
 
