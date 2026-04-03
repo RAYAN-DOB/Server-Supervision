@@ -42,7 +42,8 @@ export default function BayDetailPage() {
   const siteId = params.id as string;
   const bayId = params.baieId as string;
   const hasKnownBB = siteId in SITE_BB_EQUIPMENT;
-  const { media: allMedia, loading: mediaLoading, forBay } = useSiteMedia(siteId);
+  const { loading: mediaLoading, forBay } = useSiteMedia(siteId);
+  const bayMedia = forBay(bayId);
   // Si le site a des équipements BB connus, n'afficher que ce qui est installé
   const show = {
     temperature: !hasKnownBB || hasSensorType(siteId, "temperature"),
@@ -386,9 +387,9 @@ export default function BayDetailPage() {
               <CardTitle className="text-base flex items-center gap-2">
                 <Images className="w-4 h-4 text-purple-400" />
                 Galerie — {bay.name}
-                {!mediaLoading && forBay(bayId).length > 0 && (
+                {!mediaLoading && bayMedia.length > 0 && (
                   <span className="text-xs bg-purple-500/20 text-purple-300 rounded-full px-2 py-0.5">
-                    {forBay(bayId).length} photo{forBay(bayId).length > 1 ? "s" : ""}
+                    {bayMedia.length} photo{bayMedia.length > 1 ? "s" : ""}
                   </span>
                 )}
               </CardTitle>
@@ -397,7 +398,7 @@ export default function BayDetailPage() {
             <CardContent>
               <MediaGallery
                 siteId={siteId}
-                media={forBay(bayId)}
+                media={bayMedia}
                 loading={mediaLoading}
                 error={null}
               />

@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { SiteMedia } from "@/types";
-import { generateMockMediaForSite, getMockMediaForBay } from "@/data/mocks";
-import { generateBaysForSite } from "@/data/mocks";
-import { useStore } from "@/store/useStore";
+import { getRealPhotosForSite, SITES_WITH_PHOTOS } from "@/data/site-photos";
 
 interface UseSiteMediaReturn {
   media: SiteMedia[];
@@ -19,54 +17,42 @@ export function useSiteMedia(siteId: string): UseSiteMediaReturn {
   const [media, setMedia] = useState<SiteMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { sites } = useStore();
 
   const reload = useCallback(async () => {
     if (!siteId) return;
     setLoading(true);
     setError(null);
+
+    // 1. Vraies photos depuis GitHub (hardcodées dans site-photos.ts)
+    if (SITES_WITH_PHOTOS.includes(siteId)) {
+      const real = getRealPhotosForSite(siteId);
+      if (real.length > 0) {
+        setMedia(real);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // 2. Tenter l'API Prisma (si inventaire seedé en base)
     try {
       const res = await fetch(`/api/v1/sites/${siteId}/media`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const fetched: SiteMedia[] = data.media ?? [];
-
-      if (fetched.length > 0) {
-        setMedia(fetched);
-      } else {
-        // Fallback : générer des médias de démonstration depuis les baies mockées
-        const site = sites.find((s) => s.id === siteId);
-        if (site) {
-          const bays = generateBaysForSite(site.id, site.name, site.bayCount);
-          const mockMedia = generateMockMediaForSite(
-            siteId,
-            bays.map((b) => ({ id: b.id, name: b.name }))
-          );
-          setMedia(mockMedia);
-        } else {
-          setMedia([]);
+      if (res.ok) {
+        const data = await res.json();
+        const fetched: SiteMedia[] = data.media ?? [];
+        if (fetched.length > 0) {
+          setMedia(fetched);
+          setLoading(false);
+          return;
         }
       }
-    } catch (err) {
-      console.warn("[useSiteMedia] API non disponible, utilisation des médias mockés.", err);
-      // En cas d'erreur réseau, utiliser les mocks
-      const site = sites.find((s) => s.id === siteId);
-      if (site) {
-        const bays = generateBaysForSite(site.id, site.name, site.bayCount);
-        const mockMedia = generateMockMediaForSite(
-          siteId,
-          bays.map((b) => ({ id: b.id, name: b.name }))
-        );
-        setMedia(mockMedia);
-        setError(null); // On a des données, pas d'erreur à afficher
-      } else {
-        setError(null);
-        setMedia([]);
-      }
-    } finally {
-      setLoading(false);
+    } catch {
+      // API indisponible, continuer
     }
-  }, [siteId, sites]);
+
+    // 3. Aucune photo connue
+    setMedia([]);
+    setLoading(false);
+  }, [siteId]);
 
   useEffect(() => {
     reload();
@@ -77,8 +63,27 @@ export function useSiteMedia(siteId: string): UseSiteMediaReturn {
     [media]
   );
 
+  // Filtre par nom de baie (ex: "LT-01") ou retourne tout
   const forBay = useCallback(
-    (bayId: string) => getMockMediaForBay(media, bayId),
+    (bayIdOrName: string) => {
+      // Essai 1 : match sur bay.name ou bay.id exact
+      const byBayName = media.filter(
+        (m) => m.bay?.name === bayIdOrName || m.bay?.id === bayIdOrName
+      );
+      if (byBayName.length > 0) return byBayName;
+
+      // Essai 2 : numéro LT (ex "LT-01" dans "LT - 01")
+      const ltNum = bayIdOrName.replace(/[^0-9]/g, "");
+      if (ltNum) {
+        const byLt = media.filter(
+          (m) => m.bay?.name?.replace(/[^0-9]/g, "") === ltNum
+        );
+        if (byLt.length > 0) return byLt;
+      }
+
+      // Essai 3 : toutes les photos du site (site à une seule baie)
+      return media;
+    },
     [media]
   );
 
