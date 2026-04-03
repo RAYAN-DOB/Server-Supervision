@@ -18,6 +18,7 @@ import {
   RefreshCw,
   Download,
   AlertTriangle,
+  Images,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +29,8 @@ import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
 import { formatRelativeTime } from "@/lib/utils";
 import type { Bay } from "@/types";
 import { hasSensorType, SITE_BB_EQUIPMENT, BB_LABELS } from "@/lib/blackbox-refs";
+import { useSiteMedia } from "@/hooks/useSiteMedia";
+import { MediaGallery } from "@/components/features/media-gallery";
 
 export default function BayDetailPage() {
   const params = useParams();
@@ -37,7 +40,10 @@ export default function BayDetailPage() {
 
   const site = sites.find(s => s.id === params.id);
   const siteId = params.id as string;
+  const bayId = params.baieId as string;
   const hasKnownBB = siteId in SITE_BB_EQUIPMENT;
+  const { loading: mediaLoading, forBay } = useSiteMedia(siteId);
+  const bayMedia = forBay(bayId);
   // Si le site a des équipements BB connus, n'afficher que ce qui est installé
   const show = {
     temperature: !hasKnownBB || hasSensorType(siteId, "temperature"),
@@ -352,7 +358,7 @@ export default function BayDetailPage() {
 
           {/* Alerts for this Bay */}
           {bay.status !== "ok" && (
-            <Card className="border-yellow-500/30">
+            <Card className="border-yellow-500/30 mb-8">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-yellow-500" />
@@ -374,6 +380,30 @@ export default function BayDetailPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Galerie multimédia de la baie */}
+          <Card className="bg-white/[0.02] border-white/[0.06]">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Images className="w-4 h-4 text-purple-400" />
+                Galerie — {bay.name}
+                {!mediaLoading && bayMedia.length > 0 && (
+                  <span className="text-xs bg-purple-500/20 text-purple-300 rounded-full px-2 py-0.5">
+                    {bayMedia.length} photo{bayMedia.length > 1 ? "s" : ""}
+                  </span>
+                )}
+              </CardTitle>
+              <CardDescription>Photos et documents associés à cette baie</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MediaGallery
+                siteId={siteId}
+                media={bayMedia}
+                loading={mediaLoading}
+                error={null}
+              />
+            </CardContent>
+          </Card>
       </div>
     </div>
   );

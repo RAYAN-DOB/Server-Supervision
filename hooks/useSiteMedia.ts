@@ -63,16 +63,16 @@ export function useSiteMedia(siteId: string): UseSiteMediaReturn {
     [media]
   );
 
-  // Pour la page baie : filtre par bayName (ex: "LT-01") ou retourne tout
+  // Filtre par nom de baie (ex: "LT-01") ou retourne tout
   const forBay = useCallback(
     (bayIdOrName: string) => {
-      // Essai 1 : match sur bay.name exact
+      // Essai 1 : match sur bay.name ou bay.id exact
       const byBayName = media.filter(
         (m) => m.bay?.name === bayIdOrName || m.bay?.id === bayIdOrName
       );
       if (byBayName.length > 0) return byBayName;
 
-      // Essai 2 : bay name contient le LT number (ex "LT-01" dans "LT - 01")
+      // Essai 2 : numéro LT (ex "LT-01" dans "LT - 01")
       const ltNum = bayIdOrName.replace(/[^0-9]/g, "");
       if (ltNum) {
         const byLt = media.filter(
@@ -81,7 +81,7 @@ export function useSiteMedia(siteId: string): UseSiteMediaReturn {
         if (byLt.length > 0) return byLt;
       }
 
-      // Essai 3 : retourner toutes les photos du site (site à une seule baie)
+      // Essai 3 : toutes les photos du site (site à une seule baie)
       return media;
     },
     [media]
