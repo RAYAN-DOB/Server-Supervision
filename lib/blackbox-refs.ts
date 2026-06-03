@@ -86,6 +86,17 @@ export const SITE_BB_EQUIPMENT: Record<string, { bayPrefix: string; refs: BBRef[
       ],
     },
   ],
+  "DEMO-LAB": [
+    {
+      bayPrefix: "LAB-01",
+      refs: [
+        BB.SERVSENSOR_PLUS,
+        BB.TEMP_HUMIDITY,
+        BB.VOLTAGE,
+        BB.LCD_DISPLAY,
+      ],
+    },
+  ],
   // Ajouter ici les futurs sites lors de leur mise en service
 };
 

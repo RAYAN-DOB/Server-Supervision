@@ -7,13 +7,10 @@ import {
   AlertTriangle,
   Thermometer,
   Activity,
-  Zap,
-  MapPin,
   ChevronRight,
   ArrowUpRight,
   ArrowDownRight,
   Wifi,
-  WifiOff,
   CheckCircle2,
   BookOpen,
   Droplets,
@@ -50,15 +47,19 @@ export default function DashboardPage() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
   useEffect(() => {
-    if (sites.length === 0) setSites(MOCK_SITES);
-    if (alerts.length === 0) setAlerts(MOCK_ALERTS);
+    if (sites.length === 0 || !sites.some((site) => site.id === "DEMO-LAB")) {
+      setSites(MOCK_SITES);
+    }
+    if (alerts.length === 0 || !alerts.some((alert) => alert.siteId === "DEMO-LAB")) {
+      setAlerts(MOCK_ALERTS);
+    }
 
     const interval = setInterval(() => {
       setAvgTemp(+(22 + Math.sin(Date.now() / 10000) * 2).toFixed(1));
       setLastUpdate(new Date());
     }, 5000);
     return () => clearInterval(interval);
-  }, [sites.length, alerts.length, setSites, setAlerts]);
+  }, [sites, sites.length, alerts, alerts.length, setSites, setAlerts]);
 
   const activeAlerts = alerts.filter((a) => !a.acknowledged && !a.resolved);
   const criticalAlerts = activeAlerts.filter((a) => a.severity === "critical");
@@ -116,7 +117,7 @@ export default function DashboardPage() {
       accent: avgTemp > 24 ? "from-orange-500/20 to-orange-500/5" : "from-green-500/20 to-green-500/5",
       border: avgTemp > 24 ? "border-orange-500/20" : "border-green-500/20",
       iconColor: avgTemp > 24 ? "text-orange-400" : "text-green-400",
-      href: "/analytics",
+      href: "/demo",
     },
     {
       label: "Disponibilité",
@@ -128,7 +129,7 @@ export default function DashboardPage() {
       accent: "from-cyan-500/20 to-cyan-500/5",
       border: "border-cyan-500/20",
       iconColor: "text-cyan-400",
-      href: "/analytics",
+      href: "/architecture",
     },
   ];
 
@@ -140,7 +141,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 flex-1 scan-line">
+    <div className="p-4 sm:p-6 lg:p-8 flex-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -149,7 +150,7 @@ export default function DashboardPage() {
       >
         <div>
           <h1 className="text-3xl font-bold text-white tracking-tight mb-1">
-            <span className="gradient-text-color">Command Center</span>
+            Supervision AURION
           </h1>
           <p className="text-sm text-gray-500 font-light flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5">
@@ -187,7 +188,7 @@ export default function DashboardPage() {
             >
               <Link href={stat.href}>
                 <div className={cn(
-                  "holo-card relative overflow-hidden rounded-2xl border p-5 cursor-pointer group bg-gradient-to-br",
+                  "relative overflow-hidden rounded-2xl border p-5 cursor-pointer group bg-gradient-to-br transition-all hover:-translate-y-0.5 hover:border-white/20",
                   stat.accent,
                   stat.border,
                   stat.label === "Alertes actives" && criticalAlerts.length > 0 && "alert-glow-critical"
@@ -207,7 +208,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-white tracking-tight mb-0.5 neon-text">{stat.value}</div>
+                  <div className="text-3xl font-bold text-white tracking-tight mb-0.5">{stat.value}</div>
                   <div className="text-sm font-medium text-gray-300 mb-1">{stat.label}</div>
                   <div className="text-xs text-gray-500 font-light">{stat.sub}</div>
                   <ChevronRight className="absolute right-4 bottom-4 w-4 h-4 text-gray-700 group-hover:text-gray-400 group-hover:translate-x-1 transition-all" />
@@ -396,11 +397,10 @@ export default function DashboardPage() {
             <h3 className="text-sm font-semibold text-white mb-3">Accès rapide</h3>
             <div className="space-y-1">
               {[
-                { label: "Carte des sites", href: "/carte", icon: MapPin, sub: `${refStats.withCoordinates} géolocalisés` },
-                { label: "Référentiel", href: "/sites", icon: BookOpen, sub: `${refStats.total} sites` },
+                { label: "Sites supervisés", href: "/sites", icon: BookOpen, sub: `HTDV, PLDS, DEMO-LAB` },
+                { label: "Démo Live", href: "/demo", icon: Wifi, sub: "Zabbix + Black Box" },
                 { label: "Centre d'alertes", href: "/alertes", icon: AlertTriangle, sub: `${activeAlerts.length} active${activeAlerts.length !== 1 ? "s" : ""}` },
-                { label: "Analytics", href: "/analytics", icon: Activity, sub: "Graphiques" },
-                { label: "Rapports", href: "/rapports", icon: Zap, sub: "Exports PDF / CSV" },
+                { label: "Architecture", href: "/architecture", icon: ShieldCheck, sub: "Chaîne complète" },
               ].map((link) => {
                 const Icon = link.icon;
                 return (

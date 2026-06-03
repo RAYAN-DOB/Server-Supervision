@@ -40,6 +40,21 @@ export const MOCK_SITES: Site[] = [
     uptime: 98.5,
     powerConsumption: 8.3,
   },
+  {
+    id: "DEMO-LAB",
+    name: "Démo Lab",
+    address: "Mini-lab BTS CIEL IR — Proxmox / Zabbix / Black Box",
+    type: "technique",
+    status: "warning",
+    coordinates: MAISONS_ALFORT_CENTER,
+    bayCount: 1,
+    alertCount: 1,
+    lastUpdate: new Date().toISOString(),
+    temperature: 28.4,
+    humidity: 48,
+    uptime: 99.1,
+    powerConsumption: 0.2,
+  },
 ];
 
 // Générateur de capteurs avec variation dynamique
@@ -118,7 +133,7 @@ export function generateBaysForSite(siteId: string, siteName: string, count: num
     const status = i === 1 && siteName.includes("Marché") ? "critical" : 
                    i === 2 && siteName.includes("Palais") ? "warning" : "ok";
     
-    const isBlackBox = siteId === "HTDV" || siteId === "PLDS";
+    const isBlackBox = siteId === "HTDV" || siteId === "PLDS" || siteId === "DEMO-LAB";
     bays.push({
       id: `${siteId}-bay-${i}`,
       siteId,
@@ -139,6 +154,22 @@ export function generateBaysForSite(siteId: string, siteName: string, count: num
 }
 
 export const MOCK_ALERTS: Alert[] = [
+  {
+    id: "alert-demo-1",
+    siteId: "DEMO-LAB",
+    siteName: "Démo Lab",
+    bayId: "DEMO-LAB-bay-1",
+    bayName: "Mini baie de démonstration",
+    severity: "major",
+    title: "Température élevée — Démo Black Box",
+    description: "Trigger de démonstration : la température du capteur Black Box dépasse le seuil Warning configuré dans Zabbix.",
+    timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    acknowledged: false,
+    resolved: false,
+    sensorType: "temperature",
+    value: 28.4,
+    threshold: 27,
+  },
   {
     id: "alert-1",
     siteId: "PLDS",

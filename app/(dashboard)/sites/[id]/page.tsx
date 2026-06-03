@@ -54,8 +54,10 @@ export default function SiteDetailPage() {
   const { media, loading: mediaLoading, error: mediaError } = useSiteMedia(siteId);
 
   useEffect(() => {
-    if (sites.length === 0) setSites(MOCK_SITES);
-  }, [sites.length, setSites]);
+    if (sites.length === 0 || !sites.some((site) => site.id === "DEMO-LAB")) {
+      setSites(MOCK_SITES);
+    }
+  }, [sites, sites.length, setSites]);
 
   useEffect(() => {
     if (supervisionSite) {
@@ -408,8 +410,8 @@ export default function SiteDetailPage() {
                         {refSite.blackboxInstalledBy && (
                           <InfoRow label="Installé par" value={refSite.blackboxInstalledBy} />
                         )}
-                        <div className="col-span-2 mt-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
-                          <span className="font-semibold">Note :</span> Les données de supervision sont simulées localement. L&apos;intégration Zabbix est en cours de finalisation — les données seront synchronisées automatiquement une fois l&apos;API connectée.
+                        <div className="col-span-2 mt-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200">
+                          <span className="font-semibold">Note :</span> ce site est exploitable en mode démo ou avec une vraie API Zabbix. Le host, les items SNMP/OID et les triggers restent pilotés côté Zabbix ; AURION sert de lecture simplifiée pour la DSI.
                         </div>
                       </CardContent>
                     </Card>
