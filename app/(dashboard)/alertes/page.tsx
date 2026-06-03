@@ -32,8 +32,10 @@ export default function AlertesPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (alerts.length === 0) setAlerts(MOCK_ALERTS);
-  }, [alerts.length, setAlerts]);
+    if (alerts.length === 0 || !alerts.some((alert) => alert.siteId === "DEMO-LAB")) {
+      setAlerts(MOCK_ALERTS);
+    }
+  }, [alerts, alerts.length, setAlerts]);
 
   const filteredAlerts = alerts
     .filter((a) => {

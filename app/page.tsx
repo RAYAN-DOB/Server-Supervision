@@ -51,7 +51,7 @@ export default function HomePage() {
           transition={{ delay: 0.9, duration: 0.8 }}
           className="text-lg text-gray-500 font-light tracking-wide mb-6 max-w-lg"
         >
-          Supervision et référentiel des sites municipaux de Maisons-Alfort
+          Supervision environnementale des salles serveurs et du mini-lab de démonstration
         </motion.p>
 
         {/* Features pills */}
@@ -62,8 +62,8 @@ export default function HomePage() {
           className="flex flex-wrap justify-center gap-3 mb-12"
         >
           {[
-            { icon: Building2, label: "36 sites", color: "text-purple-400" },
-            { icon: MapPin, label: "Carte interactive", color: "text-cyan-400" },
+            { icon: Building2, label: "HTDV / PLDS / DEMO-LAB", color: "text-purple-400" },
+            { icon: MapPin, label: "Sites supervisés", color: "text-cyan-400" },
             { icon: Shield, label: "Supervision sécurisée", color: "text-green-400" },
             { icon: Zap, label: "Temps réel", color: "text-amber-400" },
           ].map(({ icon: Icon, label, color }, i) => (

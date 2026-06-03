@@ -54,6 +54,11 @@ const DEFAULT_FILTERS: Filters = {
 };
 
 const PAGE_SIZE = 20;
+const DEMO_PRIORITY: Record<string, number> = {
+  "DEMO-LAB": 0,
+  HTDV: 1,
+  PLDS: 2,
+};
 
 // ─── Utilitaires export ───────────────────────────────────────────────────────
 
@@ -179,6 +184,10 @@ export default function SitesPage() {
 
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
+      const pa = DEMO_PRIORITY[a.id] ?? 99;
+      const pb = DEMO_PRIORITY[b.id] ?? 99;
+      if (pa !== pb) return pa - pb;
+
       const va = (a as unknown as Record<string, unknown>)[sort.field] ?? "";
       const vb = (b as unknown as Record<string, unknown>)[sort.field] ?? "";
       const cmp =
@@ -480,7 +489,7 @@ export default function SitesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/[0.03]">
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   {paginated.map((site, i) => (
                     <motion.tr
                       key={site.id}

@@ -1,7 +1,7 @@
 {
   "name": "aurion-supervision",
   "version": "1.0.0",
-  "description": "AURION - Système de supervision ultime pour la Ville de Maisons-Alfort",
+  "description": "AURION - Interface de supervision environnementale pour salles serveurs",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",

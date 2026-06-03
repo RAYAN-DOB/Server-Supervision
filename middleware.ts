@@ -20,6 +20,28 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const token = request.cookies.get("aurion-token")?.value;
 
+  if (pathname.startsWith("/demo")) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-user-id", "demo-live-user");
+    requestHeaders.set("x-user-role", "viewer");
+    requestHeaders.set("x-user-name", "Demo Live");
+
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
+    if (pathname.startsWith("/admin")) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-user-id", "demo-user");
+    requestHeaders.set("x-user-role", "viewer");
+    requestHeaders.set("x-user-name", "Mode demo BTS");
+
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
   // ── Pas de token → redirection vers login ─────────────────────────────
   if (!token) {
     const loginUrl = new URL("/login", request.url);
@@ -91,6 +113,8 @@ export const config = {
     "/analytics/:path*",
     "/historique/:path*",
     "/rapports/:path*",
+    "/demo/:path*",
+    "/architecture/:path*",
     "/admin/:path*",
     "/change-password",
   ],

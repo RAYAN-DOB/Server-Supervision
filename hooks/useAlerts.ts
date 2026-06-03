@@ -18,7 +18,7 @@ export function useAlerts() {
     },
     staleTime: 30000,
     gcTime: 5 * 60 * 1000,
-    initialData: alerts.length > 0 ? alerts : undefined,
+    initialData: alerts.length > 0 && alerts.some((alert) => alert.siteId === "DEMO-LAB") ? alerts : undefined,
     refetchInterval: 30000,
   });
 

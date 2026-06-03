@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/layout/providers";
-import { AurionAIChat } from "@/components/features/aurion-ai-chat";
-import { KeyboardShortcutsHelp } from "@/components/features/keyboard-shortcuts-help";
-import { PerformanceMonitor } from "@/components/features/performance-monitor";
-import { EasterEgg } from "@/components/features/easter-egg";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
-import { CommandPalette } from "@/components/features/command-palette";
-import { CosmicBackground } from "@/components/ui/cosmic-background";
 import { Toaster } from "sonner";
 
 const inter = Inter({
@@ -26,16 +20,17 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "AURION - Supervision Serveurs Maisons-Alfort",
-  description: "Système de supervision et monitoring des salles serveurs et baies réseau de la Ville de Maisons-Alfort",
-  keywords: ["supervision", "monitoring", "zabbix", "datacenter", "serveurs", "maisons-alfort"],
+  title: "AURION - Supervision environnementale",
+  description:
+    "Supervision environnementale des salles serveurs de la Ville de Maisons-Alfort via capteurs Black Box, SNMPv3, Zabbix et interface AURION.",
+  keywords: ["supervision", "zabbix", "snmpv3", "black box", "bts ciel", "maisons-alfort"],
   authors: [{ name: "DSI Maisons-Alfort" }],
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "AURION - Supervision Serveurs",
-    description: "Système de supervision des infrastructures IT de Maisons-Alfort",
+    title: "AURION - Supervision environnementale",
+    description: "Capteurs Black Box, SNMPv3, Zabbix et interface AURION.",
     type: "website",
   },
 };
@@ -48,23 +43,17 @@ export default function RootLayout({
   return (
     <html lang="fr" className="dark">
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
-        <CosmicBackground />
         <Providers>
           {children}
-          <AurionAIChat />
-          <CommandPalette />
-          <KeyboardShortcutsHelp />
-          <PerformanceMonitor />
-          <EasterEgg />
           <ScrollToTop />
-          <Toaster 
-            position="top-right" 
+          <Toaster
+            position="top-right"
             theme="dark"
             toastOptions={{
               style: {
                 background: "rgba(10, 10, 26, 0.95)",
                 backdropFilter: "blur(12px)",
-                border: "1px solid rgba(106, 0, 255, 0.3)",
+                border: "1px solid rgba(34, 211, 238, 0.25)",
                 color: "#fff",
               },
             }}

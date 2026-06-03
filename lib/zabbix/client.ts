@@ -205,17 +205,15 @@ export class ZabbixClient {
         id: this.requestId++,
       };
 
-      // Zabbix ≥ 5.4 : token dans le header Authorization
-      // Zabbix < 5.4 : auth dans le corps
+      // Zabbix 7.4 : jeton dans le header Authorization.
+      // Ne pas ajouter "auth" dans le corps JSON-RPC : sur les versions
+      // recentes cela peut retourner des resultats vides ou incoherents.
       const headers: Record<string, string> = {
         'Content-Type': 'application/json-rpc',
       };
 
       if (auth && method !== 'user.login' && method !== 'apiinfo.version') {
-        // Essai avec Authorization header (≥ 5.4)
         headers['Authorization'] = `Bearer ${auth}`;
-        // Et aussi dans le corps pour compatibilité (< 6.4)
-        body.auth = auth;
       }
 
       const response = await fetch(this.config.apiUrl, {

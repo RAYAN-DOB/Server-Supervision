@@ -18,7 +18,7 @@ export function useSites() {
     },
     staleTime: 30000,
     gcTime: 5 * 60 * 1000,
-    initialData: sites.length > 0 ? sites : undefined,
+    initialData: sites.length > 0 && sites.some((site) => site.id === "DEMO-LAB") ? sites : undefined,
   });
 
   useEffect(() => {

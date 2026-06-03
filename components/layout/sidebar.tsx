@@ -1,20 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
-  Building2,
-  MapPin,
   AlertTriangle,
-  BarChart3,
-  FileText,
-  History,
-  Settings,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
-  BookOpen,
+  FlaskConical,
+  LayoutDashboard,
+  Network,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AurionLogo } from "@/components/features/aurion-logo";
@@ -24,48 +19,30 @@ import { useState } from "react";
 
 const navigation = [
   {
-    name: "Vue d'Ensemble",
-    items: [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Vue globale" },
-      { name: "Carte des sites", href: "/carte", icon: MapPin, description: "Tous les sites" },
-    ],
-  },
-  {
-    name: "Référentiel",
-    items: [
-      { name: "Référentiel des sites", href: "/sites", icon: BookOpen, description: "Inventaire complet" },
-    ],
-  },
-  {
     name: "Supervision",
     items: [
-      { name: "Alertes", href: "/alertes", icon: AlertTriangle, description: "Centre d'alertes" },
-      { name: "Historique", href: "/historique", icon: History, description: "Timeline" },
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Vue globale" },
+      { name: "Sites supervisés", href: "/sites", icon: BookOpen, description: "HTDV, PLDS, Démo Lab" },
+      { name: "Alertes", href: "/alertes", icon: AlertTriangle, description: "Triggers Zabbix" },
     ],
   },
   {
-    name: "Analyses",
+    name: "Soutenance",
     items: [
-      { name: "Analytics", href: "/analytics", icon: BarChart3, description: "Graphiques" },
-      { name: "Rapports", href: "/rapports", icon: FileText, description: "Exports PDF" },
-    ],
-  },
-  {
-    name: "Configuration",
-    items: [
-      { name: "Administration", href: "/admin", icon: Settings, description: "Paramètres & Zabbix" },
+      { name: "Démo Live", href: "/demo", icon: FlaskConical, description: "Mini-lab Zabbix" },
+      { name: "Architecture", href: "/architecture", icon: Network, description: "Chaîne technique" },
     ],
   },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { alerts, sites } = useStore();
+  const { alerts } = useStore();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const activeAlerts = alerts.filter(a => !a.acknowledged && !a.resolved);
-  const criticalAlerts = activeAlerts.filter(a => a.severity === "critical");
+  const activeAlerts = alerts.filter((a) => !a.acknowledged && !a.resolved);
+  const criticalAlerts = activeAlerts.filter((a) => a.severity === "critical");
 
   const handleNavigation = () => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
@@ -75,45 +52,37 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile Toggle Button */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white/[0.08] border border-white/[0.12] hover:bg-white/[0.12] transition-colors"
+        className="fixed left-4 top-4 z-50 rounded-lg border border-white/10 bg-slate-950/90 p-2 text-white lg:hidden"
+        aria-label="Ouvrir le menu"
       >
-        <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+        <span className="block h-0.5 w-5 bg-white" />
+        <span className="mt-1.5 block h-0.5 w-5 bg-white" />
+        <span className="mt-1.5 block h-0.5 w-5 bg-white" />
       </button>
 
-      {/* Mobile Backdrop */}
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
         />
       )}
 
-      {/* Sidebar */}
-      <motion.aside
-        animate={{
-          width: collapsed ? 80 : 280,
-        }}
+      <aside
         className={cn(
-          "fixed left-0 top-0 h-screen border-r border-white/[0.06] bg-[#020208]/95 backdrop-blur-xl z-50 flex flex-col",
-          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          "transition-transform lg:transition-none"
+          "fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-white/10 bg-slate-950/95 backdrop-blur-xl transition-all",
+          collapsed ? "w-20" : "w-[280px]",
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Header */}
-        <div className="p-6 border-b border-white/[0.06]">
+        <div className="border-b border-white/10 p-6">
           {!collapsed ? (
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/dashboard" className="flex items-center gap-3">
               <AurionLogo size="md" />
               <div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent group-hover:from-purple-400 group-hover:to-cyan-400 transition-all">
-                  AURION
-                </h1>
-                <p className="text-[10px] text-gray-600 font-light">Supervision IT</p>
+                <h1 className="text-lg font-semibold text-white">AURION</h1>
+                <p className="text-[11px] text-slate-500">Supervision environnementale</p>
               </div>
             </Link>
           ) : (
@@ -123,12 +92,11 @@ export function Sidebar() {
           )}
         </div>
 
-        {/* Navigation */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <nav className="flex-1 overflow-y-auto p-4">
           {navigation.map((section) => (
-            <div key={section.name}>
+            <div key={section.name} className="mb-6">
               {!collapsed && (
-                <h2 className="px-3 mb-2 text-[10px] font-semibold text-gray-600 uppercase tracking-wider">
+                <h2 className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
                   {section.name}
                 </h2>
               )}
@@ -140,79 +108,54 @@ export function Sidebar() {
 
                   return (
                     <Link key={item.href} href={item.href} onClick={handleNavigation}>
-                      <motion.div
-                        whileHover={{ x: collapsed ? 0 : 4 }}
+                      <div
                         title={collapsed ? item.name : undefined}
                         className={cn(
-                          "relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                          "relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors",
                           collapsed && "justify-center",
                           isActive
-                            ? "bg-gradient-to-r from-purple-600/20 to-cyan-600/20 border border-purple-500/30 text-white"
-                            : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
+                            ? "border border-cyan-500/25 bg-cyan-500/10 text-white"
+                            : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
                         )}
                       >
                         {isActive && (
-                          <motion.div
-                            layoutId="sidebar-active"
-                            className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-purple-500 to-cyan-500 rounded-r-full"
-                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                          />
+                          <div className="absolute bottom-1.5 left-0 top-1.5 w-1 rounded-r-full bg-cyan-400" />
                         )}
-
-                        <Icon className={cn(
-                          "w-5 h-5 flex-shrink-0",
-                          isActive && "text-purple-400"
-                        )} />
-
+                        <Icon className={cn("h-5 w-5 shrink-0", isActive && "text-cyan-300")} />
                         {!collapsed && (
                           <>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">{item.name}</p>
-                              <p className="text-xs text-gray-600 truncate">
-                                {item.description}
-                              </p>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium">{item.name}</p>
+                              <p className="truncate text-xs text-slate-600">{item.description}</p>
                             </div>
-
                             {alertCount > 0 && (
                               <Badge
                                 variant={criticalAlerts.length > 0 ? "critical" : "warning"}
-                                className="text-[10px] px-1.5 py-0.5"
+                                className="px-1.5 py-0.5 text-[10px]"
                               >
                                 {alertCount}
                               </Badge>
                             )}
                           </>
                         )}
-
-                        {collapsed && alertCount > 0 && (
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
-                        )}
-                      </motion.div>
+                      </div>
                     </Link>
                   );
                 })}
               </div>
             </div>
           ))}
-        </div>
+        </nav>
 
-        {/* Collapse Toggle */}
-        <div className="p-4 border-t border-white/[0.06] hidden lg:block">
+        <div className="hidden border-t border-white/10 p-4 lg:block">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-gray-400 hover:text-white"
+            className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-slate-400 hover:bg-white/[0.04] hover:text-white"
           >
-            {collapsed ? (
-              <ChevronRight className="w-5 h-5" />
-            ) : (
-              <>
-                <ChevronLeft className="w-5 h-5" />
-                <span className="text-sm font-medium">Réduire</span>
-              </>
-            )}
+            {collapsed ? <ChevronRight className="h-5 w-5" /> : <><ChevronLeft className="h-5 w-5" /><span className="text-sm">Réduire</span></>}
           </button>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 }
