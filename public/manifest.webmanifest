@@ -1,0 +1,36 @@
+{
+  "name": "AURION Supervision",
+  "short_name": "AURION",
+  "description": "Supervision environnementale Black Box, Zabbix et AURION.",
+  "start_url": "/demo",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#071827",
+  "theme_color": "#0b2440",
+  "orientation": "any",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/aurion-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Demo Live",
+      "short_name": "Demo",
+      "description": "Ouvrir la vue de demonstration AURION.",
+      "url": "/demo",
+      "icons": [{ "src": "/aurion-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Alertes",
+      "short_name": "Alertes",
+      "description": "Ouvrir le centre d'alertes.",
+      "url": "/alertes",
+      "icons": [{ "src": "/aurion-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
