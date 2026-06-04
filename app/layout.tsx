@@ -20,13 +20,24 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
+  applicationName: "AURION",
   title: "AURION - Supervision environnementale",
   description:
     "Supervision environnementale des salles serveurs de la Ville de Maisons-Alfort via capteurs Black Box, SNMPv3, Zabbix et interface AURION.",
   keywords: ["supervision", "zabbix", "snmpv3", "black box", "bts ciel", "maisons-alfort"],
   authors: [{ name: "DSI Maisons-Alfort" }],
+  manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/aurion-icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/aurion-icon.svg", type: "image/svg+xml" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "AURION",
+    statusBarStyle: "black-translucent",
   },
   openGraph: {
     title: "AURION - Supervision environnementale",

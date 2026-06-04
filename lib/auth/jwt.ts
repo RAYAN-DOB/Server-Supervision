@@ -1,13 +1,3 @@
-/**
- * Utilitaires JWT — utilise `jose` (compatible Edge / Netlify Functions).
- *
- * Sécurité :
- * - Secret via AUTH_SECRET (min. 32 caractères, obligatoire en production)
- * - Tokens HS256 avec JTI (JWT ID) pour la révocation
- * - Expiration 8h (réduite depuis 24h)
- * - Blacklist en mémoire pour invalider les tokens après logout
- */
-
 import { SignJWT, jwtVerify } from "jose";
 import type { UserRole } from "./store";
 
@@ -27,17 +17,18 @@ function getSecret(): Uint8Array {
   if (!authSecret || authSecret.length < 32) {
     if (process.env.NODE_ENV === "production") {
       throw new Error(
-        "[AURION] AUTH_SECRET non défini ou trop court (min. 32 caractères). " +
-          "Définissez cette variable dans les paramètres Netlify."
+        "[AURION] AUTH_SECRET non defini ou trop court (min. 32 caracteres). " +
+          "Definissez cette variable dans les parametres Vercel."
       );
     }
-    // Fallback développement uniquement — jamais utilisé en production
+
     if (process.env.NODE_ENV !== "test") {
       console.warn(
-        "[AURION] ⚠ AUTH_SECRET non défini — utilisation du secret de développement. " +
-          "NE PAS utiliser en production."
+        "[AURION] AUTH_SECRET non defini - utilisation du secret de developpement. " +
+          "Ne pas utiliser en production."
       );
     }
+
     return new TextEncoder().encode(
       "aurion-dev-secret-only-DO-NOT-USE-IN-PRODUCTION-!!"
     );
@@ -46,33 +37,28 @@ function getSecret(): Uint8Array {
   return new TextEncoder().encode(authSecret);
 }
 
-// ─── Blacklist JWT (invalide les tokens après logout) ─────────────────────────
-// Note : en mémoire — partagé uniquement dans le même processus Node.js.
-// En serverless, les tokens expirés naturellement après 8h même si non révoqués.
-
 interface BlacklistEntry {
-  exp: number; // timestamp expiry du token
+  exp: number;
 }
 
-const _blacklist = new Map<string, BlacklistEntry>();
+const tokenBlacklist = new Map<string, BlacklistEntry>();
 
 export function blacklistToken(jti: string, expiresAt: number): void {
-  _blacklist.set(jti, { exp: expiresAt });
-  // Nettoyage des tokens expirés pour éviter la fuite mémoire
+  tokenBlacklist.set(jti, { exp: expiresAt });
+
   const now = Date.now() / 1000;
-  for (const [id, entry] of _blacklist) {
-    if (entry.exp < now) _blacklist.delete(id);
+  for (const [id, entry] of tokenBlacklist) {
+    if (entry.exp < now) tokenBlacklist.delete(id);
   }
 }
 
 export function isTokenBlacklisted(jti: string): boolean {
-  return _blacklist.has(jti);
+  return tokenBlacklist.has(jti);
 }
-
-// ─── Fonctions principales ────────────────────────────────────────────────────
 
 export async function signToken(user: AuthUser): Promise<string> {
   const jti = crypto.randomUUID();
+
   return new SignJWT({ ...user })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -89,9 +75,7 @@ export interface VerifiedToken extends AuthUser {
   iat: number;
 }
 
-export async function verifyToken(
-  token: string
-): Promise<VerifiedToken | null> {
+export async function verifyToken(token: string): Promise<VerifiedToken | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret(), {
       issuer: "aurion.maisons-alfort.fr",

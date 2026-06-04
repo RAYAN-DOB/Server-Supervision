@@ -6,14 +6,15 @@ import {
   AlertTriangle,
   CheckCircle2,
   Database,
+  Droplets,
   RefreshCw,
   Server,
   ShieldCheck,
   Thermometer,
-  Droplets,
-  Zap,
   Wifi,
+  Zap,
 } from "lucide-react";
+import { PwaNotificationButton } from "@/components/features/pwa-notifications";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/store/useStore";
 import type { Alert, Site } from "@/types";
@@ -67,8 +68,7 @@ function statusClass(status: string) {
 
 function statusLabel(status: string) {
   if (status === "critical") return "Critique";
-  if (status === "warning") return "Warning";
-  if (status === "major") return "Majeure";
+  if (status === "warning" || status === "major") return "Warning";
   if (status === "minor") return "Mineure";
   if (status === "info") return "Info";
   return "OK";
@@ -99,9 +99,11 @@ export default function DemoLivePage() {
   const refresh = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
       const response = await fetch("/api/zabbix/demo", { cache: "no-store" });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
       const payload = (await response.json()) as DemoPayload;
       setData(payload);
 
@@ -130,9 +132,9 @@ export default function DemoLivePage() {
   const summary = useMemo(() => {
     const sensors = data?.sensors ?? [];
     return {
-      ok: sensors.filter((s) => s.status === "ok").length,
-      warning: sensors.filter((s) => s.status === "warning").length,
-      critical: sensors.filter((s) => s.status === "critical").length,
+      ok: sensors.filter((sensor) => sensor.status === "ok").length,
+      warning: sensors.filter((sensor) => sensor.status === "warning").length,
+      critical: sensors.filter((sensor) => sensor.status === "critical").length,
     };
   }, [data]);
 
@@ -142,28 +144,36 @@ export default function DemoLivePage() {
         <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">
-              Démonstration BTS CIEL IR
+              Demonstration AURION
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight text-white">Démo Live — site DEMO-LAB</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">Demo Live - site DEMO-LAB</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-              Cette page présente le mini-lab comme un vrai site supervisé : capteurs Black Box,
-              collecte SNMPv3, host Zabbix, items, triggers et affichage simplifié dans AURION.
+              Le mini-lab est traite comme un vrai site supervise : gateway Black Box, capteur
+              temperature/humidite, collecte SNMPv3, host Zabbix, items, triggers et lecture
+              simplifiee dans AURION.
             </p>
           </div>
 
-          <button
-            onClick={refresh}
-            disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-400/15 disabled:opacity-60"
-          >
-            <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-            Actualiser
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <PwaNotificationButton
+              alerts={data?.alerts ?? []}
+              connected={Boolean(data?.connected)}
+              lastSync={data?.lastSync}
+            />
+            <button
+              onClick={refresh}
+              disabled={loading}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-100 hover:bg-cyan-400/15 disabled:opacity-60"
+            >
+              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+              Actualiser
+            </button>
+          </div>
         </header>
 
         {error && (
           <section className="rounded-2xl border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-200">
-            Impossible de charger la démo : {error}
+            Impossible de charger la demo : {error}
           </section>
         )}
 
@@ -173,19 +183,21 @@ export default function DemoLivePage() {
               <span className="text-xs uppercase tracking-wider">Site</span>
               <Server className="h-4 w-4" />
             </div>
-            <p className="mt-3 text-2xl font-semibold text-white">{data?.site?.name ?? "Démo Lab"}</p>
+            <p className="mt-3 text-2xl font-semibold text-white">{data?.site?.name ?? "Demo Lab"}</p>
             <p className="mt-1 font-mono text-xs text-slate-500">ID : DEMO-LAB</p>
           </div>
+
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs uppercase tracking-wider">Zabbix</span>
               <Database className="h-4 w-4" />
             </div>
             <p className={cn("mt-3 inline-flex rounded-full border px-3 py-1 text-sm font-medium", data?.connected ? statusClass("ok") : statusClass("warning"))}>
-              {data?.connected ? "API connectée" : "Mode démo"}
+              {data?.connected ? "API connectee" : "Mode demo"}
             </p>
             <p className="mt-2 text-xs text-slate-500">Version : {data?.apiVersion ?? "mock"}</p>
           </div>
+
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs uppercase tracking-wider">Capteurs</span>
@@ -193,16 +205,17 @@ export default function DemoLivePage() {
             </div>
             <p className="mt-3 text-2xl font-semibold text-white">{data?.sensors?.length ?? 0}</p>
             <p className="mt-1 text-xs text-slate-500">
-              {summary.ok} OK · {summary.warning} warning · {summary.critical} critique
+              {summary.ok} OK - {summary.warning} warning - {summary.critical} critique
             </p>
           </div>
+
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-xs uppercase tracking-wider">Triggers</span>
               <AlertTriangle className="h-4 w-4" />
             </div>
             <p className="mt-3 text-2xl font-semibold text-white">{data?.alerts?.length ?? 0}</p>
-            <p className="mt-1 text-xs text-slate-500">Dernière synchro : {formatTime(data?.lastSync)}</p>
+            <p className="mt-1 text-xs text-slate-500">Derniere synchro : {formatTime(data?.lastSync)}</p>
           </div>
         </section>
 
@@ -210,8 +223,10 @@ export default function DemoLivePage() {
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-white">Valeurs capteurs remontées</h2>
-                <p className="text-sm text-slate-500">Source : {data?.source === "zabbix" ? "Zabbix API JSON-RPC" : "mode mock/démo"}</p>
+                <h2 className="text-lg font-semibold text-white">Valeurs capteurs remontees</h2>
+                <p className="text-sm text-slate-500">
+                  Source : {data?.source === "zabbix" ? "Zabbix API JSON-RPC" : "mode mock/demo"}
+                </p>
               </div>
               <span className="rounded-full border border-white/10 px-3 py-1 font-mono text-xs text-slate-400">
                 Host : {data?.zabbixHost?.name ?? "BLACKBOX-DEMO"}
@@ -270,12 +285,12 @@ export default function DemoLivePage() {
             <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
               <div className="mb-3 flex items-center gap-2 text-emerald-200">
                 <ShieldCheck className="h-5 w-5" />
-                <h2 className="font-semibold">Point à expliquer au jury</h2>
+                <h2 className="font-semibold">Principe de demonstration</h2>
               </div>
               <p className="text-sm leading-6 text-emerald-50/85">
-                La démo est volontairement intégrée comme un site AURION. Elle permet de
-                montrer que le même modèle sert au pilote réel : un host Zabbix, des items
-                SNMP/OID, des triggers, puis une lecture simplifiée pour la DSI.
+                La demo utilise le meme modele que le pilote : un host Zabbix, des items SNMP/OID,
+                des triggers, puis une interface plus lisible pour la DSI. AURION ne collecte pas
+                directement les capteurs, il lit Zabbix via API JSON-RPC.
               </p>
             </div>
           </aside>
@@ -297,7 +312,7 @@ export default function DemoLivePage() {
                 {(data?.alerts ?? []).length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
-                      Aucun trigger actif pour le site de démonstration.
+                      Aucun trigger actif pour le site de demonstration.
                     </td>
                   </tr>
                 ) : (

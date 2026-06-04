@@ -1,23 +1,24 @@
 import type { NextConfig } from "next";
 
-// Avertissement si AUTH_SECRET manquant (erreur runtime dans lib/auth/jwt.ts en prod)
+// Avertissement si AUTH_SECRET est absent ou trop court en production.
 if (
   process.env.NODE_ENV === "production" &&
   (!process.env.AUTH_SECRET || process.env.AUTH_SECRET.length < 32)
 ) {
   console.warn(
-    "[AURION] ⚠ AUTH_SECRET non défini ou trop court (min. 32 caractères). " +
-      "Définissez cette variable dans les paramètres Netlify."
+    "[AURION] AUTH_SECRET non defini ou trop court (min. 32 caracteres). " +
+      "Definissez cette variable dans les parametres Vercel."
   );
 }
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  outputFileTracingRoot: process.cwd(),
   experimental: {
     optimizePackageImports: ["lucide-react", "recharts", "@tremor/react"],
   },
   images: {
-    // Restreindre aux domaines réellement utilisés (OpenStreetMap pour Leaflet)
+    // Restreindre aux domaines reellement utilises.
     remotePatterns: [
       {
         protocol: "https",
@@ -35,7 +36,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  // Headers de sécurité supplémentaires (complément à netlify.toml)
+  // Headers de securite supplementaires pour les routes API.
   async headers() {
     return [
       {
