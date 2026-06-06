@@ -38,7 +38,7 @@ function buildBody(alert: Alert) {
     typeof alert.value === "number" ? `valeur ${alert.value}` : null,
   ].filter(Boolean);
 
-  return `${alert.title}${details.length ? `\n${details.join(" · ")}` : ""}`;
+  return `${alert.title}${details.length ? `\n${details.join(" - ")}` : ""}`;
 }
 
 async function registerServiceWorker() {
@@ -110,7 +110,7 @@ export function PwaNotificationButton({
       tag: `aurion-alert-${alert.id}`,
       icon: "/aurion-icon.svg",
       badge: "/aurion-icon.svg",
-      data: { url: "/demo", alertId: alert.id },
+      data: { url: "/alertes", alertId: alert.id },
       requireInteraction: alert.severity === "critical",
       silent: false,
     });
@@ -150,14 +150,14 @@ export function PwaNotificationButton({
       if (nextPermission === "granted") {
         await showNotification("AURION - Notifications actives", {
           body: connected
-            ? `La page DEMO-LAB est connectee a Zabbix. Derniere synchro : ${
+            ? `Le site DEMO-LAB est connecte a Zabbix. Derniere synchro : ${
                 lastSync ? new Date(lastSync).toLocaleTimeString("fr-FR") : "en cours"
               }.`
-            : "La page DEMO-LAB est en mode demonstration. Les pop-ups fonctionneront aussi avec les alertes Zabbix.",
+            : "Le site DEMO-LAB fonctionne en mode laboratoire. Les pop-ups fonctionneront aussi avec les alertes Zabbix.",
           tag: "aurion-notifications-ready",
           icon: "/aurion-icon.svg",
           badge: "/aurion-icon.svg",
-          data: { url: "/demo" },
+          data: { url: "/lab" },
         });
       }
     } finally {
@@ -174,7 +174,7 @@ export function PwaNotificationButton({
           ? activeAlerts.length > 0
             ? `${activeAlerts.length} alerte(s) suivie(s)`
             : "Tester notification"
-          : "Activer pop-up demo";
+          : "Activer alertes navigateur";
 
   const Icon =
     pending ? Loader2 : permission === "denied" || permission === "unsupported" ? BellOff : activeAlerts.length > 0 ? BellRing : Bell;
@@ -184,7 +184,7 @@ export function PwaNotificationButton({
       type="button"
       onClick={enableOrTest}
       disabled={pending || permission === "unsupported"}
-      title="Active les notifications navigateur pour la demonstration AURION"
+      title="Active les notifications navigateur pour les alertes AURION"
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition",
         permission === "granted"

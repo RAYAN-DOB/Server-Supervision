@@ -21,14 +21,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       return;
     }
 
-    if (process.env.NEXT_PUBLIC_DEMO_MODE === "true" || pathname.startsWith("/demo")) {
+    const isLabRoute = pathname.startsWith("/lab") || pathname.startsWith("/demo");
+
+    if (process.env.NEXT_PUBLIC_DEMO_MODE === "true" || isLabRoute) {
       setCurrentUser({
-        id: pathname.startsWith("/demo") ? "demo-live-user" : "demo-user",
-        username: "demo",
-        email: "demo@maisons-alfort.fr",
-        name: pathname.startsWith("/demo") ? "Demo Live" : "Demo BTS",
+        id: isLabRoute ? "lab-blackbox-user" : "dsi-viewer",
+        username: "technicien",
+        email: "supervision@maisons-alfort.fr",
+        name: "Technicien DSI",
         role: "viewer",
-        department: pathname.startsWith("/demo") ? "Mini-lab AURION" : "Soutenance BTS CIEL IR",
+        department: "Supervision environnementale",
         isActive: true,
         createdAt: new Date().toISOString(),
       });

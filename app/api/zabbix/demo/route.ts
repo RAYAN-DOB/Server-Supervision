@@ -178,12 +178,12 @@ function buildChecks(params: {
     {
       label: "API Zabbix",
       status: params.connected ? "ok" : "warning",
-      detail: params.connected ? "Connexion JSON-RPC active" : "Mode demonstration utilise",
+      detail: params.connected ? "Connexion JSON-RPC active" : "Mode laboratoire utilise",
     },
     {
-      label: "Host Demo Lab",
+      label: "Host Lab Black Box",
       status: params.hostFound ? "ok" : params.useMock ? "warning" : "critical",
-      detail: params.hostFound ? "Host trouve dans Zabbix" : "Host non trouve, donnees de demonstration affichees",
+      detail: params.hostFound ? "Host trouve dans Zabbix" : "Host non trouve, donnees laboratoire affichees",
     },
     {
       label: "Items SNMP/OID",
@@ -216,12 +216,12 @@ function buildMockAlerts(sensors: DemoSensor[]): Alert[] {
   return active.map((sensor, index) => ({
     id: `demo-live-${sensor.id}-${index}`,
     siteId: DEMO_SITE_ID,
-    siteName: "Demo Lab",
+    siteName: "Lab Black Box",
     bayId: "DEMO-LAB-bay-1",
-    bayName: "Mini baie de demonstration",
+    bayName: "Baie laboratoire Black Box",
     severity: severityFromStatus(sensor.status),
     title: `${sensor.name} - seuil surveille`,
-    description: `Valeur actuelle remontee dans la demonstration : ${sensor.value}.`,
+    description: `Valeur actuelle remontee sur le site laboratoire : ${sensor.value}.`,
     timestamp: sensor.lastUpdate,
     acknowledged: false,
     resolved: false,
@@ -256,7 +256,7 @@ function mockPayload(reason?: string) {
       triggersCount: alerts.length,
       error: reason,
     }),
-    explanation: "Cette vue represente le mini-lab comme un site AURION supervise. Si Zabbix est disponible, les valeurs viennent de l'API JSON-RPC ; sinon le mode demo reste utilisable.",
+    explanation: "Cette vue represente DEMO-LAB comme un site AURION supervise. Si Zabbix est disponible, les valeurs viennent de l'API JSON-RPC ; sinon le mode laboratoire reste utilisable.",
     lastSync: new Date().toISOString(),
     error: reason,
   };
@@ -284,7 +284,7 @@ export async function GET() {
     });
 
     if (!host) {
-      return NextResponse.json(mockPayload("Aucun host Zabbix de demonstration trouve. Configurez ZABBIX_DEMO_HOST_NAME=BLACKBOX-DEMO ou ZABBIX_DEMO_HOST_ID."));
+      return NextResponse.json(mockPayload("Aucun host Zabbix de laboratoire trouve. Configurez ZABBIX_DEMO_HOST_NAME=BLACKBOX-DEMO ou ZABBIX_DEMO_HOST_ID."));
     }
 
     const [items, triggers] = await Promise.all([
@@ -304,7 +304,7 @@ export async function GET() {
     const alerts = hostTriggers.map((trigger) => ({
       ...mapZabbixTriggerToAlert(trigger),
       siteId: DEMO_SITE_ID,
-      siteName: "Demo Lab",
+      siteName: "Lab Black Box",
       description: trigger.comments || trigger.description || "Trigger actif remonte par Zabbix.",
       acknowledged: false,
       resolved: false,
@@ -345,7 +345,7 @@ export async function GET() {
         sensorsCount: sensors.length,
         triggersCount: alerts.length,
       }),
-      explanation: "Cette vue lit le mini-lab comme un site AURION reel : host Zabbix, items SNMP/OID, triggers et alertes actives.",
+      explanation: "Cette vue lit DEMO-LAB comme un site AURION reel : host Zabbix, items SNMP/OID, triggers et alertes actives.",
       lastSync: new Date().toISOString(),
     });
   } catch (error) {

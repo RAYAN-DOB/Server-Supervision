@@ -117,7 +117,7 @@ export default function DashboardPage() {
       accent: avgTemp > 24 ? "from-orange-500/20 to-orange-500/5" : "from-green-500/20 to-green-500/5",
       border: avgTemp > 24 ? "border-orange-500/20" : "border-green-500/20",
       iconColor: avgTemp > 24 ? "text-orange-400" : "text-green-400",
-      href: "/demo",
+      href: "/sites",
     },
     {
       label: "Disponibilité",
@@ -397,8 +397,8 @@ export default function DashboardPage() {
             <h3 className="text-sm font-semibold text-white mb-3">Accès rapide</h3>
             <div className="space-y-1">
               {[
-                { label: "Sites supervisés", href: "/sites", icon: BookOpen, sub: `HTDV, PLDS, DEMO-LAB` },
-                { label: "Démo Live", href: "/demo", icon: Wifi, sub: "Zabbix + Black Box" },
+                { label: "Sites supervisés", href: "/sites", icon: BookOpen, sub: "HTDV, PLDS, Lab Black Box" },
+                { label: "Lab Black Box", href: "/lab", icon: Wifi, sub: "Site de validation" },
                 { label: "Centre d'alertes", href: "/alertes", icon: AlertTriangle, sub: `${activeAlerts.length} active${activeAlerts.length !== 1 ? "s" : ""}` },
                 { label: "Architecture", href: "/architecture", icon: ShieldCheck, sub: "Chaîne complète" },
               ].map((link) => {

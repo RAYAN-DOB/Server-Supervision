@@ -1,8 +1,8 @@
 {
   "name": "AURION Supervision",
   "short_name": "AURION",
-  "description": "Supervision environnementale Black Box, Zabbix et AURION.",
-  "start_url": "/demo",
+  "description": "Supervision environnementale des salles serveurs de la DSI de Maisons-Alfort.",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "background_color": "#071827",
@@ -19,10 +19,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Demo Live",
-      "short_name": "Demo",
-      "description": "Ouvrir la vue de demonstration AURION.",
-      "url": "/demo",
+      "name": "Supervision",
+      "short_name": "Dashboard",
+      "description": "Ouvrir le tableau de bord DSI.",
+      "url": "/dashboard",
       "icons": [{ "src": "/aurion-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
@@ -30,6 +30,13 @@
       "short_name": "Alertes",
       "description": "Ouvrir le centre d'alertes.",
       "url": "/alertes",
+      "icons": [{ "src": "/aurion-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Lab Black Box",
+      "short_name": "Lab",
+      "description": "Ouvrir le site de validation Black Box.",
+      "url": "/lab",
       "icons": [{ "src": "/aurion-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]
