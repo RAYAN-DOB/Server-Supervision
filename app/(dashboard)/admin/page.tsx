@@ -544,7 +544,7 @@ export default function AdminPage() {
       if (data.connected && !data.useMock) {
         toast.success(`Connexion Zabbix réussie ! API v${data.apiVersion}`);
       } else if (data.useMock) {
-        toast.warning("Mode démonstration — Zabbix non configuré côté serveur");
+        toast.warning("Mode laboratoire — Zabbix non configuré côté serveur");
       } else {
         toast.error("Connexion échouée : " + (data.error ?? "Erreur"));
       }
@@ -1034,7 +1034,7 @@ export default function AdminPage() {
                       Configuration Zabbix API
                     </CardTitle>
                     <CardDescription>
-                      Le token API reste côté serveur (variable Netlify
+                      Le token API reste côté serveur (variable Vercel
                       ZABBIX_API_TOKEN). Seule l'URL est sauvegardée ici.
                     </CardDescription>
                   </div>
@@ -1071,7 +1071,7 @@ export default function AdminPage() {
                       type={showToken ? "text" : "password"}
                       value={localToken}
                       onChange={(e) => setLocalToken(e.target.value)}
-                      placeholder="Configuré via ZABBIX_API_TOKEN dans Netlify"
+                      placeholder="Configuré via ZABBIX_API_TOKEN dans Vercel"
                       className="w-full px-4 py-3 pr-12 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none focus:border-nebula-violet/50 transition-all font-light"
                     />
                     <button
@@ -1088,7 +1088,7 @@ export default function AdminPage() {
                   </div>
                   <p className="text-xs text-amber-400 mt-1.5 font-light">
                     ⚠ Le token n'est jamais sauvegardé dans le navigateur.
-                    Configurez ZABBIX_API_TOKEN dans les variables Netlify.
+                    Configurez ZABBIX_API_TOKEN dans les variables Vercel.
                   </p>
                 </div>
 
@@ -1153,7 +1153,7 @@ export default function AdminPage() {
                           {testResult.connected && !testResult.useMock
                             ? `Connecté à Zabbix ${testResult.apiVersion}`
                             : testResult.useMock
-                            ? "Mode démonstration actif"
+                            ? "Mode laboratoire actif"
                             : "Connexion échouée"}
                         </p>
                         {testResult.error && (
@@ -1206,7 +1206,7 @@ export default function AdminPage() {
                   },
                   {
                     n: 3,
-                    title: "Variables Netlify",
+                    title: "Variables Vercel",
                     text: "Site configuration → Environment variables :",
                     code: "ZABBIX_API_URL=http://IP_VM/zabbix/api_jsonrpc.php\nZABBIX_API_TOKEN=votre_token\nINITIAL_DSI_PASSWORD=MotDePasseTemporaire2026!\nAUTH_SECRET=$(openssl rand -base64 32)",
                   },

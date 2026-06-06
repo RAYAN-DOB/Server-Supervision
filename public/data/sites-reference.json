@@ -72,9 +72,9 @@
     },
     {
       "id": "DEMO-LAB",
-      "name": "Démo Lab",
-      "aliases": ["DEMO", "LAB", "Mini Zabbix"],
-      "address": "Mini-lab de soutenance BTS CIEL IR",
+      "name": "Lab Black Box",
+      "aliases": ["DEMO-LAB", "LAB", "Validation Black Box"],
+      "address": "Site laboratoire AURION",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8064,
@@ -99,8 +99,8 @@
       "blackboxFirmware": null,
       "blackboxBayCount": 1,
       "visibleOnMap": false,
-      "notes": "Site de démonstration utilisé pendant la soutenance : mini PC Proxmox, VM Debian, Zabbix Server, gateway Black Box et capteurs température / humidité / tension AC. Il reproduit à petite échelle la chaîne déployée en entreprise.",
-      "source": "demo",
+      "notes": "Site laboratoire AURION : mini PC Proxmox, VM Debian, Zabbix Server, gateway Black Box et capteurs température / humidité / tension AC. Il reproduit à petite échelle la chaîne Black Box -> SNMPv3 -> Zabbix -> AURION utilisée sur les sites pilotes.",
+      "source": "laboratoire",
       "createdAt": "2026-05-28T00:00:00Z",
       "updatedAt": "2026-05-28T00:00:00Z"
     },

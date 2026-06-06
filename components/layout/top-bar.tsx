@@ -32,17 +32,17 @@ export function TopBar() {
       <div className="flex min-h-[56px] items-center justify-between gap-3 px-3 py-2.5 sm:px-6 lg:px-8">
         <div className="min-w-0">
           <p className="hidden text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300 sm:block">
-            Démonstration BTS CIEL IR
+            Supervision DSI - Maisons-Alfort
           </p>
           <h2 className="truncate text-sm font-semibold text-white sm:text-base">
-            AURION - Black Box / SNMPv3 / Zabbix
+            AURION - Supervision environnementale
           </h2>
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <div className="hidden items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-medium text-emerald-300 md:flex">
             <Wifi className="h-3.5 w-3.5" />
-            Live
+            En direct
           </div>
 
           <div className="hidden items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2.5 py-1.5 text-xs font-medium text-cyan-200 lg:flex">

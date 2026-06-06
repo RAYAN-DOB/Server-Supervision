@@ -271,7 +271,7 @@ export async function getZabbixStatus(): Promise<ZabbixConnectionStatus> {
     return {
       connected: false,
       useMock: true,
-      error: 'ZABBIX_API_URL non configuré — données de démonstration actives',
+      error: 'ZABBIX_API_URL non configurée — mode laboratoire actif',
       lastSync: new Date().toISOString(),
       hostsCount: 12,
       itemsCount: 156,

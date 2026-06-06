@@ -11,7 +11,7 @@ import {
 const chain = [
   {
     title: "Capteurs",
-    detail: "Température, humidité, tension AC, eau, fumée",
+    detail: "Temperature, humidite, tension AC, eau, fumee",
     icon: Thermometer,
   },
   {
@@ -21,7 +21,7 @@ const chain = [
   },
   {
     title: "SNMPv3 authPriv",
-    detail: "Flux sécurisé vers Zabbix en UDP/161",
+    detail: "Flux securise vers Zabbix en UDP/161",
     icon: ShieldCheck,
   },
   {
@@ -31,12 +31,12 @@ const chain = [
   },
   {
     title: "PostgreSQL / TimescaleDB",
-    detail: "Historique et séries temporelles",
+    detail: "Historique et series temporelles",
     icon: Database,
   },
   {
     title: "AURION",
-    detail: "Lecture API JSON-RPC côté serveur",
+    detail: "Lecture API JSON-RPC cote serveur",
     icon: Eye,
   },
 ];
@@ -49,10 +49,13 @@ export default function ArchitecturePage() {
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">
             Architecture de supervision
           </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">De la salle serveur à AURION</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-white">
+            De la salle serveur a l'exploitation DSI
+          </h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-            Cette vue sert de support de soutenance. Elle explique le fonctionnement réel
-            déployé à la DSI et reproduit dans le mini-lab de démonstration.
+            Cette vue explique le fonctionnement d'exploitation : les capteurs remontent
+            les mesures a Zabbix, puis AURION les presente dans une interface lisible
+            pour les techniciens DSI.
           </p>
         </header>
 
@@ -78,34 +81,33 @@ export default function ArchitecturePage() {
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <h2 className="mb-3 text-lg font-semibold text-white">Principe important</h2>
             <p className="text-sm leading-6 text-slate-400">
-              AURION ne parle pas directement aux capteurs. Les capteurs sont collectés
-              par la gateway Black Box, puis Zabbix devient la source de vérité pour les
+              AURION ne parle pas directement aux capteurs. Les capteurs sont collectes
+              par la gateway Black Box, puis Zabbix devient la source de verite pour les
               mesures, les seuils, les triggers, les historiques et les alertes.
             </p>
             <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm leading-6 text-emerald-50/90">
-              Pour la soutenance, le mini-lab reprend la même chaîne mais à petite
-              échelle : une gateway, quelques capteurs, un Zabbix local et AURION qui
-              lit l’API JSON-RPC.
+              Le site DEMO-LAB reprend la meme chaine a petite echelle. Il sert a valider
+              les capteurs et les triggers sans toucher aux sites pilotes HTDV et PLDS.
             </div>
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
               <Network className="h-5 w-5 text-cyan-300" />
-              Flux à retenir
+              Flux a retenir
             </h2>
             <ul className="space-y-3 text-sm text-slate-400">
               <li className="rounded-xl border border-white/10 bg-black/20 p-3">
                 <strong className="text-white">SNMPv3 :</strong> Zabbix interroge la Black Box en UDP/161.
               </li>
               <li className="rounded-xl border border-white/10 bg-black/20 p-3">
-                <strong className="text-white">Base :</strong> Zabbix stocke l’historique dans PostgreSQL / TimescaleDB.
+                <strong className="text-white">Base :</strong> Zabbix stocke l'historique dans PostgreSQL / TimescaleDB.
               </li>
               <li className="rounded-xl border border-white/10 bg-black/20 p-3">
-                <strong className="text-white">AURION :</strong> l’application lit Zabbix via API JSON-RPC côté serveur.
+                <strong className="text-white">AURION :</strong> l'application lit Zabbix via API JSON-RPC cote serveur.
               </li>
               <li className="rounded-xl border border-white/10 bg-black/20 p-3">
-                <strong className="text-white">Sécurité :</strong> token API non exposé au navigateur, comptes en lecture seule.
+                <strong className="text-white">Securite :</strong> token API non expose au navigateur, comptes en lecture seule.
               </li>
             </ul>
           </div>

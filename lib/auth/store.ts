@@ -1,13 +1,13 @@
 ﻿/**
- * Stockage des utilisateurs en mÃ©moire cÃ´tÃ© serveur.
+ * Stockage des utilisateurs en memoire cote serveur.
  *
- * Tous les membres de la DSI de Maisons-Alfort sont prÃ©-configurÃ©s avec
- * un mot de passe temporaire dÃ©fini par INITIAL_DSI_PASSWORD.
- * Le flag mustChangePassword=true force le changement Ã  la premiÃ¨re connexion.
+ * Tous les membres de la DSI de Maisons-Alfort sont pre-configures avec
+ * un mot de passe temporaire defini par INITIAL_DSI_PASSWORD.
+ * Le flag mustChangePassword=true force le changement a la premiere connexion.
  *
- * âš  Persistance : ce store est en mÃ©moire. En serverless (Netlify Functions),
- *   les comptes crÃ©Ã©s dynamiquement sont perdus au cold start. Les 9 comptes
- *   DSI sont recrÃ©Ã©s Ã  chaque dÃ©marrage depuis les constantes ci-dessous.
+ * Attention Persistance : ce store est en memoire. En serverless (Vercel Functions),
+ *   les comptes crees dynamiquement sont perdus au cold start. Les 9 comptes
+ *   DSI sont recrees a chaque demarrage depuis les constantes ci-dessous.
  */
 
 import bcrypt from "bcryptjs";
@@ -32,7 +32,7 @@ export interface StoredUser {
   lockedUntil?: string;
 }
 
-// â”€â”€â”€ Membres DSI de Maisons-Alfort â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Membres DSI de Maisons-Alfort --------------------------------------------
 
 const DSI_MEMBERS: Array<{
   id: string;
@@ -106,7 +106,7 @@ const DSI_MEMBERS: Array<{
   },
 ];
 
-// â”€â”€â”€ Store module-level (partagÃ© dans un mÃªme processus Node.js) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Store module-level (partage dans un meme processus Node.js) -------------
 
 const _store = new Map<string, StoredUser>();
 let _initialized = false;
@@ -117,7 +117,7 @@ function init() {
 
   // Mot de passe temporaire fourni par INITIAL_DSI_PASSWORD (aucun secret réel dans le code).
   const initialPassword =
-    process.env.INITIAL_DSI_PASSWORD ?? "AURION-DEMO-ONLY-CHANGE-ME!";
+    process.env.INITIAL_DSI_PASSWORD ?? "AURION-LAB-ONLY-CHANGE-ME!";
   const mustChangePassword = !process.env.INITIAL_DSI_PASSWORD;
 
   const sharedHash = bcrypt.hashSync(initialPassword, 12);
@@ -125,18 +125,18 @@ function init() {
   for (const member of DSI_MEMBERS) {
     _store.set(member.id, {
       ...member,
-      department: "Direction des SystÃ¨mes d'Information",
+      department: "Direction des Systemes d'Information",
       passwordHash: sharedHash,
       isActive: true,
       mustChangePassword,
       createdAt: "2026-01-15T10:00:00Z",
-      createdBy: "systÃ¨me",
+      createdBy: "systeme",
       failedLoginAttempts: 0,
     });
   }
 }
 
-// â”€â”€â”€ Journal d'audit en mÃ©moire â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Journal d'audit en memoire ------------------------------------------------
 
 export interface AuditEntry {
   id: string;
@@ -159,7 +159,7 @@ export function addAuditEntry(
     timestamp: new Date().toISOString(),
     ...entry,
   });
-  // Conserver seulement les 500 derniÃ¨res entrÃ©es
+  // Conserver seulement les 500 dernieres entrees
   if (_auditLog.length > 500) _auditLog.splice(500);
 }
 
@@ -167,7 +167,7 @@ export function getAuditLog(): AuditEntry[] {
   return [..._auditLog];
 }
 
-// â”€â”€â”€ Accesseurs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Accesseurs ---------------------------------------------------------------
 
 export function getUsers(): StoredUser[] {
   init();
@@ -210,12 +210,12 @@ export function updateUser(
 
 export function deleteUser(id: string): boolean {
   init();
-  // Interdit la suppression des comptes DSI systÃ¨me
+  // Interdit la suppression des comptes DSI systeme
   if (id.startsWith("dsi-")) return false;
   return _store.delete(id);
 }
 
-// â”€â”€â”€ Verrouillage de compte â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Verrouillage de compte ----------------------------------------------------
 
 export function recordFailedLogin(id: string): void {
   init();
@@ -223,7 +223,7 @@ export function recordFailedLogin(id: string): void {
   if (!user) return;
   const attempts = (user.failedLoginAttempts ?? 0) + 1;
   const updates: Partial<StoredUser> = { failedLoginAttempts: attempts };
-  // Verrouillage progressif : 5 tentatives â†’ 30 min, 10 â†’ 2h
+  // Verrouillage progressif : 5 tentatives -> 30 min, 10 -> 2h
   if (attempts >= 10) {
     updates.lockedUntil = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
   } else if (attempts >= 5) {

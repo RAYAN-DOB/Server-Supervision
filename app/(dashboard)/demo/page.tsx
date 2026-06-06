@@ -19,27 +19,27 @@ import { cn } from "@/lib/utils";
 import { useStore } from "@/store/useStore";
 import type { Alert, Site } from "@/types";
 
-type DemoStatus = "ok" | "warning" | "critical" | "maintenance";
+type LabStatus = "ok" | "warning" | "critical" | "maintenance";
 
-interface DemoSensor {
+interface LabSensor {
   id: string;
   name: string;
   type: string;
   value: string;
-  status: DemoStatus;
+  status: LabStatus;
   lastUpdate: string;
   source: "zabbix" | "mock";
   zabbixItemId?: string;
   oidOrKey?: string;
 }
 
-interface DemoCheck {
+interface LabCheck {
   label: string;
   status: "ok" | "warning" | "critical";
   detail: string;
 }
 
-interface DemoPayload {
+interface LabPayload {
   site: Site;
   source: "zabbix" | "mock";
   connected: boolean;
@@ -50,9 +50,9 @@ interface DemoPayload {
     name: string;
     available: string;
   };
-  sensors: DemoSensor[];
+  sensors: LabSensor[];
   alerts: Alert[];
-  checks: DemoCheck[];
+  checks: LabCheck[];
   explanation: string;
   lastSync: string;
   error?: string;
@@ -92,7 +92,7 @@ function formatTime(value?: string) {
 }
 
 export default function DemoLivePage() {
-  const [data, setData] = useState<DemoPayload | null>(null);
+  const [data, setData] = useState<LabPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,7 +104,7 @@ export default function DemoLivePage() {
       const response = await fetch("/api/zabbix/demo", { cache: "no-store" });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      const payload = (await response.json()) as DemoPayload;
+      const payload = (await response.json()) as LabPayload;
       setData(payload);
 
       const store = useStore.getState();
@@ -144,13 +144,13 @@ export default function DemoLivePage() {
         <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">
-              Demonstration AURION
+              Site de validation
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight text-white">Demo Live - site DEMO-LAB</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">Lab Black Box - site DEMO-LAB</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-              Le mini-lab est traite comme un vrai site supervise : gateway Black Box, capteur
-              temperature/humidite, collecte SNMPv3, host Zabbix, items, triggers et lecture
-              simplifiee dans AURION.
+              Ce site laboratoire est traite comme un site supervise AURION : gateway Black Box,
+              capteur temperature/humidite, collecte SNMPv3, host Zabbix, items, triggers
+              et lecture simplifiee pour les techniciens DSI.
             </p>
           </div>
 
@@ -173,7 +173,7 @@ export default function DemoLivePage() {
 
         {error && (
           <section className="rounded-2xl border border-red-500/25 bg-red-500/10 p-4 text-sm text-red-200">
-            Impossible de charger la demo : {error}
+            Impossible de charger le site laboratoire : {error}
           </section>
         )}
 
@@ -183,7 +183,7 @@ export default function DemoLivePage() {
               <span className="text-xs uppercase tracking-wider">Site</span>
               <Server className="h-4 w-4" />
             </div>
-            <p className="mt-3 text-2xl font-semibold text-white">{data?.site?.name ?? "Demo Lab"}</p>
+            <p className="mt-3 text-2xl font-semibold text-white">{data?.site?.name ?? "Lab Black Box"}</p>
             <p className="mt-1 font-mono text-xs text-slate-500">ID : DEMO-LAB</p>
           </div>
 
@@ -193,7 +193,7 @@ export default function DemoLivePage() {
               <Database className="h-4 w-4" />
             </div>
             <p className={cn("mt-3 inline-flex rounded-full border px-3 py-1 text-sm font-medium", data?.connected ? statusClass("ok") : statusClass("warning"))}>
-              {data?.connected ? "API connectee" : "Mode demo"}
+              {data?.connected ? "API connectee" : "Mode laboratoire"}
             </p>
             <p className="mt-2 text-xs text-slate-500">Version : {data?.apiVersion ?? "mock"}</p>
           </div>
@@ -225,7 +225,7 @@ export default function DemoLivePage() {
               <div>
                 <h2 className="text-lg font-semibold text-white">Valeurs capteurs remontees</h2>
                 <p className="text-sm text-slate-500">
-                  Source : {data?.source === "zabbix" ? "Zabbix API JSON-RPC" : "mode mock/demo"}
+                  Source : {data?.source === "zabbix" ? "Zabbix API JSON-RPC" : "mode laboratoire"}
                 </p>
               </div>
               <span className="rounded-full border border-white/10 px-3 py-1 font-mono text-xs text-slate-400">
@@ -285,12 +285,12 @@ export default function DemoLivePage() {
             <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
               <div className="mb-3 flex items-center gap-2 text-emerald-200">
                 <ShieldCheck className="h-5 w-5" />
-                <h2 className="font-semibold">Principe de demonstration</h2>
+                <h2 className="font-semibold">Principe d'exploitation</h2>
               </div>
               <p className="text-sm leading-6 text-emerald-50/85">
-                La demo utilise le meme modele que le pilote : un host Zabbix, des items SNMP/OID,
-                des triggers, puis une interface plus lisible pour la DSI. AURION ne collecte pas
-                directement les capteurs, il lit Zabbix via API JSON-RPC.
+                Le site laboratoire utilise le meme modele que le pilote : un host Zabbix,
+                des items SNMP/OID, des triggers, puis une interface plus lisible pour la DSI.
+                AURION ne collecte pas directement les capteurs, il lit Zabbix via API JSON-RPC.
               </p>
             </div>
           </aside>
@@ -312,7 +312,7 @@ export default function DemoLivePage() {
                 {(data?.alerts ?? []).length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-4 py-6 text-center text-slate-500">
-                      Aucun trigger actif pour le site de demonstration.
+                      Aucun trigger actif pour ce site.
                     </td>
                   </tr>
                 ) : (

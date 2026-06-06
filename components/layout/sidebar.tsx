@@ -21,16 +21,16 @@ const navigation = [
   {
     name: "Supervision",
     items: [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Vue globale" },
-      { name: "Sites supervisés", href: "/sites", icon: BookOpen, description: "HTDV, PLDS, Démo Lab" },
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Etat global DSI" },
+      { name: "Sites supervises", href: "/sites", icon: BookOpen, description: "HTDV, PLDS, sites DSI" },
       { name: "Alertes", href: "/alertes", icon: AlertTriangle, description: "Triggers Zabbix" },
     ],
   },
   {
-    name: "Soutenance",
+    name: "Exploitation",
     items: [
-      { name: "Démo Live", href: "/demo", icon: FlaskConical, description: "Mini-lab Zabbix" },
-      { name: "Architecture", href: "/architecture", icon: Network, description: "Chaîne technique" },
+      { name: "Lab Black Box", href: "/lab", icon: FlaskConical, description: "Site de validation" },
+      { name: "Architecture", href: "/architecture", icon: Network, description: "Chaine technique" },
     ],
   },
 ];
@@ -152,7 +152,14 @@ export function Sidebar() {
             onClick={() => setCollapsed(!collapsed)}
             className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-slate-400 hover:bg-white/[0.04] hover:text-white"
           >
-            {collapsed ? <ChevronRight className="h-5 w-5" /> : <><ChevronLeft className="h-5 w-5" /><span className="text-sm">Réduire</span></>}
+            {collapsed ? (
+              <ChevronRight className="h-5 w-5" />
+            ) : (
+              <>
+                <ChevronLeft className="h-5 w-5" />
+                <span className="text-sm">Reduire</span>
+              </>
+            )}
           </button>
         </div>
       </aside>
