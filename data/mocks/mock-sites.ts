@@ -42,13 +42,13 @@ export const MOCK_SITES: Site[] = [
     name: "Lab Black Box",
     address: "Site laboratoire AURION - Proxmox / Zabbix / Black Box",
     type: "technique",
-    status: "warning",
+    status: "ok",
     coordinates: MAISONS_ALFORT_CENTER,
     bayCount: 1,
-    alertCount: 1,
+    alertCount: 0,
     lastUpdate: new Date().toISOString(),
-    temperature: 28.4,
-    humidity: 48,
+    temperature: 22.8,
+    humidity: 53,
     uptime: 99.1,
     powerConsumption: 0.2,
   },
@@ -56,8 +56,9 @@ export const MOCK_SITES: Site[] = [
 
 export function generateSensors(baseTemp: number = 22, status: string = "ok"): Sensors {
   const now = new Date().toISOString();
-  const tempVariation = Math.sin(Date.now() / 10000) * 2;
-  const humidityVariation = Math.cos(Date.now() / 15000) * 3;
+  const isLabBlackBox = baseTemp >= 22.7 && baseTemp <= 22.9;
+  const tempVariation = isLabBlackBox ? 0 : Math.sin(Date.now() / 10000) * 2;
+  const humidityVariation = isLabBlackBox ? 8 : Math.cos(Date.now() / 15000) * 3;
 
   const temperature = baseTemp + tempVariation;
   const humidity = 45 + humidityVariation;
@@ -66,8 +67,8 @@ export function generateSensors(baseTemp: number = 22, status: string = "ok"): S
     temperature: {
       value: temperature,
       unit: "C",
-      status: temperature > 30 ? "critical" : temperature > 25 ? "warning" : "ok",
-      threshold: { warning: 25, critical: 30 },
+      status: temperature > 30 ? "critical" : temperature > 27 ? "warning" : "ok",
+      threshold: { warning: 27, critical: 30 },
       lastUpdate: now,
     },
     humidity: {
@@ -134,7 +135,7 @@ export function generateBaysForSite(siteId: string, siteName: string, count: num
       name: isBlackBox ? `Baie BlackBox ${i}` : `Baie ${i}`,
       location: isBlackBox ? `Local technique - BlackBox ServSensor ${i}` : `Salle serveur ${Math.ceil(i / 2)}`,
       status,
-      sensors: generateSensors(22 + i, status),
+      sensors: generateSensors(siteId === "DEMO-LAB" ? 22.8 : 22 + i, status),
       lastUpdate: new Date().toISOString(),
       powerConsumption: 2 + Math.random() * 3,
       networkUsage: {
@@ -155,13 +156,13 @@ export const MOCK_ALERTS: Alert[] = [
     bayId: "DEMO-LAB-bay-1",
     bayName: "Baie laboratoire Black Box",
     severity: "major",
-    title: "Temperature elevee - Lab Black Box",
-    description: "Le capteur Black Box du site laboratoire depasse le seuil Warning configure dans Zabbix.",
+    title: "Test alerte temperature - Lab Black Box",
+    description: "Exemple d'alerte de laboratoire utilise uniquement lorsque Zabbix n'est pas joignable.",
     timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
     acknowledged: false,
     resolved: false,
     sensorType: "temperature",
-    value: 28.4,
+    value: 22.8,
     threshold: 27,
   },
   {
