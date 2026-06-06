@@ -111,8 +111,8 @@ function mapItemToSensor(item: any): DemoSensor {
 
 function mockSensors(): DemoSensor[] {
   const now = new Date().toISOString();
-  const temp = +(27.8 + Math.sin(Date.now() / 14000) * 1.2).toFixed(1);
-  const humidity = +(48 + Math.cos(Date.now() / 18000) * 3).toFixed(1);
+  const temp = 22.8;
+  const humidity = 53;
 
   return [
     {
@@ -211,7 +211,7 @@ function severityFromStatus(status: SiteStatus): Severity {
 
 function buildMockAlerts(sensors: DemoSensor[]): Alert[] {
   const active = sensors.filter((s) => s.status === "warning" || s.status === "critical");
-  if (active.length === 0) return MOCK_ALERTS.filter((a) => a.siteId === DEMO_SITE_ID);
+  if (active.length === 0) return [];
 
   return active.map((sensor, index) => ({
     id: `demo-live-${sensor.id}-${index}`,

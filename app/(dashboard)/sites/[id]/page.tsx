@@ -33,10 +33,99 @@ import { useSitesReference } from "@/hooks/useSitesReference";
 import { useSiteMedia } from "@/hooks/useSiteMedia";
 import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
 import { formatTemperature } from "@/lib/utils";
-import type { Bay } from "@/types";
+import type { Bay, Site, SiteStatus } from "@/types";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { MediaGallery } from "@/components/features/media-gallery";
 import { hasSensorType } from "@/lib/blackbox-refs";
+
+interface LabSensor {
+  id: string;
+  name: string;
+  type: string;
+  value: string;
+  numericValue?: number;
+  unit: string;
+  status: SiteStatus;
+  lastUpdate: string;
+  source: "zabbix" | "mock";
+  oidOrKey?: string;
+}
+
+interface LabPayload {
+  site: Site;
+  source: "zabbix" | "mock";
+  connected: boolean;
+  sensors: LabSensor[];
+  alerts: unknown[];
+  lastSync: string;
+}
+
+function numericSensor(payload: LabPayload | null, type: string, fallback: number) {
+  const value = payload?.sensors.find((sensor) => sensor.type === type)?.numericValue;
+  return Number.isFinite(value) ? Number(value) : fallback;
+}
+
+function sensorStatus(payload: LabPayload | null, type: string, fallback: SiteStatus = "ok") {
+  return payload?.sensors.find((sensor) => sensor.type === type)?.status ?? fallback;
+}
+
+function buildLabBay(site: Site, payload: LabPayload): Bay {
+  const now = payload.lastSync ?? new Date().toISOString();
+  const temperature = numericSensor(payload, "temperature", site.temperature);
+  const humidity = numericSensor(payload, "humidity", site.humidity);
+
+  return {
+    id: "DEMO-LAB-bay-1",
+    siteId: "DEMO-LAB",
+    name: "Baie BlackBox 1",
+    location: "Module 0 - Port 1",
+    status: site.status,
+    sensors: {
+      temperature: {
+        value: temperature,
+        unit: "C",
+        status: sensorStatus(payload, "temperature"),
+        threshold: { warning: 27, critical: 30 },
+        lastUpdate: now,
+      },
+      humidity: {
+        value: humidity,
+        unit: "%",
+        status: sensorStatus(payload, "humidity"),
+        threshold: { warning: 60, critical: 75 },
+        lastUpdate: now,
+      },
+      smoke: { active: false, status: "ok", lastUpdate: now },
+      water: { active: false, status: "ok", lastUpdate: now },
+      door: { active: false, status: "ok", lastUpdate: now },
+      vibration: {
+        value: 0,
+        unit: "g",
+        status: "ok",
+        threshold: { warning: 0.3, critical: 0.5 },
+        lastUpdate: now,
+      },
+      power230v: { active: true, status: "ok", lastUpdate: now },
+      airflow: {
+        value: 0,
+        unit: "m3/h",
+        status: "ok",
+        threshold: { warning: 80, critical: 60 },
+        lastUpdate: now,
+      },
+      pressure: {
+        value: 0,
+        unit: "hPa",
+        status: "ok",
+        threshold: { warning: 1005, critical: 1000 },
+        lastUpdate: now,
+      },
+    },
+    lastUpdate: now,
+    powerConsumption: site.powerConsumption,
+    networkUsage: { inbound: 0, outbound: 0 },
+  };
+}
 
 export default function SiteDetailPage() {
   const params = useParams();
@@ -48,8 +137,12 @@ export default function SiteDetailPage() {
   const [bays, setBays] = useState<Bay[]>([]);
   const [loading, setLoading] = useState(true);
   const [tempHistory, setTempHistory] = useState<{ time: string; temperature: number }[]>([]);
+  const [labPayload, setLabPayload] = useState<LabPayload | null>(null);
 
-  const supervisionSite = sites.find((s) => s.id === siteId);
+  const storedSupervisionSite = sites.find((s) => s.id === siteId);
+  const supervisionSite = siteId === "DEMO-LAB" && labPayload?.site
+    ? labPayload.site
+    : storedSupervisionSite;
   const refSite = getSiteById(siteId);
   const { media, loading: mediaLoading, error: mediaError } = useSiteMedia(siteId);
 
@@ -60,8 +153,45 @@ export default function SiteDetailPage() {
   }, [sites, sites.length, setSites]);
 
   useEffect(() => {
+    if (siteId !== "DEMO-LAB") return;
+
+    let cancelled = false;
+
+    async function loadLabSite() {
+      try {
+        const response = await fetch("/api/zabbix/demo", { cache: "no-store" });
+        if (!response.ok) return;
+
+        const payload = (await response.json()) as LabPayload;
+        if (cancelled) return;
+
+        setLabPayload(payload);
+        if (payload.site) {
+          const currentSites = useStore.getState().sites;
+          setSites([
+            ...currentSites.filter((site) => site.id !== payload.site.id),
+            payload.site,
+          ]);
+        }
+      } catch {
+        // La fiche reste exploitable avec les valeurs de secours si Zabbix est indisponible.
+      }
+    }
+
+    loadLabSite();
+    const timer = setInterval(loadLabSite, 15000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [siteId, setSites]);
+
+  useEffect(() => {
     if (supervisionSite) {
-      const siteBays = generateBaysForSite(supervisionSite.id, supervisionSite.name, supervisionSite.bayCount);
+      const siteBays = siteId === "DEMO-LAB" && labPayload?.connected
+        ? [buildLabBay(supervisionSite, labPayload)]
+        : generateBaysForSite(supervisionSite.id, supervisionSite.name, supervisionSite.bayCount);
       setBays(siteBays);
       const history = Array.from({ length: 12 }, (_, i) => ({
         time: `${11 - i}h`,
@@ -72,7 +202,7 @@ export default function SiteDetailPage() {
     } else if (!refLoading) {
       setLoading(false);
     }
-  }, [supervisionSite, refLoading]);
+  }, [supervisionSite, refLoading, siteId, labPayload]);
 
   if (loading || refLoading) {
     return (
