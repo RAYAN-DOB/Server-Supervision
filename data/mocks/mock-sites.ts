@@ -150,22 +150,6 @@ export function generateBaysForSite(siteId: string, siteName: string, count: num
 
 export const MOCK_ALERTS: Alert[] = [
   {
-    id: "alert-lab-1",
-    siteId: "DEMO-LAB",
-    siteName: "Lab Black Box",
-    bayId: "DEMO-LAB-bay-1",
-    bayName: "Baie laboratoire Black Box",
-    severity: "major",
-    title: "Test alerte temperature - Lab Black Box",
-    description: "Exemple d'alerte de laboratoire utilise uniquement lorsque Zabbix n'est pas joignable.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
-    acknowledged: false,
-    resolved: false,
-    sensorType: "temperature",
-    value: 22.8,
-    threshold: 27,
-  },
-  {
     id: "alert-1",
     siteId: "PLDS",
     siteName: "Palais des Sports",
