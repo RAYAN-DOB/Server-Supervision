@@ -19,10 +19,7 @@ export async function GET(
 
     return NextResponse.json({ media });
   } catch (error) {
-    console.error("[API] GET /api/v1/sites/[id]/media error:", error);
-    return NextResponse.json(
-      { error: "Erreur lors de la récupération des médias" },
-      { status: 500 }
-    );
+    console.warn("[API] media indisponible, fallback galerie vide:", error);
+    return NextResponse.json({ media: [], fallback: true });
   }
 }
