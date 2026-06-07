@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/layout/providers";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
@@ -12,11 +12,11 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const spaceGrotesk = Space_Grotesk({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-space",
+  variable: "--font-display",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -53,7 +53,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="dark">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${plusJakarta.variable} font-sans antialiased`}>
         <Providers>
           {children}
           <ScrollToTop />
@@ -62,7 +62,7 @@ export default function RootLayout({
             theme="dark"
             toastOptions={{
               style: {
-                background: "rgba(10, 10, 26, 0.95)",
+                background: "rgba(15, 23, 42, 0.96)",
                 backdropFilter: "blur(12px)",
                 border: "1px solid rgba(34, 211, 238, 0.25)",
                 color: "#fff",

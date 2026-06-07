@@ -57,7 +57,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#07111f] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_18%,rgba(34,211,238,0.14),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(124,58,237,0.16),transparent_30%),linear-gradient(135deg,#07111f_0%,#0b1220_45%,#071a1f_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_16%,rgba(34,211,238,0.14),transparent_32%),radial-gradient(circle_at_88%_12%,rgba(37,99,235,0.10),transparent_32%),linear-gradient(135deg,#07111f_0%,#0b1220_48%,#06151b_100%)]" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
 
       <main className="relative z-10 grid min-h-screen place-items-center px-6 py-10">
