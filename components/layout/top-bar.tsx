@@ -28,13 +28,13 @@ export function TopBar() {
   const criticalAlerts = activeAlerts.filter((a) => a.severity === "critical");
 
   return (
-    <div className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/85 backdrop-blur-xl">
+    <div className="sticky top-0 z-30 border-b border-slate-800 bg-[#07111f]/92 backdrop-blur-xl">
       <div className="flex min-h-[56px] items-center justify-between gap-3 px-3 py-2.5 sm:px-6 lg:px-8">
         <div className="min-w-0">
           <p className="hidden text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300 sm:block">
             Supervision DSI - Maisons-Alfort
           </p>
-          <h2 className="truncate text-sm font-semibold text-white sm:text-base">
+          <h2 className="truncate text-sm font-semibold text-slate-50 sm:text-base">
             AURION - Supervision environnementale
           </h2>
         </div>
@@ -50,12 +50,12 @@ export function TopBar() {
             SNMPv3 authPriv
           </div>
 
-          <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs text-slate-300 xl:flex">
+          <div className="hidden items-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-2.5 py-1.5 text-xs text-slate-300 xl:flex">
             <Database className="h-3.5 w-3.5 text-cyan-300" />
             API JSON-RPC
           </div>
 
-          <div className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 lg:flex">
+          <div className="hidden items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-1.5 lg:flex">
             <Clock className="h-3.5 w-3.5 text-slate-500" />
             <span className="font-mono text-xs font-medium text-slate-300">{timeStr}</span>
           </div>
@@ -67,7 +67,7 @@ export function TopBar() {
             whileTap={{ scale: 0.95 }}
             onClick={() => router.push("/alertes")}
             title="Voir les alertes"
-            className="relative rounded-xl p-2 transition-colors hover:bg-white/[0.06]"
+            className="relative rounded-xl p-2 transition-colors hover:bg-slate-900/80"
           >
             <Bell className="h-5 w-5 text-slate-400" />
             {activeAlerts.length > 0 && (
@@ -82,7 +82,7 @@ export function TopBar() {
             )}
           </motion.button>
 
-          <div className="h-5 w-px bg-white/10" />
+          <div className="h-5 w-px bg-slate-800" />
           <UserMenu />
         </div>
       </div>

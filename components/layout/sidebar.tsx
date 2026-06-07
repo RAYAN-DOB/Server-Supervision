@@ -21,8 +21,8 @@ const navigation = [
   {
     name: "Supervision",
     items: [
-      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "Etat global DSI" },
-      { name: "Sites supervises", href: "/sites", icon: BookOpen, description: "HTDV, PLDS, sites DSI" },
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, description: "État global DSI" },
+      { name: "Sites supervisés", href: "/sites", icon: BookOpen, description: "HTDV, PLDS, sites DSI" },
       { name: "Alertes", href: "/alertes", icon: AlertTriangle, description: "Triggers Zabbix" },
     ],
   },
@@ -30,7 +30,7 @@ const navigation = [
     name: "Exploitation",
     items: [
       { name: "Lab Black Box", href: "/lab", icon: FlaskConical, description: "Site de validation" },
-      { name: "Architecture", href: "/architecture", icon: Network, description: "Chaine technique" },
+      { name: "Architecture", href: "/architecture", icon: Network, description: "Chaîne technique" },
     ],
   },
 ];
@@ -54,7 +54,7 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="fixed left-4 top-4 z-50 rounded-lg border border-white/10 bg-slate-950/90 p-2 text-white lg:hidden"
+        className="fixed left-4 top-4 z-50 rounded-lg border border-slate-700 bg-slate-950/90 p-2 text-white lg:hidden"
         aria-label="Ouvrir le menu"
       >
         <span className="block h-0.5 w-5 bg-white" />
@@ -71,18 +71,18 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-white/10 bg-slate-950/95 backdrop-blur-xl transition-all",
+          "fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-slate-800 bg-[#07111f]/98 backdrop-blur-xl transition-all",
           collapsed ? "w-20" : "w-[280px]",
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        <div className="border-b border-white/10 p-6">
+        <div className="border-b border-slate-800 p-6">
           {!collapsed ? (
             <Link href="/dashboard" className="flex items-center gap-3">
               <AurionLogo size="md" />
               <div>
                 <h1 className="text-lg font-semibold text-white">AURION</h1>
-                <p className="text-[11px] text-slate-500">Supervision environnementale</p>
+                <p className="text-[11px] text-slate-500">Supervision DSI</p>
               </div>
             </Link>
           ) : (
@@ -114,8 +114,8 @@ export function Sidebar() {
                           "relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors",
                           collapsed && "justify-center",
                           isActive
-                            ? "border border-cyan-500/25 bg-cyan-500/10 text-white"
-                            : "text-slate-400 hover:bg-white/[0.04] hover:text-white"
+                            ? "border border-cyan-500/25 bg-cyan-500/10 text-white shadow-[inset_3px_0_0_rgba(34,211,238,0.9)]"
+                            : "text-slate-400 hover:bg-slate-900/70 hover:text-white"
                         )}
                       >
                         {isActive && (
@@ -147,17 +147,17 @@ export function Sidebar() {
           ))}
         </nav>
 
-        <div className="hidden border-t border-white/10 p-4 lg:block">
+        <div className="hidden border-t border-slate-800 p-4 lg:block">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-slate-400 hover:bg-white/[0.04] hover:text-white"
+            className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-slate-400 hover:bg-slate-900/70 hover:text-white"
           >
             {collapsed ? (
               <ChevronRight className="h-5 w-5" />
             ) : (
               <>
                 <ChevronLeft className="h-5 w-5" />
-                <span className="text-sm">Reduire</span>
+                <span className="text-sm">Réduire</span>
               </>
             )}
           </button>

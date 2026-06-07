@@ -4,8 +4,17 @@
 
 @layer base {
   :root {
-    --background: 2 2 8;
+    --background: 7 17 31;
     --foreground: 250 250 250;
+    --aurion-bg: #07111f;
+    --aurion-panel: #0b1220;
+    --aurion-panel-2: #111827;
+    --aurion-border: rgba(148, 163, 184, 0.16);
+    --aurion-cyan: #22d3ee;
+    --aurion-blue: #2563eb;
+    --aurion-green: #22c55e;
+    --aurion-amber: #f59e0b;
+    --aurion-red: #ef4444;
   }
   
   * {
@@ -13,7 +22,10 @@
   }
   
   body {
-    background: #020208;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(34, 211, 238, 0.12), transparent 28rem),
+      radial-gradient(circle at 100% 12%, rgba(37, 99, 235, 0.10), transparent 30rem),
+      linear-gradient(180deg, #07111f 0%, #020617 100%);
     color: rgb(250, 250, 250);
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
     -webkit-font-smoothing: antialiased;
@@ -31,12 +43,12 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    background: rgba(106, 0, 255, 0.3);
+    background: rgba(148, 163, 184, 0.28);
     border-radius: 10px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(106, 0, 255, 0.5);
+    background: rgba(34, 211, 238, 0.45);
   }
 
   /* Hide scrollbar for tabs on mobile */
@@ -51,21 +63,21 @@
 }
 
 @layer components {
-  /* Clean Card - Vercel Style */
+  /* Clean Card - AURION operations style */
   .clean-card {
-    @apply bg-white/[0.02] border border-white/[0.06] rounded-2xl backdrop-blur-sm;
-    @apply hover:border-white/[0.12] hover:bg-white/[0.04];
-    @apply transition-all duration-300;
+    @apply rounded-2xl border border-slate-700/60 bg-slate-950/55 backdrop-blur-sm;
+    @apply shadow-[0_18px_48px_-40px_rgba(15,23,42,0.95)];
+    @apply transition-colors duration-200;
   }
   
   /* Glass Card - Used by UI components */
   .glass-card {
-    @apply bg-white/[0.02] border border-white/[0.06] rounded-2xl backdrop-blur-xl shadow-xl;
+    @apply rounded-2xl border border-slate-700/60 bg-slate-950/65 backdrop-blur-xl shadow-xl shadow-slate-950/30;
   }
   
   /* Card Glow Effect */
   .card-glow {
-    @apply shadow-[0_0_30px_rgba(106,0,255,0.15)];
+    @apply shadow-[0_20px_50px_-38px_rgba(34,211,238,0.42)];
   }
   
   /* Gradient Text - Subtle */
@@ -75,7 +87,7 @@
   
   /* Gradient Text - Colorful */
   .gradient-text-color {
-    @apply bg-gradient-to-r from-nebula-violet via-nebula-magenta to-nebula-cyan bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-cyan-200 via-sky-300 to-blue-300 bg-clip-text text-transparent;
   }
   
   /* Button Clean */
@@ -89,8 +101,8 @@
   /* Button Primary */
   .btn-primary {
     @apply px-4 sm:px-6 py-2.5 rounded-xl;
-    @apply bg-gradient-to-r from-nebula-violet to-nebula-magenta;
-    @apply hover:shadow-lg hover:shadow-nebula-violet/20;
+    @apply bg-cyan-400 text-slate-950;
+    @apply hover:bg-cyan-300 hover:shadow-lg hover:shadow-cyan-950/30;
     @apply transition-all duration-200;
     @apply text-xs sm:text-sm font-semibold text-white;
   }
@@ -104,9 +116,9 @@
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-space), var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
 }
 
 /* Smooth transitions globally */
@@ -116,12 +128,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Focus states */
 *:focus-visible {
-  @apply outline-none ring-2 ring-nebula-violet/50 ring-offset-2 ring-offset-[#020208];
+  @apply outline-none ring-2 ring-cyan-300/70 ring-offset-2 ring-offset-slate-950;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(106, 0, 255, 0.3);
+  background: rgba(34, 211, 238, 0.28);
   color: white;
 }
 
@@ -293,4 +305,58 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 50%;
   background: inherit;
   animation: statusPulse 2s ease-out infinite;
+}
+
+/* AURION sober operations overrides */
+.holo-card:hover {
+  transform: none;
+  box-shadow: 0 20px 48px -38px rgba(15, 23, 42, 0.9);
+}
+
+.holo-card::before,
+.holo-border::after,
+.scan-line::after {
+  display: none;
+}
+
+.neon-text,
+.neon-text-cyan {
+  text-shadow: none;
+}
+
+.gauge-glow {
+  filter: none;
+}
+
+.ops-panel {
+  border: 1px solid var(--aurion-border);
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: 0 24px 64px -44px rgba(2, 6, 23, 0.95);
+}
+
+.ops-card {
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(2, 6, 23, 0.72));
+  box-shadow: 0 18px 46px -36px rgba(2, 6, 23, 0.95);
+}
+
+.ops-card:hover {
+  border-color: rgba(34, 211, 238, 0.28);
+}
+
+.ops-chip {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.72);
+  color: #cbd5e1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

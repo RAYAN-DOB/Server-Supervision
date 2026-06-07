@@ -12,15 +12,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Nebula Color System
+        // AURION operations palette: sober DSI dashboard, not marketing/neon.
         nebula: {
-          violet: "#6A00FF",
-          magenta: "#C300FF",
-          cyan: "#00F0FF",
-          pink: "#FF00E5",
-          space: "#050510",
-          dark: "#0A0A1A",
-          darker: "#02010A",
+          violet: "#2563EB",
+          magenta: "#0EA5E9",
+          cyan: "#22D3EE",
+          pink: "#38BDF8",
+          space: "#07111F",
+          dark: "#0B1220",
+          darker: "#020617",
         },
         primary: {
           50: "#f5f0ff",
@@ -37,23 +37,23 @@ const config: Config = {
         },
       },
       backgroundImage: {
-        "gradient-nebula": "linear-gradient(135deg, #6A00FF 0%, #C300FF 50%, #FF00E5 100%)",
-        "gradient-cyber": "linear-gradient(135deg, #6A00FF 0%, #00F0FF 100%)",
+        "gradient-nebula": "linear-gradient(135deg, #0F172A 0%, #0E7490 54%, #0369A1 100%)",
+        "gradient-cyber": "linear-gradient(135deg, #0F172A 0%, #0891B2 100%)",
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       boxShadow: {
-        "neon-sm": "0 0 10px -2px rgba(106, 0, 255, 0.3)",
-        "neon-md": "0 0 20px -5px rgba(106, 0, 255, 0.4)",
-        "neon-lg": "0 0 30px -5px rgba(106, 0, 255, 0.5)",
-        "neon-xl": "0 0 40px -10px rgba(106, 0, 255, 0.6)",
-        "cyan-neon": "0 0 20px -5px rgba(0, 240, 255, 0.5)",
-        "magenta-neon": "0 0 20px -5px rgba(195, 0, 255, 0.5)",
+        "neon-sm": "0 8px 24px -18px rgba(34, 211, 238, 0.45)",
+        "neon-md": "0 12px 32px -22px rgba(34, 211, 238, 0.45)",
+        "neon-lg": "0 18px 42px -28px rgba(34, 211, 238, 0.42)",
+        "neon-xl": "0 24px 56px -34px rgba(34, 211, 238, 0.38)",
+        "cyan-neon": "0 14px 34px -24px rgba(34, 211, 238, 0.45)",
+        "magenta-neon": "0 14px 34px -24px rgba(14, 165, 233, 0.35)",
       },
       dropShadow: {
-        "neon": "0 0 12px rgba(106, 0, 255, 0.7)",
-        "cyan-neon": "0 0 12px rgba(0, 240, 255, 0.7)",
-        "magenta-neon": "0 0 12px rgba(195, 0, 255, 0.7)",
+        "neon": "0 4px 14px rgba(34, 211, 238, 0.25)",
+        "cyan-neon": "0 4px 14px rgba(34, 211, 238, 0.32)",
+        "magenta-neon": "0 4px 14px rgba(14, 165, 233, 0.24)",
       },
       animation: {
         "float": "float 6s ease-in-out infinite",

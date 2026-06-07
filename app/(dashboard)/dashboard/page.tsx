@@ -1,49 +1,60 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Building2,
-  AlertTriangle,
-  Thermometer,
-  Activity,
-  ChevronRight,
-  ArrowUpRight,
-  ArrowDownRight,
-  Wifi,
-  CheckCircle2,
-  BookOpen,
-  Droplets,
-  Flame,
-  DoorOpen,
-  ShieldCheck,
-} from "lucide-react";
-import { SITE_BB_EQUIPMENT, BB_LABELS, hasSensorType } from "@/lib/blackbox-refs";
-import { Badge } from "@/components/ui/badge";
-import { useStore } from "@/store/useStore";
-import { useSitesReference } from "@/hooks/useSitesReference";
-import { MOCK_SITES, MOCK_ALERTS } from "@/data/mocks";
-import { formatRelativeTime, cn } from "@/lib/utils";
 import Link from "next/link";
 import {
-  AreaChart,
+  Activity,
+  AlertTriangle,
+  ArrowUpRight,
+  BookOpen,
+  Building2,
+  CheckCircle2,
+  ChevronRight,
+  DoorOpen,
+  Droplets,
+  Flame,
+  ShieldCheck,
+  Thermometer,
+  Wifi,
+} from "lucide-react";
+import {
   Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
+import { SITE_BB_EQUIPMENT, hasSensorType } from "@/lib/blackbox-refs";
+import { Badge } from "@/components/ui/badge";
+import { MOCK_ALERTS, MOCK_SITES } from "@/data/mocks";
+import { useSitesReference } from "@/hooks/useSitesReference";
+import { cn, formatRelativeTime } from "@/lib/utils";
+import { useStore } from "@/store/useStore";
 
 const BASE_TEMP_DATA = Array.from({ length: 24 }, (_, i) => ({
   time: `${String(i).padStart(2, "0")}h`,
-  temperature: +(22 + Math.sin((i / 24) * Math.PI * 2) * 2 + ((i * 7 + 3) % 10) / 20).toFixed(1),
+  temperature: +(22 + Math.sin((i / 24) * Math.PI * 2) * 1.6 + ((i * 7 + 3) % 8) / 20).toFixed(1),
 }));
+
+const severityDot: Record<string, string> = {
+  critical: "bg-red-500",
+  major: "bg-orange-500",
+  minor: "bg-yellow-500",
+  info: "bg-sky-500",
+};
+
+function statusTone(status: string) {
+  if (status === "critical") return "border-red-500/30 bg-red-500/10 text-red-300";
+  if (status === "warning") return "border-amber-500/30 bg-amber-500/10 text-amber-200";
+  return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
+}
 
 export default function DashboardPage() {
   const { sites, alerts, setSites, setAlerts } = useStore();
   const { stats: refStats, loading: refLoading } = useSitesReference();
-  const [avgTemp, setAvgTemp] = useState(22.5);
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
   useEffect(() => {
@@ -54,454 +65,379 @@ export default function DashboardPage() {
       setAlerts(MOCK_ALERTS);
     }
 
-    const interval = setInterval(() => {
-      setAvgTemp(+(22 + Math.sin(Date.now() / 10000) * 2).toFixed(1));
-      setLastUpdate(new Date());
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [sites, sites.length, alerts, alerts.length, setSites, setAlerts]);
+    const timer = setInterval(() => setLastUpdate(new Date()), 15000);
+    return () => clearInterval(timer);
+  }, [alerts, alerts.length, setAlerts, setSites, sites, sites.length]);
 
-  const activeAlerts = alerts.filter((a) => !a.acknowledged && !a.resolved);
-  const criticalAlerts = activeAlerts.filter((a) => a.severity === "critical");
-  const totalBays = sites.reduce((sum, s) => sum + s.bayCount, 0);
-  const avgUptime = useMemo(
-    () => (sites.reduce((sum, s) => sum + s.uptime, 0) / (sites.length || 1)).toFixed(1),
-    [sites]
-  );
+  const visibleSites = sites.length > 0 ? sites : MOCK_SITES;
+  const visibleAlerts = alerts.length > 0 ? alerts : MOCK_ALERTS;
+
+  const activeAlerts = visibleAlerts.filter((alert) => !alert.acknowledged && !alert.resolved);
+  const criticalAlerts = activeAlerts.filter((alert) => alert.severity === "critical");
+  const sitesToWatch = visibleSites
+    .filter((site) => site.status === "critical" || site.status === "warning")
+    .slice(0, 4);
+
+  const avgTemp = useMemo(() => {
+    const values = visibleSites.map((site) => site.temperature).filter(Number.isFinite);
+    if (values.length === 0) return 0;
+    return values.reduce((sum, value) => sum + value, 0) / values.length;
+  }, [visibleSites]);
+
+  const avgUptime = useMemo(() => {
+    const values = visibleSites.map((site) => site.uptime).filter(Number.isFinite);
+    if (values.length === 0) return "0.0";
+    return (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1);
+  }, [visibleSites]);
 
   const recentAlerts = useMemo(
     () =>
-      [...alerts]
+      [...visibleAlerts]
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, 5),
-    [alerts]
+    [visibleAlerts]
   );
 
-  const criticalSites = useMemo(
-    () => sites.filter((s) => s.status === "critical" || s.status === "warning").slice(0, 4),
-    [sites]
-  );
-
-  const stats = [
+  const kpis = [
     {
-      label: "Référentiel",
+      label: "Sites DSI",
       value: refStats.total,
-      sub: `${refStats.dsiManaged} gérés par la DSI`,
+      sub: `${refStats.connectedZabbix} connectés Zabbix`,
       icon: BookOpen,
-      trend: `${refStats.connectedZabbix} Zabbix`,
-      trendUp: true,
-      accent: "from-purple-500/20 to-purple-500/5",
-      border: "border-purple-500/20",
-      iconColor: "text-purple-400",
       href: "/sites",
+      tone: "border-sky-500/25 bg-sky-500/10 text-sky-300",
+      trend: `${refStats.dsiManaged} gérés`,
     },
     {
       label: "Alertes actives",
       value: activeAlerts.length,
-      sub: `${criticalAlerts.length} critique${criticalAlerts.length !== 1 ? "s" : ""}`,
+      sub: `${criticalAlerts.length} critique${criticalAlerts.length > 1 ? "s" : ""}`,
       icon: AlertTriangle,
-      trend: criticalAlerts.length > 0 ? "Action requise" : "Tout OK",
-      trendUp: criticalAlerts.length === 0,
-      accent: criticalAlerts.length > 0 ? "from-red-500/20 to-red-500/5" : "from-green-500/20 to-green-500/5",
-      border: criticalAlerts.length > 0 ? "border-red-500/20" : "border-green-500/20",
-      iconColor: criticalAlerts.length > 0 ? "text-red-400" : "text-green-400",
       href: "/alertes",
+      tone: criticalAlerts.length > 0 ? "border-red-500/30 bg-red-500/10 text-red-300" : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+      trend: criticalAlerts.length > 0 ? "Action requise" : "Tout OK",
     },
     {
-      label: "Température moy.",
-      value: `${avgTemp}°C`,
-      sub: "Sites supervisés",
+      label: "Température moyenne",
+      value: `${avgTemp.toFixed(1)} °C`,
+      sub: "HTDV, PLDS, Lab Black Box",
       icon: Thermometer,
-      trend: avgTemp > 24 ? "Élevée" : "Normale",
-      trendUp: avgTemp <= 24,
-      accent: avgTemp > 24 ? "from-orange-500/20 to-orange-500/5" : "from-green-500/20 to-green-500/5",
-      border: avgTemp > 24 ? "border-orange-500/20" : "border-green-500/20",
-      iconColor: avgTemp > 24 ? "text-orange-400" : "text-green-400",
       href: "/sites",
+      tone: avgTemp >= 27 ? "border-amber-500/30 bg-amber-500/10 text-amber-200" : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+      trend: avgTemp >= 27 ? "À surveiller" : "Normale",
     },
     {
       label: "Disponibilité",
       value: `${avgUptime}%`,
-      sub: "30 derniers jours",
+      sub: "Derniers relevés",
       icon: Activity,
-      trend: parseFloat(avgUptime) >= 99.5 ? "Objectif atteint" : "À surveiller",
-      trendUp: parseFloat(avgUptime) >= 99.5,
-      accent: "from-cyan-500/20 to-cyan-500/5",
-      border: "border-cyan-500/20",
-      iconColor: "text-cyan-400",
       href: "/architecture",
+      tone: "border-cyan-500/25 bg-cyan-500/10 text-cyan-300",
+      trend: parseFloat(avgUptime) >= 99.5 ? "Objectif atteint" : "Suivi renforcé",
     },
   ];
 
-  const SEVERITY_DOT: Record<string, string> = {
-    critical: "bg-red-500",
-    major: "bg-orange-500",
-    minor: "bg-yellow-500",
-    info: "bg-blue-500",
-  };
-
   return (
-    <div className="p-4 sm:p-6 lg:p-8 flex-1">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8 flex items-start justify-between gap-4 flex-wrap"
-      >
-        <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-1">
-            Supervision AURION
-          </h1>
-          <p className="text-sm text-gray-500 font-light flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              En direct
-            </span>
-            <span className="text-gray-700">·</span>
-            <span>Mis à jour {formatRelativeTime(lastUpdate.toISOString())}</span>
-          </p>
-        </div>
-        <div className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-medium",
-          criticalAlerts.length > 0
-            ? "border-red-500/30 bg-red-500/5 text-red-400"
-            : "border-green-500/30 bg-green-500/5 text-green-400"
-        )}>
-          {criticalAlerts.length > 0 ? (
-            <><AlertTriangle className="w-4 h-4" />{criticalAlerts.length} alerte{criticalAlerts.length > 1 ? "s" : ""} critique{criticalAlerts.length > 1 ? "s" : ""}</>
-          ) : (
-            <><CheckCircle2 className="w-4 h-4" />Infrastructure opérationnelle</>
-          )}
-        </div>
-      </motion.div>
+    <main className="flex-1 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <motion.header
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+        >
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">
+              Supervision DSI - Maisons-Alfort
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
+              Vue d'exploitation AURION
+            </h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+              Lecture synthétique des sites supervisés, des capteurs Black Box, des alertes Zabbix
+              et de l'état de la chaîne SNMPv3 / API JSON-RPC.
+            </p>
+          </div>
 
-      {/* KPI Cards — Holographic */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat, i) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-            >
-              <Link href={stat.href}>
-                <div className={cn(
-                  "relative overflow-hidden rounded-2xl border p-5 cursor-pointer group bg-gradient-to-br transition-all hover:-translate-y-0.5 hover:border-white/20",
-                  stat.accent,
-                  stat.border,
-                  stat.label === "Alertes actives" && criticalAlerts.length > 0 && "alert-glow-critical"
-                )}>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={cn("p-2.5 rounded-xl bg-white/[0.06] relative", stat.iconColor)}>
-                      <Icon className="w-5 h-5 gauge-glow" />
-                    </div>
-                    <div className="flex items-center gap-1 text-xs">
-                      {stat.trendUp ? (
-                        <ArrowUpRight className="w-3.5 h-3.5 text-green-400" />
-                      ) : (
-                        <ArrowDownRight className="w-3.5 h-3.5 text-red-400" />
-                      )}
-                      <span className={stat.trendUp ? "text-green-400" : "text-red-400"}>
-                        {stat.trend}
+          <div className={cn("inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium", criticalAlerts.length > 0 ? statusTone("critical") : statusTone("ok"))}>
+            {criticalAlerts.length > 0 ? <AlertTriangle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+            {criticalAlerts.length > 0
+              ? `${criticalAlerts.length} alerte critique`
+              : "Infrastructure opérationnelle"}
+          </div>
+        </motion.header>
+
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {kpis.map((kpi, index) => {
+            const Icon = kpi.icon;
+            return (
+              <motion.div
+                key={kpi.label}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Link href={kpi.href}>
+                  <article className="ops-card group h-full p-5">
+                    <div className="mb-5 flex items-start justify-between gap-3">
+                      <span className={cn("rounded-xl border p-2.5", kpi.tone)}>
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-xs text-emerald-300">
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                        {kpi.trend}
                       </span>
                     </div>
-                  </div>
-                  <div className="text-3xl font-bold text-white tracking-tight mb-0.5">{stat.value}</div>
-                  <div className="text-sm font-medium text-gray-300 mb-1">{stat.label}</div>
-                  <div className="text-xs text-gray-500 font-light">{stat.sub}</div>
-                  <ChevronRight className="absolute right-4 bottom-4 w-4 h-4 text-gray-700 group-hover:text-gray-400 group-hover:translate-x-1 transition-all" />
-                </div>
-              </Link>
-            </motion.div>
-          );
-        })}
-      </div>
+                    <p className="text-3xl font-semibold tracking-tight text-white">{kpi.value}</p>
+                    <p className="mt-1 text-sm font-medium text-slate-200">{kpi.label}</p>
+                    <p className="mt-1 text-xs text-slate-500">{kpi.sub}</p>
+                    <ChevronRight className="absolute bottom-5 right-5 h-4 w-4 text-slate-600 transition group-hover:text-slate-300" />
+                  </article>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </section>
 
-      {/* Sites en Supervision Active */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.32 }}
-        className="mb-6"
-      >
-        <div className="clean-card p-5">
-          <div className="flex items-center justify-between mb-4">
+        <section className="ops-panel p-5">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-semibold text-white">Sites en Supervision Active</h3>
-              <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full px-2 py-0.5">
-                {Object.keys(SITE_BB_EQUIPMENT).length} site{Object.keys(SITE_BB_EQUIPMENT).length > 1 ? "s" : ""}
+              <ShieldCheck className="h-4 w-4 text-emerald-300" />
+              <h2 className="text-sm font-semibold text-white">Sites supervisés actifs</h2>
+              <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2 py-0.5 text-[10px] text-cyan-200">
+                HTDV / PLDS / Lab
               </span>
             </div>
-            <Link href="/sites">
-              <span className="text-xs text-gray-500 hover:text-purple-400 transition-colors">Détails →</span>
+            <Link href="/sites" className="text-xs text-slate-500 transition hover:text-cyan-300">
+              Détails →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             {Object.entries(SITE_BB_EQUIPMENT).map(([siteId, bays]) => {
-              const liveSite = sites.find(s => s.id === siteId);
-              const temp = liveSite?.temperature ?? 22.5;
-              const tempStatus = temp > 27 ? "critical" : temp > 24 ? "warning" : "ok";
+              const site = visibleSites.find((candidate) => candidate.id === siteId);
+              const temp = site?.temperature;
+              const tempStatus = temp == null ? "ok" : temp >= 30 ? "critical" : temp >= 27 ? "warning" : "ok";
               const sensors = {
                 temperature: hasSensorType(siteId, "temperature"),
                 humidity: hasSensorType(siteId, "humidity"),
                 smoke: hasSensorType(siteId, "smoke"),
                 water: hasSensorType(siteId, "water"),
                 door: hasSensorType(siteId, "door"),
-                power: hasSensorType(siteId, "power"),
               };
+
               return (
                 <Link key={siteId} href={`/sites/${siteId}`}>
-                  <motion.div
-                    whileHover={{ y: -2 }}
-                    className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/15 hover:border-emerald-500/30 transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                          <Building2 className="w-4 h-4 text-emerald-400" />
-                        </div>
+                  <article className="rounded-2xl border border-slate-800/90 bg-slate-950/45 p-4 transition hover:border-cyan-400/25 hover:bg-slate-900/60">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-2 text-cyan-200">
+                          <Building2 className="h-4 w-4" />
+                        </span>
                         <div>
-                          <p className="text-sm font-semibold text-white">{siteId}</p>
-                          <p className="text-[10px] text-gray-500">{bays[0]?.bayPrefix ?? "—"}</p>
+                          <p className="text-sm font-semibold text-white">{site?.name ?? siteId}</p>
+                          <p className="text-xs text-slate-500">{bays[0]?.bayPrefix ?? "Local technique"}</p>
                         </div>
                       </div>
-                      <div className={cn(
-                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border",
-                        tempStatus === "critical" ? "bg-red-500/10 text-red-400 border-red-500/20" :
-                        tempStatus === "warning" ? "bg-orange-500/10 text-orange-400 border-orange-500/20" :
-                        "bg-green-500/10 text-green-400 border-green-500/20"
-                      )}>
-                        <span className={cn(
-                          "w-1.5 h-1.5 rounded-full",
-                          tempStatus === "critical" ? "bg-red-500 animate-pulse" :
-                          tempStatus === "warning" ? "bg-orange-500 animate-pulse" :
-                          "bg-green-500"
-                        )} />
-                        {liveSite ? (tempStatus === "ok" ? "Nominal" : tempStatus === "warning" ? "Attention" : "Critique") : "En ligne"}
-                      </div>
+                      <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-medium", statusTone(tempStatus))}>
+                        {tempStatus === "ok" ? "OK" : tempStatus === "warning" ? "Warning" : "Critique"}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
                       {sensors.temperature && (
-                        <span className="flex items-center gap-1 text-[11px] text-gray-400">
-                          <Thermometer className="w-3 h-3 text-orange-400" />
-                          {liveSite ? `${temp.toFixed(1)}°C` : "—"}
+                        <span className="inline-flex items-center gap-1">
+                          <Thermometer className="h-3 w-3 text-amber-300" />
+                          {temp == null ? "n/a" : `${temp.toFixed(1)} °C`}
                         </span>
                       )}
                       {sensors.humidity && (
-                        <span className="flex items-center gap-1 text-[11px] text-gray-400">
-                          <Droplets className="w-3 h-3 text-cyan-400" />
-                          {liveSite ? `${liveSite.humidity.toFixed(0)}%` : "—"}
+                        <span className="inline-flex items-center gap-1">
+                          <Droplets className="h-3 w-3 text-cyan-300" />
+                          {site == null ? "n/a" : `${site.humidity.toFixed(0)} %`}
                         </span>
                       )}
                       {sensors.smoke && (
-                        <span className="flex items-center gap-1 text-[11px] text-gray-500">
-                          <Flame className="w-3 h-3 text-gray-500" />
+                        <span className="inline-flex items-center gap-1">
+                          <Flame className="h-3 w-3 text-slate-500" />
                           Fumée
                         </span>
                       )}
                       {sensors.door && (
-                        <span className="flex items-center gap-1 text-[11px] text-gray-500">
-                          <DoorOpen className="w-3 h-3 text-gray-500" />
+                        <span className="inline-flex items-center gap-1">
+                          <DoorOpen className="h-3 w-3 text-slate-500" />
                           Porte
                         </span>
                       )}
                     </div>
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-[10px] text-gray-600">
-                        {bays.flatMap(b => b.refs).length} capteur{bays.flatMap(b => b.refs).length > 1 ? "s" : ""} BlackBox
-                      </span>
-                      <ChevronRight className="w-3.5 h-3.5 text-gray-700 group-hover:text-gray-400 transition-colors" />
-                    </div>
-                  </motion.div>
+                    <p className="mt-3 text-[10px] text-slate-600">
+                      {bays.flatMap((bay) => bay.refs).length} capteurs Black Box documentés
+                    </p>
+                  </article>
                 </Link>
               );
             })}
           </div>
-        </div>
-      </motion.div>
+        </section>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Graphique température */}
-        <motion.div className="lg:col-span-2" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-          <div className="clean-card p-6 h-full">
-            <div className="flex items-center justify-between mb-6">
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <article className="ops-panel p-6 lg:col-span-2">
+            <div className="mb-5 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-semibold text-white">Température sur 24h</h3>
-                <p className="text-xs text-gray-500 font-light mt-0.5">Moyenne consolidée tous sites</p>
+                <h2 className="text-base font-semibold text-white">Température sur 24h</h2>
+                <p className="mt-1 text-xs text-slate-500">Tendance consolidée des sites supervisés</p>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-500 font-light">
-                <Wifi className="w-3.5 h-3.5 text-green-400" />
-                Temps réel
-              </div>
+              <span className="inline-flex items-center gap-2 text-xs text-emerald-300">
+                <Wifi className="h-3.5 w-3.5" />
+                Mis à jour {formatRelativeTime(lastUpdate.toISOString())}
+              </span>
             </div>
+
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={BASE_TEMP_DATA} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+              <AreaChart data={BASE_TEMP_DATA} margin={{ top: 5, right: 10, left: -18, bottom: 0 }}>
                 <defs>
                   <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6A00FF" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#6A00FF" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.34} />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                <XAxis dataKey="time" stroke="transparent" tick={{ fill: "#555", fontSize: 11 }} tickLine={false} />
-                <YAxis stroke="transparent" tick={{ fill: "#555", fontSize: 11 }} tickLine={false} domain={["auto", "auto"]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.08)" vertical={false} />
+                <XAxis dataKey="time" tick={{ fill: "#64748b", fontSize: 11 }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fill: "#64748b", fontSize: 11 }} tickLine={false} axisLine={false} domain={["auto", "auto"]} />
                 <Tooltip
                   contentStyle={{
-                    background: "rgba(2,2,8,0.97)",
-                    border: "1px solid rgba(255,255,255,0.07)",
+                    background: "rgba(15,23,42,0.98)",
+                    border: "1px solid rgba(34,211,238,0.18)",
                     borderRadius: "12px",
-                    fontSize: "13px",
                     color: "#fff",
+                    fontSize: "13px",
                   }}
-                  formatter={(v: number) => [`${v}°C`, "Température"]}
+                  formatter={(value: number) => [`${value} °C`, "Température"]}
                 />
-                <Area type="monotone" dataKey="temperature" stroke="#6A00FF" strokeWidth={2} fill="url(#tempGrad)" dot={false} activeDot={{ r: 4, fill: "#6A00FF" }} />
+                <Area
+                  type="monotone"
+                  dataKey="temperature"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  fill="url(#tempGrad)"
+                  dot={false}
+                  activeDot={{ r: 4, fill: "#f59e0b" }}
+                />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        </motion.div>
+          </article>
 
-        {/* Résumé référentiel + accès rapide */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="space-y-3">
-          {/* Référentiel summary */}
-          {!refLoading && (
-            <div className="clean-card p-5">
-              <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-purple-400" />
-                Référentiel
-              </h3>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: "Total sites", value: refStats.total, color: "text-white" },
-                  { label: "Gérés DSI", value: refStats.dsiManaged, color: "text-violet-400" },
-                  { label: "Avec Zabbix", value: refStats.connectedZabbix, color: "text-blue-400" },
-                  { label: "Avec LT", value: refStats.withLT, color: "text-cyan-400" },
-                  { label: "Adresses OK", value: refStats.addressVerified, color: "text-green-400" },
-                  { label: "Sans GPS", value: refStats.withoutCoordinates, color: "text-orange-400" },
-                ].map(({ label, value, color }) => (
-                  <div key={label} className="p-2 rounded-lg bg-white/[0.03]">
-                    <p className="text-[10px] text-gray-600">{label}</p>
-                    <p className={cn("text-lg font-bold", color)}>{value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <aside className="space-y-4">
+            {!refLoading && (
+              <article className="ops-panel p-5">
+                <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
+                  <BookOpen className="h-4 w-4 text-cyan-300" />
+                  Référentiel DSI
+                </h2>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    ["Total sites", refStats.total, "text-white"],
+                    ["Gérés DSI", refStats.dsiManaged, "text-cyan-300"],
+                    ["Avec Zabbix", refStats.connectedZabbix, "text-sky-300"],
+                    ["Adresses OK", refStats.addressVerified, "text-emerald-300"],
+                  ].map(([label, value, color]) => (
+                    <div key={label as string} className="rounded-xl border border-slate-800 bg-slate-950/45 p-3">
+                      <p className="text-[10px] text-slate-500">{label}</p>
+                      <p className={cn("text-xl font-semibold", color as string)}>{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            )}
 
-          {/* Accès rapide */}
-          <div className="clean-card p-5">
-            <h3 className="text-sm font-semibold text-white mb-3">Accès rapide</h3>
-            <div className="space-y-1">
+            <article className="ops-panel p-5">
+              <h2 className="mb-3 text-sm font-semibold text-white">Accès rapide</h2>
               {[
-                { label: "Sites supervisés", href: "/sites", icon: BookOpen, sub: "HTDV, PLDS, Lab Black Box" },
-                { label: "Lab Black Box", href: "/lab", icon: Wifi, sub: "Site de validation" },
-                { label: "Centre d'alertes", href: "/alertes", icon: AlertTriangle, sub: `${activeAlerts.length} active${activeAlerts.length !== 1 ? "s" : ""}` },
-                { label: "Architecture", href: "/architecture", icon: ShieldCheck, sub: "Chaîne complète" },
-              ].map((link) => {
-                const Icon = link.icon;
+                { label: "Sites supervisés", href: "/sites", icon: Building2, sub: "HTDV, PLDS, Lab Black Box" },
+                { label: "Lab Black Box", href: "/lab", icon: Wifi, sub: "Validation Zabbix / SNMPv3" },
+                { label: "Centre d'alertes", href: "/alertes", icon: AlertTriangle, sub: `${activeAlerts.length} active${activeAlerts.length > 1 ? "s" : ""}` },
+                { label: "Architecture", href: "/architecture", icon: ShieldCheck, sub: "Chaîne technique complète" },
+              ].map((item) => {
+                const Icon = item.icon;
                 return (
-                  <Link key={link.href} href={link.href}>
-                    <motion.div whileHover={{ x: 3 }} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/[0.05] transition-colors group">
-                      <div className="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center group-hover:bg-purple-500/10 transition-colors">
-                        <Icon className="w-3.5 h-3.5 text-gray-500 group-hover:text-purple-400 transition-colors" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors truncate">{link.label}</p>
-                        <p className="text-[11px] text-gray-600 font-light truncate">{link.sub}</p>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-gray-700 group-hover:text-gray-400 transition-colors flex-shrink-0" />
-                    </motion.div>
+                  <Link key={item.href} href={item.href} className="group flex items-center gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-800/45">
+                    <span className="rounded-lg border border-slate-700 bg-slate-900/80 p-2 text-slate-400 transition group-hover:border-cyan-400/30 group-hover:text-cyan-300">
+                      <Icon className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-slate-200">{item.label}</span>
+                      <span className="block truncate text-[11px] text-slate-600">{item.sub}</span>
+                    </span>
+                    <ChevronRight className="h-3.5 w-3.5 text-slate-700 transition group-hover:text-slate-400" />
                   </Link>
                 );
               })}
-            </div>
-          </div>
-        </motion.div>
-      </div>
+            </article>
+          </aside>
+        </section>
 
-      {/* Bottom Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Alertes récentes */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
-          <div className="clean-card p-6 h-full">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold text-white">Alertes récentes</h3>
-              <Link href="/alertes">
-                <span className="text-xs text-gray-500 hover:text-purple-400 transition-colors">Tout voir →</span>
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <article className="ops-panel p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-white">Alertes récentes</h2>
+              <Link href="/alertes" className="text-xs text-slate-500 transition hover:text-cyan-300">
+                Tout voir →
               </Link>
             </div>
             {recentAlerts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 gap-2">
-                <CheckCircle2 className="w-10 h-10 text-green-500/40" />
-                <p className="text-sm text-gray-600 font-light">Aucune alerte active</p>
+              <div className="flex flex-col items-center justify-center gap-2 py-8">
+                <CheckCircle2 className="h-10 w-10 text-emerald-400/45" />
+                <p className="text-sm text-slate-500">Aucune alerte active</p>
               </div>
             ) : (
               <div className="space-y-2">
-                {recentAlerts.map((alert, i) => (
-                  <motion.div key={alert.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.03] transition-colors group cursor-default">
-                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0 relative", SEVERITY_DOT[alert.severity] ?? "bg-gray-500", (alert.severity === "critical" || alert.severity === "major") && "status-dot-pulse")} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-200 truncate">{alert.title}</p>
-                      <p className="text-xs text-gray-600 font-light truncate">{alert.siteName}</p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={cn(
-                        "text-[10px] px-1.5 py-0.5 rounded-md font-medium",
-                        alert.severity === "critical" && "bg-red-500/15 text-red-400",
-                        alert.severity === "major" && "bg-orange-500/15 text-orange-400",
-                        alert.severity === "minor" && "bg-yellow-500/15 text-yellow-400",
-                        alert.severity === "info" && "bg-blue-500/15 text-blue-400",
-                      )}>
-                        {alert.severity}
-                      </span>
-                      <span className="text-xs text-gray-600 whitespace-nowrap">{formatRelativeTime(alert.timestamp)}</span>
-                    </div>
-                  </motion.div>
+                {recentAlerts.map((alert) => (
+                  <div key={alert.id} className="flex items-center gap-3 rounded-xl p-3 transition hover:bg-slate-800/35">
+                    <span className={cn("h-2 w-2 rounded-full", severityDot[alert.severity] ?? "bg-slate-500")} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-slate-200">{alert.title}</span>
+                      <span className="block truncate text-xs text-slate-600">{alert.siteName}</span>
+                    </span>
+                    <span className="text-xs text-slate-600">{formatRelativeTime(alert.timestamp)}</span>
+                  </div>
                 ))}
               </div>
             )}
-          </div>
-        </motion.div>
+          </article>
 
-        {/* Sites à surveiller */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-          <div className="clean-card p-6 h-full">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-semibold text-white">Sites à surveiller</h3>
-              <Link href="/sites">
-                <span className="text-xs text-gray-500 hover:text-purple-400 transition-colors">Tout voir →</span>
+          <article className="ops-panel p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-base font-semibold text-white">Sites à surveiller</h2>
+              <Link href="/sites" className="text-xs text-slate-500 transition hover:text-cyan-300">
+                Tout voir →
               </Link>
             </div>
-            {criticalSites.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 gap-2">
-                <CheckCircle2 className="w-10 h-10 text-green-500/40" />
-                <p className="text-sm text-green-400/60 font-light">Tous les sites opérationnels</p>
+            {sitesToWatch.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-8">
+                <CheckCircle2 className="h-10 w-10 text-emerald-400/45" />
+                <p className="text-sm text-emerald-300/70">Tous les sites sont opérationnels</p>
               </div>
             ) : (
               <div className="space-y-2">
-                {criticalSites.map((site, i) => (
-                  <Link key={site.id} href={`/sites/${site.id}`}>
-                    <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }} whileHover={{ x: 3 }} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer group">
-                      <div className="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500/10 transition-colors">
-                        <Building2 className="w-4 h-4 text-gray-500 group-hover:text-purple-400 transition-colors" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-200 truncate">{site.name}</p>
-                        <p className="text-xs text-gray-600 font-light">{site.alertCount} alerte{site.alertCount > 1 ? "s" : ""} · {site.temperature.toFixed(1)}°C</p>
-                      </div>
-                      <Badge variant={site.status as "ok" | "warning" | "critical" | "info" | "default"} className="text-[10px] flex-shrink-0">{site.status}</Badge>
-                    </motion.div>
+                {sitesToWatch.map((site) => (
+                  <Link key={site.id} href={`/sites/${site.id}`} className="flex items-center gap-3 rounded-xl p-3 transition hover:bg-slate-800/35">
+                    <span className="rounded-xl border border-slate-700 bg-slate-900 p-2 text-slate-400">
+                      <Building2 className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-slate-200">{site.name}</span>
+                      <span className="block text-xs text-slate-600">
+                        {site.alertCount} alerte{site.alertCount > 1 ? "s" : ""} · {site.temperature.toFixed(1)} °C
+                      </span>
+                    </span>
+                    <Badge variant={site.status as "ok" | "warning" | "critical" | "info" | "default"}>
+                      {site.status}
+                    </Badge>
                   </Link>
                 ))}
               </div>
             )}
-          </div>
-        </motion.div>
+          </article>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

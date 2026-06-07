@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { jwtVerify } from "jose/jwt/verify";
 
 function getSecret(): Uint8Array {
   const authSecret = process.env.AUTH_SECRET;
   if (!authSecret || authSecret.length < 32) {
     if (process.env.NODE_ENV === "production") {
-      // En production sans secret, on refuse tout accès (fail-safe)
+      // En production sans secret, on refuse tout acces (fail-safe).
       return new Uint8Array(0);
     }
     return new TextEncoder().encode(
@@ -41,8 +41,7 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
-
-  // ── Pas de token → redirection vers login ─────────────────────────────
+  // Pas de token : redirection vers login.
   if (!token) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
@@ -51,8 +50,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     const secret = getSecret();
-
-    // Vérification du secret (fail-safe si AUTH_SECRET manquant en prod)
+    // Verification du secret (fail-safe si AUTH_SECRET est manquant en prod).
     if (secret.length === 0) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("error", "config");
@@ -68,8 +66,7 @@ export async function middleware(request: NextRequest) {
 
     const role = payload.role as string;
     const mustChangePassword = payload.mustChangePassword as boolean | undefined;
-
-    // ── Changement de mot de passe obligatoire ─────────────────────────
+    // Changement de mot de passe obligatoire.
     // Si mustChangePassword=true, seule la page /change-password est accessible
     if (
       mustChangePassword === true &&
@@ -77,8 +74,7 @@ export async function middleware(request: NextRequest) {
     ) {
       return NextResponse.redirect(new URL("/change-password?forced=true", request.url));
     }
-
-    // ── Protection de /admin : super_admin et admin uniquement ─────────
+    // Protection de /admin : super_admin et admin uniquement.
     if (
       pathname.startsWith("/admin") &&
       role !== "super_admin" &&
@@ -86,8 +82,7 @@ export async function middleware(request: NextRequest) {
     ) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
-
-    // ── Propagation de l'identité utilisateur vers les API routes ──────
+    // Propagation de l identite utilisateur vers les API routes.
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-user-id", String(payload.id ?? ""));
     requestHeaders.set("x-user-role", role);
@@ -95,7 +90,7 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next({ request: { headers: requestHeaders } });
   } catch {
-    // Token invalide, expiré ou altéré
+    // Token invalide, expire ou altere.
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     const response = NextResponse.redirect(loginUrl);

@@ -29,6 +29,10 @@ interface DemoCheck {
 
 const DEMO_SITE_ID = "DEMO-LAB";
 const DEFAULT_DEMO_HOSTS = [
+  "SP01C5B0",
+  "SERVSENSOR",
+  "SERVSENSORX",
+  "BLACKBOX",
   "BLACKBOX-DEMO-LAB",
   "BLACKBOX-DEMO",
   "DEMO-LAB",
@@ -63,6 +67,38 @@ function classifySensor(item: any): DemoSensorType {
   return "other";
 }
 
+function isMeasurementItem(item: any, type: DemoSensorType) {
+  const text = `${item.name ?? ""} ${item.key_ ?? ""}`.toLowerCase();
+  const numericValue = Number(item.lastvalue);
+
+  if (
+    text.includes("threshold") ||
+    text.includes("seuil") ||
+    text.includes("low warning") ||
+    text.includes("high warning") ||
+    text.includes("low critical") ||
+    text.includes("high critical") ||
+    text.includes("rearm") ||
+    text.includes("calibration") ||
+    text.includes("graph enable") ||
+    text.includes("filter status")
+  ) {
+    return false;
+  }
+
+  if (type === "temperature") {
+    return Number.isFinite(numericValue) && numericValue > -20 && numericValue < 80;
+  }
+  if (type === "humidity") {
+    return Number.isFinite(numericValue) && numericValue >= 0 && numericValue <= 100;
+  }
+  if (type === "availability") {
+    return text.includes("icmpping") || text.includes("available") || text.includes("snmp");
+  }
+
+  return true;
+}
+
 function statusForSensor(type: DemoSensorType, rawValue: string, numericValue?: number): SiteStatus {
   if (numericValue == null || Number.isNaN(numericValue)) return "ok";
 
@@ -83,11 +119,30 @@ function statusForSensor(type: DemoSensorType, rawValue: string, numericValue?: 
   return "ok";
 }
 
+function displayNameForSensor(type: DemoSensorType, fallback?: string) {
+  switch (type) {
+    case "temperature":
+      return "Température capteur Black Box";
+    case "humidity":
+      return "Humidité capteur Black Box";
+    case "power":
+      return "Tension AC";
+    case "water":
+      return "Détection d'eau";
+    case "smoke":
+      return "Détection fumée";
+    case "availability":
+      return "Disponibilité SNMPv3";
+    default:
+      return fallback ?? "Item Zabbix";
+  }
+}
+
 function mapItemToSensor(item: any): DemoSensor {
   const type = classifySensor(item);
   const numericValue = Number(item.lastvalue);
   const isNumber = Number.isFinite(numericValue);
-  const unit = item.units === "C" ? "C" : item.units || (type === "temperature" ? "C" : type === "humidity" ? "%" : "");
+  const unit = item.units === "C" ? "°C" : item.units || (type === "temperature" ? "°C" : type === "humidity" ? "%" : "");
   const value = type === "availability" && isNumber
     ? "joignable"
     : isNumber
@@ -96,7 +151,7 @@ function mapItemToSensor(item: any): DemoSensor {
 
   return {
     id: item.itemid ?? item.key_ ?? item.name,
-    name: item.name ?? item.key_ ?? "Item Zabbix",
+    name: displayNameForSensor(type, item.name ?? item.key_),
     type,
     value,
     numericValue: isNumber ? numericValue : undefined,
@@ -117,11 +172,11 @@ function mockSensors(): DemoSensor[] {
   return [
     {
       id: "mock-temp",
-      name: "Temperature capteur Black Box",
+      name: "Température capteur Black Box",
       type: "temperature",
-      value: `${temp} C`,
+      value: `${temp} °C`,
       numericValue: temp,
-      unit: "C",
+      unit: "°C",
       status: statusForSensor("temperature", String(temp), temp),
       lastUpdate: now,
       source: "mock",
@@ -129,7 +184,7 @@ function mockSensors(): DemoSensor[] {
     },
     {
       id: "mock-humidity",
-      name: "Humidite capteur Black Box",
+      name: "Humidité capteur Black Box",
       type: "humidity",
       value: `${humidity} %`,
       numericValue: humidity,
@@ -143,7 +198,7 @@ function mockSensors(): DemoSensor[] {
       id: "mock-power",
       name: "Tension AC",
       type: "power",
-      value: "presente",
+      value: "présente",
       numericValue: 1,
       unit: "",
       status: "ok",
@@ -153,7 +208,7 @@ function mockSensors(): DemoSensor[] {
     },
     {
       id: "mock-snmp",
-      name: "Disponibilite SNMPv3",
+      name: "Disponibilité SNMPv3",
       type: "availability",
       value: "joignable",
       numericValue: 1,
@@ -178,12 +233,12 @@ function buildChecks(params: {
     {
       label: "API Zabbix",
       status: params.connected ? "ok" : "warning",
-      detail: params.connected ? "Connexion JSON-RPC active" : "Mode laboratoire utilise",
+      detail: params.connected ? "Connexion JSON-RPC active" : "Valeurs de secours affichées",
     },
     {
       label: "Host Lab Black Box",
       status: params.hostFound ? "ok" : params.useMock ? "warning" : "critical",
-      detail: params.hostFound ? "Host trouve dans Zabbix" : "Host non trouve, donnees laboratoire affichees",
+      detail: params.hostFound ? "Host trouvé dans Zabbix" : "Host non trouvé, valeurs de secours affichées",
     },
     {
       label: "Items SNMP/OID",
@@ -193,12 +248,12 @@ function buildChecks(params: {
     {
       label: "Triggers Zabbix",
       status: params.triggersCount > 0 ? "warning" : "ok",
-      detail: params.triggersCount > 0 ? `${params.triggersCount} trigger(s) actif(s)` : "Aucun probleme actif",
+      detail: params.triggersCount > 0 ? `${params.triggersCount} trigger(s) actif(s)` : "Aucun problème actif",
     },
     {
-      label: "Securite",
+      label: "Sécurité",
       status: "ok",
-      detail: "Token API cote serveur uniquement, SNMPv3 authPriv cote supervision",
+      detail: "Token API côté serveur uniquement, SNMPv3 authPriv côté supervision",
     },
   ];
 }
@@ -218,10 +273,10 @@ function buildMockAlerts(sensors: DemoSensor[]): Alert[] {
     siteId: DEMO_SITE_ID,
     siteName: "Lab Black Box",
     bayId: "DEMO-LAB-bay-1",
-    bayName: "Baie laboratoire Black Box",
+    bayName: "Baie Black Box",
     severity: severityFromStatus(sensor.status),
-    title: `${sensor.name} - seuil surveille`,
-    description: `Valeur actuelle remontee sur le site laboratoire : ${sensor.value}.`,
+    title: `${sensor.name} - seuil surveillé`,
+    description: `Valeur actuelle remontée sur le site Lab Black Box : ${sensor.value}.`,
     timestamp: sensor.lastUpdate,
     acknowledged: false,
     resolved: false,
@@ -256,7 +311,7 @@ function mockPayload(reason?: string) {
       triggersCount: alerts.length,
       error: reason,
     }),
-    explanation: "Cette vue represente DEMO-LAB comme un site AURION supervise. Si Zabbix est disponible, les valeurs viennent de l'API JSON-RPC ; sinon le mode laboratoire reste utilisable.",
+    explanation: "Cette vue représente DEMO-LAB comme un site AURION supervisé. Si Zabbix est disponible, les valeurs viennent de l'API JSON-RPC ; sinon des valeurs de secours restent affichées.",
     lastSync: new Date().toISOString(),
     error: reason,
   };
@@ -271,7 +326,7 @@ export async function GET() {
 
   try {
     const client = getZabbixClient();
-    if (!client) return NextResponse.json(mockPayload("Client Zabbix non initialise"));
+    if (!client) return NextResponse.json(mockPayload("Client Zabbix non initialisé"));
 
     await client.authenticate();
     const hosts = await client.getHosts();
@@ -284,7 +339,7 @@ export async function GET() {
     });
 
     if (!host) {
-      return NextResponse.json(mockPayload("Aucun host Zabbix de laboratoire trouve. Configurez ZABBIX_DEMO_HOST_NAME=BLACKBOX-DEMO ou ZABBIX_DEMO_HOST_ID."));
+      return NextResponse.json(mockPayload("Aucun host Zabbix Lab Black Box trouvé. Configurez ZABBIX_DEMO_HOST_NAME=SP01C5B0, BLACKBOX-DEMO ou ZABBIX_DEMO_HOST_ID."));
     }
 
     const [items, triggers] = await Promise.all([
@@ -292,10 +347,14 @@ export async function GET() {
       client.getTriggers(),
     ]);
 
-    const sensors = items
-      .map(mapItemToSensor)
-      .filter((sensor) => sensor.type !== "other")
-      .slice(0, 12);
+    const mappedSensors = items
+      .map((item) => ({ item, sensor: mapItemToSensor(item) }))
+      .filter(({ item, sensor }) => sensor.type !== "other" && isMeasurementItem(item, sensor.type));
+
+    const priority: DemoSensorType[] = ["temperature", "humidity", "power", "water", "smoke", "availability"];
+    const sensors = priority
+      .map((type) => mappedSensors.find(({ sensor }) => sensor.type === type)?.sensor)
+      .filter(Boolean) as DemoSensor[];
 
     const hostTriggers = triggers.filter((trigger) =>
       trigger.hosts?.some((h: any) => String(h.hostid) === String(host.hostid) || String(h.name) === String(host.name ?? host.host))
@@ -305,7 +364,7 @@ export async function GET() {
       ...mapZabbixTriggerToAlert(trigger),
       siteId: DEMO_SITE_ID,
       siteName: "Lab Black Box",
-      description: trigger.comments || trigger.description || "Trigger actif remonte par Zabbix.",
+      description: trigger.comments || trigger.description || "Trigger actif remonté par Zabbix.",
       acknowledged: false,
       resolved: false,
     })) as Alert[];
@@ -345,7 +404,7 @@ export async function GET() {
         sensorsCount: sensors.length,
         triggersCount: alerts.length,
       }),
-      explanation: "Cette vue lit DEMO-LAB comme un site AURION reel : host Zabbix, items SNMP/OID, triggers et alertes actives.",
+      explanation: "Cette vue lit Lab Black Box comme un site AURION réel : host Zabbix, items SNMP/OID, triggers et alertes actives.",
       lastSync: new Date().toISOString(),
     });
   } catch (error) {

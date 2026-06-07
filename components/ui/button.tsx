@@ -3,16 +3,16 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-nebula-violet focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-gradient-nebula text-white shadow-neon-md hover:shadow-neon-lg hover:scale-105",
-        cyber: "bg-gradient-cyber text-white shadow-cyan-neon hover:shadow-cyan-neon hover:scale-105",
-        outline: "border-2 border-nebula-violet/50 text-nebula-violet hover:bg-nebula-violet/10 hover:border-nebula-violet",
+        default: "bg-cyan-400 text-slate-950 hover:bg-cyan-300 shadow-[0_14px_34px_-24px_rgba(34,211,238,0.55)]",
+        cyber: "bg-sky-500 text-white hover:bg-sky-400",
+        outline: "border border-cyan-400/35 text-cyan-100 hover:bg-cyan-400/10",
         ghost: "hover:bg-white/5 hover:text-white",
-        destructive: "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-neon-md hover:shadow-neon-lg",
-        glass: "bg-white/5 backdrop-blur-xl border border-white/10 text-white hover:bg-white/10 hover:border-nebula-violet/50",
+        destructive: "bg-red-500 text-white hover:bg-red-400",
+        glass: "bg-slate-900/75 backdrop-blur-xl border border-slate-700/70 text-slate-100 hover:bg-slate-800/90 hover:border-cyan-400/30",
       },
       size: {
         default: "h-11 px-6 py-3",
