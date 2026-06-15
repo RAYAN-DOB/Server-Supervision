@@ -8,18 +8,21 @@
  * Pour une solution multi-instance, utiliser Redis/Upstash.
  */
 
+// Suivi des tentatives pour une clé : nombre d'essais, début de la fenêtre, fin de blocage éventuelle.
 interface RateRecord {
   count: number;
   windowStart: number;
   blockedUntil?: number;
 }
 
+// Stockage en mémoire : une entrée par clé (IP). Vidé au redémarrage du processus.
 const _store = new Map<string, RateRecord>();
 
 const MAX_ATTEMPTS = 5;
 const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const BLOCK_MS = 30 * 60 * 1000; // 30 minutes
 
+// Résultat renvoyé à l'appelant : autorisé ou non, et infos sur le blocage le cas échéant.
 export interface RateLimitResult {
   allowed: boolean;
   remainingAttempts?: number;
@@ -27,6 +30,7 @@ export interface RateLimitResult {
   blockedUntil?: Date;
 }
 
+// Cœur du rate limiter : appelé à chaque tentative de login pour décider si on l'autorise.
 export function checkRateLimit(key: string): RateLimitResult {
   const now = Date.now();
   const record = _store.get(key);
@@ -49,6 +53,7 @@ export function checkRateLimit(key: string): RateLimitResult {
   // Incrémenter le compteur
   record.count++;
 
+  // Seuil dépassé : on déclenche un blocage de 30 minutes.
   if (record.count > MAX_ATTEMPTS) {
     record.blockedUntil = now + BLOCK_MS;
     _store.set(key, record);
@@ -59,6 +64,7 @@ export function checkRateLimit(key: string): RateLimitResult {
     };
   }
 
+  // Encore sous le seuil : on autorise et on indique le nombre d'essais restants.
   _store.set(key, record);
   return {
     allowed: true,
@@ -66,11 +72,13 @@ export function checkRateLimit(key: string): RateLimitResult {
   };
 }
 
+// Remet à zéro le compteur d'une clé (appelé après une connexion réussie).
 export function resetRateLimit(key: string): void {
   _store.delete(key);
 }
 
 // Nettoyage périodique des entrées expirées
+// Évite que la Map grossisse sans fin avec des clés/IP qui ne reviennent plus.
 setInterval(() => {
   const now = Date.now();
   for (const [key, record] of _store) {

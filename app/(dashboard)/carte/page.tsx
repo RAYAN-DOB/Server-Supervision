@@ -1,3 +1,13 @@
+// ============================================================================
+// app/(dashboard)/carte/page.tsx — Carte géographique des sites supervisés
+// ----------------------------------------------------------------------------
+// Rôle : afficher sur une carte interactive (Leaflet) tous les sites municipaux
+// du référentiel qui ont des coordonnées GPS, avec des filtres (DSI, Zabbix...).
+// Liste aussi les sites SANS coordonnées (à géocoder) et une grille de fiches.
+// Reçoit : le référentiel des sites via le hook useSitesReference.
+// Produit : une vue cartographique pour situer les salles serveurs dans la ville.
+// ============================================================================
+
 "use client";
 
 import { useState } from "react";
@@ -8,8 +18,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AddressBadge, ZabbixBadge } from "@/components/ui/status-badge";
 import { useSitesReference } from "@/hooks/useSitesReference";
 import Link from "next/link";
+// dynamic = import différé ; nécessaire pour Leaflet qui ne fonctionne pas en SSR
 import dynamic from "next/dynamic";
 
+// La carte est chargée uniquement côté client (ssr: false) car elle dépend du
+// DOM/window du navigateur. `loading` affiche un placeholder pendant le chargement.
 const InteractiveMap = dynamic(
   () => import("@/components/features/interactive-map").then((mod) => mod.InteractiveMap),
   {
@@ -25,20 +38,26 @@ const InteractiveMap = dynamic(
   }
 );
 
+// Coordonnées GPS du centre de la carte = Maisons-Alfort (lat, lng)
 const CENTER: [number, number] = [48.8064, 2.4379];
 
 export default function CartePage() {
+  // Récupère la liste des sites du référentiel + état de chargement + stats
   const { sites, loading, stats } = useSitesReference();
+  // Filtre actif sélectionné par l'utilisateur (boutons en haut)
   const [filter, setFilter] = useState<"all" | "zabbix" | "dsi" | "nocoords">("all");
 
+  // Sites affichables sur la carte : visibles + ayant des coordonnées GPS,
+  // puis affinés selon le filtre choisi (Zabbix connecté/partiel, ou géré DSI).
   const filteredForMap = sites.filter((s) => {
     if (!s.visibleOnMap) return false;
-    if (s.lat == null || s.lng == null) return false;
+    if (s.lat == null || s.lng == null) return false; // pas de GPS = pas affichable
     if (filter === "zabbix") return s.zabbixStatus === "connected" || s.zabbixStatus === "partial";
     if (filter === "dsi") return s.likelyManagedByDSI;
     return true;
   });
 
+  // Sites sans coordonnées GPS : listés à part car non affichables sur la carte
   const sitesWithoutCoords = sites.filter((s) => s.lat == null || s.lng == null);
 
   return (
@@ -82,6 +101,7 @@ export default function CartePage() {
       <Card className="border-white/[0.06] bg-white/[0.02] overflow-hidden mb-6">
         <CardContent className="p-0">
           <div className="relative w-full overflow-hidden" style={{ height: "min(70vh, 620px)" }}>
+            {/* On n'affiche la carte qu'une fois les données chargées et hors filtre "sans coords" */}
             {!loading && filter !== "nocoords" ? (
               <InteractiveMap
                 referenceMode
@@ -143,6 +163,7 @@ export default function CartePage() {
           ? `Sites sans coordonnées (${sitesWithoutCoords.length})`
           : `Sites sur la carte (${filteredForMap.length})`}
       </h2>
+      {/* Grille de fiches : selon le filtre, on liste soit les sites sans GPS, soit ceux de la carte */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {(filter === "nocoords" ? sitesWithoutCoords : filteredForMap).map((site, i) => (
           <Link key={site.id} href={`/sites/${site.id}`}>

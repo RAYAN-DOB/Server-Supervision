@@ -5,13 +5,20 @@
     {
       "id": "HTDV",
       "name": "Hôtel de Ville",
-      "aliases": ["HDV", "Mairie", "HTDV"],
+      "aliases": [
+        "HDV",
+        "Mairie",
+        "HTDV"
+      ],
       "address": "118 avenue du Général de Gaulle",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8058,
       "lng": 2.4392,
-      "ltNames": ["LT-01", "LT-02"],
+      "ltNames": [
+        "LT-01",
+        "LT-02"
+      ],
       "ltCount": 2,
       "telephonyEquipment": "OXE virtualisé",
       "likelyManagedByDSI": true,
@@ -21,31 +28,37 @@
       "sensorsStatus": "active",
       "zabbixEnabled": true,
       "zabbixHostId": "10001",
-      "zabbixHostName": "HTDV-SRV01",
-      "zabbixTemplate": "Template OS Linux",
+      "zabbixHostName": "BLACKBOX-HTDV",
+      "zabbixTemplate": "Template BlackBox AlertWerks - Environment",
       "blackboxInstalled": true,
-      "blackboxModel": "BlackBox ServSensor Enterprise",
-      "blackboxSerial": "SRV-2024-HTDV-001",
+      "blackboxModel": "Black Box ServSensor Plus EME168A",
+      "blackboxSerial": "BLACKBOX-HTDV",
       "blackboxInstalledAt": "2024-11-15T09:00:00Z",
       "blackboxInstalledBy": "Rayan DOB",
-      "blackboxFirmware": "v4.2.1",
-      "blackboxBayCount": 5,
+      "blackboxFirmware": "ServSensorX Plus",
+      "blackboxBayCount": 4,
       "visibleOnMap": true,
-      "notes": "Site principal — DSI hébergée sur place. Salle serveur principale avec 5 baies supervisées par BlackBox ServSensor Enterprise. Connexion Zabbix opérationnelle.",
+      "notes": "Site principal DSI. Une gateway Black Box EME168A supervise 4 baies avec capteur temperature/humidite, thermal map, eau, fumee, porte et tension 230 V. AURION lit les donnees via Zabbix, pas directement sur la gateway.",
       "source": "interne",
       "createdAt": "2024-01-01T00:00:00Z",
-      "updatedAt": "2026-03-15T10:00:00Z"
+      "updatedAt": "2026-06-11T20:12:31.460Z",
+      "zabbixLastSync": "2026-06-11T20:12:31.460Z",
+      "zabbixError": null
     },
     {
       "id": "PLDS",
       "name": "Palais des Sports",
-      "aliases": ["Palais des Sports (PLDS)"],
+      "aliases": [
+        "Palais des Sports (PLDS)"
+      ],
       "address": "4 rue Edouard Herriot",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8012,
       "lng": 2.4318,
-      "ltNames": ["LT-04"],
+      "ltNames": [
+        "LT-04"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -55,31 +68,39 @@
       "sensorsStatus": "partial",
       "zabbixEnabled": true,
       "zabbixHostId": "10045",
-      "zabbixHostName": "PLDS-IOT-01",
-      "zabbixTemplate": "Template IoT BlackBox",
+      "zabbixHostName": "BLACKBOX-PLDS",
+      "zabbixTemplate": "Template BlackBox AlertWerks - Environment",
       "blackboxInstalled": true,
-      "blackboxModel": "BlackBox ServSensor 4E",
-      "blackboxSerial": "SRV-2025-PLDS-001",
+      "blackboxModel": "Black Box ServSensor Plus EME168A",
+      "blackboxSerial": "BLACKBOX-PLDS",
       "blackboxInstalledAt": "2025-02-10T14:00:00Z",
       "blackboxInstalledBy": "Rayan DOB",
-      "blackboxFirmware": "v4.1.3",
-      "blackboxBayCount": 3,
+      "blackboxFirmware": "ServSensorX Plus",
+      "blackboxBayCount": 2,
       "visibleOnMap": true,
-      "notes": "BlackBox ServSensor 4E installé le 10/02/2025. Supervision environnementale de la salle technique (température, humidité, détection fumée/eau). Intégration Zabbix partielle — liaison en cours de finalisation. L'API Zabbix n'est pas encore pleinement opérationnelle.",
+      "notes": "Site distant pilote. Une gateway Black Box EME168A supervise 2 baies. Le raccordement VLAN DSI et les flux Stormshield doivent etre valides avant la collecte Zabbix complete.",
       "source": "interne",
       "createdAt": "2024-02-15T00:00:00Z",
-      "updatedAt": "2026-03-15T10:00:00Z"
+      "updatedAt": "2026-06-11T20:12:31.460Z",
+      "zabbixLastSync": null,
+      "zabbixError": "Flux reseau PLDS a valider : VLAN DSI, Stormshield, SNMPv3 UDP/161 vers Zabbix."
     },
     {
       "id": "DEMO-LAB",
       "name": "Lab Black Box",
-      "aliases": ["DEMO-LAB", "LAB", "Validation Black Box"],
+      "aliases": [
+        "DEMO-LAB",
+        "LAB",
+        "Validation Black Box"
+      ],
       "address": "Site laboratoire AURION",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8064,
       "lng": 2.4379,
-      "ltNames": ["LAB-01"],
+      "ltNames": [
+        "LAB-01"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -107,13 +128,17 @@
     {
       "id": "CTM",
       "name": "Centre Technique Municipal",
-      "aliases": ["CTM"],
+      "aliases": [
+        "CTM"
+      ],
       "address": "39 avenue Gambetta",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8025,
       "lng": 2.4287,
-      "ltNames": ["LT-03"],
+      "ltNames": [
+        "LT-03"
+      ],
       "ltCount": 1,
       "telephonyEquipment": "Postes IP",
       "likelyManagedByDSI": true,
@@ -132,13 +157,17 @@
     {
       "id": "GBTA",
       "name": "Gambetta",
-      "aliases": ["GBTA"],
+      "aliases": [
+        "GBTA"
+      ],
       "address": "39 avenue Gambetta",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8025,
       "lng": 2.4287,
-      "ltNames": ["LT-03"],
+      "ltNames": [
+        "LT-03"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -157,13 +186,18 @@
     {
       "id": "CTAQ",
       "name": "Centre Aquatique",
-      "aliases": ["CTAQ", "Piscine"],
+      "aliases": [
+        "CTAQ",
+        "Piscine"
+      ],
       "address": "55 rue du 11 Novembre 1918",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.7989,
       "lng": 2.4256,
-      "ltNames": ["LT-09"],
+      "ltNames": [
+        "LT-09"
+      ],
       "ltCount": 1,
       "telephonyEquipment": "OXO",
       "likelyManagedByDSI": true,
@@ -182,7 +216,10 @@
     {
       "id": "MRG",
       "name": "Musée Réghat",
-      "aliases": ["MRG", "Musée"],
+      "aliases": [
+        "MRG",
+        "Musée"
+      ],
       "address": "34 rue Victor Hugo",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
@@ -207,7 +244,10 @@
     {
       "id": "LPA",
       "name": "Groupe Scolaire Pasteur",
-      "aliases": ["LPA", "Pasteur"],
+      "aliases": [
+        "LPA",
+        "Pasteur"
+      ],
       "address": "10 rue Girard",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
@@ -232,13 +272,20 @@
     {
       "id": "EPB",
       "name": "École Élémentaire Paul Bert (annexe)",
-      "aliases": ["EPB", "Paul Bert élémentaire"],
+      "aliases": [
+        "EPB",
+        "Paul Bert élémentaire"
+      ],
       "address": "37 avenue du Général Leclerc",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8093,
       "lng": 2.4412,
-      "ltNames": ["LT-36", "LT-37", "LT-38"],
+      "ltNames": [
+        "LT-36",
+        "LT-37",
+        "LT-38"
+      ],
       "ltCount": 3,
       "telephonyEquipment": "4200D",
       "likelyManagedByDSI": true,
@@ -257,13 +304,17 @@
     {
       "id": "CSCL",
       "name": "Cuisine Centrale",
-      "aliases": ["CSCL"],
+      "aliases": [
+        "CSCL"
+      ],
       "address": "11 avenue du Professeur Cadiot",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8021,
       "lng": 2.4334,
-      "ltNames": ["LT-05"],
+      "ltNames": [
+        "LT-05"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -282,13 +333,18 @@
     {
       "id": "MQAM",
       "name": "Médiathèque André Malraux",
-      "aliases": ["MQAM", "Médiathèque"],
+      "aliases": [
+        "MQAM",
+        "Médiathèque"
+      ],
       "address": "4 rue Albert Camus",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8034,
       "lng": 2.4301,
-      "ltNames": ["LT-11"],
+      "ltNames": [
+        "LT-11"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -307,13 +363,17 @@
     {
       "id": "BQDC",
       "name": "Bibliothèque du Centre",
-      "aliases": ["BQDC"],
+      "aliases": [
+        "BQDC"
+      ],
       "address": "34-36 avenue du Professeur Cadiot",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8045,
       "lng": 2.4352,
-      "ltNames": ["LT-12"],
+      "ltNames": [
+        "LT-12"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -332,13 +392,19 @@
     {
       "id": "PCML",
       "name": "Police Municipale",
-      "aliases": ["PCML", "PM"],
+      "aliases": [
+        "PCML",
+        "PM"
+      ],
       "address": "2 rue Pasteur",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8061,
       "lng": 2.4398,
-      "ltNames": ["LT-15", "LT-16"],
+      "ltNames": [
+        "LT-15",
+        "LT-16"
+      ],
       "ltCount": 2,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -357,13 +423,19 @@
     {
       "id": "NECC",
       "name": "Nouvel Espace Culturel Charentonneau",
-      "aliases": ["NECC", "Théâtre NECC"],
+      "aliases": [
+        "NECC",
+        "Théâtre NECC"
+      ],
       "address": "107 avenue Gambetta",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8008,
       "lng": 2.4269,
-      "ltNames": ["LT-13", "LT-14"],
+      "ltNames": [
+        "LT-13",
+        "LT-14"
+      ],
       "ltCount": 2,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -382,7 +454,10 @@
     {
       "id": "THEA_DEB",
       "name": "Théâtre Claude Debussy",
-      "aliases": ["Théâtre", "Debussy"],
+      "aliases": [
+        "Théâtre",
+        "Debussy"
+      ],
       "address": "116 avenue du Général de Gaulle",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
@@ -407,13 +482,19 @@
     {
       "id": "CVHD",
       "name": "Conservatoire Henri Dutilleux",
-      "aliases": ["CVHD", "Conservatoire"],
+      "aliases": [
+        "CVHD",
+        "Conservatoire"
+      ],
       "address": "83-85 rue Victor Hugo",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8039,
       "lng": 2.4358,
-      "ltNames": ["LT-30", "LT-31"],
+      "ltNames": [
+        "LT-30",
+        "LT-31"
+      ],
       "ltCount": 2,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -432,7 +513,9 @@
     {
       "id": "MDE",
       "name": "Maison de l'Environnement",
-      "aliases": ["MDE"],
+      "aliases": [
+        "MDE"
+      ],
       "address": "2 avenue Foch",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
@@ -457,13 +540,17 @@
     {
       "id": "MPTA",
       "name": "Maison Pour Tous d'Alfort",
-      "aliases": ["MPTA"],
+      "aliases": [
+        "MPTA"
+      ],
       "address": "1 rue du Maréchal Juin",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8084,
       "lng": 2.4419,
-      "ltNames": ["LT-26"],
+      "ltNames": [
+        "LT-26"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -482,13 +569,18 @@
     {
       "id": "BRLO",
       "name": "Bureau du Logement",
-      "aliases": ["BRLO", "Bureaux du logement"],
+      "aliases": [
+        "BRLO",
+        "Bureaux du logement"
+      ],
       "address": "13 rue Parmentier",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8078,
       "lng": 2.4425,
-      "ltNames": ["LT-46"],
+      "ltNames": [
+        "LT-46"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -507,13 +599,18 @@
     {
       "id": "SMAE",
       "name": "Service Municipal Accueil Emploi",
-      "aliases": ["SMAE", "Accueil Emploi"],
+      "aliases": [
+        "SMAE",
+        "Accueil Emploi"
+      ],
       "address": "137 bis avenue du Général Leclerc",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8101,
       "lng": 2.4432,
-      "ltNames": ["LT-29"],
+      "ltNames": [
+        "LT-29"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -532,13 +629,17 @@
     {
       "id": "MLBL",
       "name": "Moulin Brûlé",
-      "aliases": ["MLBL"],
+      "aliases": [
+        "MLBL"
+      ],
       "address": "47 avenue Foch",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8069,
       "lng": 2.4401,
-      "ltNames": ["LT-19"],
+      "ltNames": [
+        "LT-19"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -557,13 +658,17 @@
     {
       "id": "CLBT",
       "name": "Centre de Loisirs Busteau",
-      "aliases": ["CLBT"],
+      "aliases": [
+        "CLBT"
+      ],
       "address": "9 bis avenue Busteau",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8028,
       "lng": 2.4325,
-      "ltNames": ["LT-20"],
+      "ltNames": [
+        "LT-20"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -582,13 +687,17 @@
     {
       "id": "MDEF",
       "name": "Maison de l'Enfant",
-      "aliases": ["MDEF"],
+      "aliases": [
+        "MDEF"
+      ],
       "address": "86 avenue Busteau",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8022,
       "lng": 2.4329,
-      "ltNames": ["LT-21"],
+      "ltNames": [
+        "LT-21"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -607,13 +716,17 @@
     {
       "id": "SCDS",
       "name": "Service des Sports",
-      "aliases": ["SCDS"],
+      "aliases": [
+        "SCDS"
+      ],
       "address": "4 rue Edouard Herriot",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8012,
       "lng": 2.4318,
-      "ltNames": ["LT-22"],
+      "ltNames": [
+        "LT-22"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -632,13 +745,21 @@
     {
       "id": "EEPM",
       "name": "École Élémentaire Parmentier",
-      "aliases": ["EEPM"],
+      "aliases": [
+        "EEPM"
+      ],
       "address": "8 rue Paul Vaillant Couturier",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8095,
       "lng": 2.4441,
-      "ltNames": ["LT-23", "LT-42", "LT-43", "LT-44", "LT-45"],
+      "ltNames": [
+        "LT-23",
+        "LT-42",
+        "LT-43",
+        "LT-44",
+        "LT-45"
+      ],
       "ltCount": 5,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -657,7 +778,9 @@
     {
       "id": "EMPM",
       "name": "École Maternelle Parmentier",
-      "aliases": ["EMPM"],
+      "aliases": [
+        "EMPM"
+      ],
       "address": "57 avenue du Général de Gaulle",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
@@ -682,13 +805,17 @@
     {
       "id": "EERS",
       "name": "École Élémentaire Raspail",
-      "aliases": ["EERS"],
+      "aliases": [
+        "EERS"
+      ],
       "address": "44 avenue Georges Clemenceau",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8037,
       "lng": 2.4342,
-      "ltNames": ["LT-24"],
+      "ltNames": [
+        "LT-24"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -707,13 +834,17 @@
     {
       "id": "EEPN",
       "name": "École Élémentaire Planètes",
-      "aliases": ["EEPN"],
+      "aliases": [
+        "EEPN"
+      ],
       "address": "9 rue de la Marne",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8049,
       "lng": 2.4371,
-      "ltNames": ["LT-25"],
+      "ltNames": [
+        "LT-25"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -732,13 +863,18 @@
     {
       "id": "CTSL",
       "name": "Centre Socioculturel Liberté",
-      "aliases": ["CTSL"],
+      "aliases": [
+        "CTSL"
+      ],
       "address": "59 avenue de la Liberté",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8108,
       "lng": 2.4452,
-      "ltNames": ["LT-27", "LT-28"],
+      "ltNames": [
+        "LT-27",
+        "LT-28"
+      ],
       "ltCount": 2,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -757,13 +893,17 @@
     {
       "id": "EEPS",
       "name": "École Élémentaire Pasteur",
-      "aliases": ["EEPS"],
+      "aliases": [
+        "EEPS"
+      ],
       "address": "33 rue Bourgelat",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8075,
       "lng": 2.4408,
-      "ltNames": ["LT-32"],
+      "ltNames": [
+        "LT-32"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -782,13 +922,19 @@
     {
       "id": "EESX",
       "name": "École Élémentaire Saint-Exupéry",
-      "aliases": ["EESX"],
+      "aliases": [
+        "EESX"
+      ],
       "address": "57 rue Gabriel Péri",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8029,
       "lng": 2.4293,
-      "ltNames": ["LT-33", "LT-34", "LT-35"],
+      "ltNames": [
+        "LT-33",
+        "LT-34",
+        "LT-35"
+      ],
       "ltCount": 3,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -807,13 +953,19 @@
     {
       "id": "EEPB",
       "name": "École Élémentaire Paul Bert",
-      "aliases": ["EEPB"],
+      "aliases": [
+        "EEPB"
+      ],
       "address": "37 avenue du Général Leclerc",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8093,
       "lng": 2.4412,
-      "ltNames": ["LT-36", "LT-37", "LT-38"],
+      "ltNames": [
+        "LT-36",
+        "LT-37",
+        "LT-38"
+      ],
       "ltCount": 3,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -832,13 +984,17 @@
     {
       "id": "EMPB",
       "name": "École Maternelle Paul Bert",
-      "aliases": ["EMPB"],
+      "aliases": [
+        "EMPB"
+      ],
       "address": "37 avenue du Général Leclerc",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8093,
       "lng": 2.4412,
-      "ltNames": ["LT-39"],
+      "ltNames": [
+        "LT-39"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -857,13 +1013,17 @@
     {
       "id": "ELCT",
       "name": "Espace Loisirs de Charentonneau",
-      "aliases": ["ELCT"],
+      "aliases": [
+        "ELCT"
+      ],
       "address": "122 rue Roger François",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.8001,
       "lng": 2.4262,
-      "ltNames": ["LT-40"],
+      "ltNames": [
+        "LT-40"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -882,13 +1042,17 @@
     {
       "id": "EEJF",
       "name": "École Élémentaire Jules Ferry",
-      "aliases": ["EEJF"],
+      "aliases": [
+        "EEJF"
+      ],
       "address": "218 bis rue Jean Jaurès",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
       "lat": 48.7992,
       "lng": 2.4248,
-      "ltNames": ["LT-41"],
+      "ltNames": [
+        "LT-41"
+      ],
       "ltCount": 1,
       "telephonyEquipment": null,
       "likelyManagedByDSI": true,
@@ -907,7 +1071,10 @@
     {
       "id": "EMGS",
       "name": "École Maternelle Georges Sand",
-      "aliases": ["EMGS", "George Sand"],
+      "aliases": [
+        "EMGS",
+        "George Sand"
+      ],
       "address": "1 rue Parmentier",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
@@ -932,7 +1099,10 @@
     {
       "id": "ECPG",
       "name": "École Élémentaire Charles Péguy",
-      "aliases": ["ECPG", "Charles Peguy"],
+      "aliases": [
+        "ECPG",
+        "Charles Peguy"
+      ],
       "address": "20 avenue de la Liberté",
       "postalCode": "94700",
       "city": "Maisons-Alfort",
@@ -957,7 +1127,9 @@
     {
       "id": "CIMT",
       "name": "Cimetière Communal",
-      "aliases": ["Cimetière"],
+      "aliases": [
+        "Cimetière"
+      ],
       "address": "33 avenue du Professeur Cadiot",
       "postalCode": "94700",
       "city": "Maisons-Alfort",

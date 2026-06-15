@@ -11,14 +11,10 @@ import {
   Droplets,
   Flame,
   DoorOpen,
-  Vibrate,
   Zap,
-  Wind,
-  Gauge,
   RefreshCw,
   Download,
   AlertTriangle,
-  Images,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,8 +25,6 @@ import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
 import { formatRelativeTime } from "@/lib/utils";
 import type { Bay } from "@/types";
 import { hasSensorType, SITE_BB_EQUIPMENT, BB_LABELS } from "@/lib/blackbox-refs";
-import { useSiteMedia } from "@/hooks/useSiteMedia";
-import { MediaGallery } from "@/components/features/media-gallery";
 
 export default function BayDetailPage() {
   const params = useParams();
@@ -40,10 +34,7 @@ export default function BayDetailPage() {
 
   const site = sites.find(s => s.id === params.id);
   const siteId = params.id as string;
-  const bayId = params.baieId as string;
   const hasKnownBB = siteId in SITE_BB_EQUIPMENT;
-  const { loading: mediaLoading, forBay } = useSiteMedia(siteId);
-  const bayMedia = forBay(bayId);
   // Si le site a des équipements BB connus, n'afficher que ce qui est installé
   const show = {
     temperature: !hasKnownBB || hasSensorType(siteId, "temperature"),
@@ -52,8 +43,6 @@ export default function BayDetailPage() {
     water:       !hasKnownBB || hasSensorType(siteId, "water"),
     door:        !hasKnownBB || hasSensorType(siteId, "door"),
     power:       !hasKnownBB || hasSensorType(siteId, "power"),
-    airflow:     !hasKnownBB, // Pas de capteur BB pour le flux d'air
-    pressure:    !hasKnownBB, // Pas de capteur BB pour la pression
   };
 
   useEffect(() => {
@@ -182,53 +171,6 @@ export default function BayDetailPage() {
               </Card>
             )}
 
-            {show.airflow && (
-              <Card glow>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm">Flux d&apos;Air</CardTitle>
-                    <Wind className="w-5 h-5 text-green-500" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <SensorGauge
-                    value={bay.sensors.airflow.value}
-                    maxValue={200}
-                    unit="m³/h"
-                    label=""
-                    status={bay.sensors.airflow.status}
-                    size="sm"
-                  />
-                  <div className="mt-3 text-xs text-gray-400">
-                    <p>Flux normal: 120-150 m³/h</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {show.pressure && (
-              <Card glow>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm">Pression</CardTitle>
-                    <Gauge className="w-5 h-5 text-yellow-500" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <SensorGauge
-                    value={bay.sensors.pressure.value}
-                    maxValue={1050}
-                    unit="hPa"
-                    label=""
-                    status={bay.sensors.pressure.status}
-                    size="sm"
-                  />
-                  <div className="mt-3 text-xs text-gray-400">
-                    <p>Pression standard: ~1013 hPa</p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </div>
 
           {/* Binary Sensors & Status */}
@@ -237,7 +179,7 @@ export default function BayDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Capteurs Binaires</CardTitle>
-                <CardDescription>États on/off</CardDescription>
+                <CardDescription>�0tats on/off</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 {[
@@ -291,11 +233,11 @@ export default function BayDetailPage() {
               <CardContent className="space-y-4">
                 <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-400">Consommation Électrique</span>
+                    <span className="text-sm text-gray-400">Consommation �0lectrique</span>
                     <Zap className="w-5 h-5 text-yellow-500" />
                   </div>
                   <p className="text-2xl font-bold gradient-text">{bay.powerConsumption.toFixed(2)} kW</p>
-                  <p className="text-xs text-gray-500 mt-1">Coût estimé: {(bay.powerConsumption * 0.15 * 24).toFixed(2)}€/jour</p>
+                  <p className="text-xs text-gray-500 mt-1">Coût estimé: {(bay.powerConsumption * 0.15 * 24).toFixed(2)}��/jour</p>
                 </div>
 
                 <div className="p-4 rounded-lg bg-white/5 border border-white/10">
@@ -315,28 +257,17 @@ export default function BayDetailPage() {
                     </div>
                   </div>
                 </div>
-
-                <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-400">Vibrations</span>
-                    <Vibrate className="w-5 h-5 text-purple-500" />
-                  </div>
-                  <p className="text-lg font-semibold">{bay.sensors.vibration.value.toFixed(3)} g</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Seuil: {bay.sensors.vibration.threshold.critical} g
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Équipements Black Box installés */}
+          {/* �0quipements Black Box installés */}
           {hasKnownBB && (
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-400 inline-block" />
-                  Équipements Black Box ServSensor
+                  �0quipements Black Box ServSensor
                 </CardTitle>
                 <CardDescription>Capteurs physiquement installés sur ce site</CardDescription>
               </CardHeader>
@@ -348,7 +279,7 @@ export default function BayDetailPage() {
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs text-purple-300"
                     >
                       <span className="font-mono font-semibold">{ref}</span>
-                      <span className="text-gray-500">— {BB_LABELS[ref]?.split(" — ")[0] ?? ""}</span>
+                      <span className="text-gray-500">� {BB_LABELS[ref]?.split(" � ")[0] ?? ""}</span>
                     </span>
                   ))}
                 </div>
@@ -380,30 +311,6 @@ export default function BayDetailPage() {
               </CardContent>
             </Card>
           )}
-
-          {/* Galerie multimédia de la baie */}
-          <Card className="bg-white/[0.02] border-white/[0.06]">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Images className="w-4 h-4 text-purple-400" />
-                Galerie — {bay.name}
-                {!mediaLoading && bayMedia.length > 0 && (
-                  <span className="text-xs bg-purple-500/20 text-purple-300 rounded-full px-2 py-0.5">
-                    {bayMedia.length} photo{bayMedia.length > 1 ? "s" : ""}
-                  </span>
-                )}
-              </CardTitle>
-              <CardDescription>Photos et documents associés à cette baie</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MediaGallery
-                siteId={siteId}
-                media={bayMedia}
-                loading={mediaLoading}
-                error={null}
-              />
-            </CardContent>
-          </Card>
       </div>
     </div>
   );

@@ -1,3 +1,13 @@
+// ============================================================================
+// app/(dashboard)/sites/page.tsx — Référentiel des sites municipaux (tableau)
+// ----------------------------------------------------------------------------
+// Rôle : page la plus riche d'AURION. Elle affiche TOUS les sites de la Ville
+// dans un tableau avec recherche, filtres avancés, tri par colonne, pagination
+// et export CSV/JSON. C'est l'inventaire complet consulté par la DSI.
+// Reçoit : la liste des sites via le hook useSitesReference.
+// Produit : un tableau interactif + des fichiers exportables du référentiel.
+// ============================================================================
+
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
@@ -43,6 +53,7 @@ interface Filters {
   hasCoords: "all" | "yes" | "no";
 }
 
+// Valeurs par défaut des filtres (= aucun filtre actif, tout affiché)
 const DEFAULT_FILTERS: Filters = {
   search: "",
   dsiOnly: false,
@@ -53,7 +64,9 @@ const DEFAULT_FILTERS: Filters = {
   hasCoords: "all",
 };
 
+// Nombre de sites affichés par page du tableau
 const PAGE_SIZE = 20;
+// Priorité de tri : ces sites de démo remontent toujours en tête de liste
 const DEMO_PRIORITY: Record<string, number> = {
   "DEMO-LAB": 0,
   HTDV: 1,
@@ -62,16 +75,21 @@ const DEMO_PRIORITY: Record<string, number> = {
 
 // ─── Utilitaires export ───────────────────────────────────────────────────────
 
+// Exporte la liste des sites en fichier JSON. Astuce navigateur : on crée un
+// "blob" en mémoire, une URL temporaire, un lien <a> invisible cliqué par code,
+// puis on libère l'URL pour ne pas garder de mémoire inutile.
 function exportJSON(sites: SiteReference[]) {
   const blob = new Blob([JSON.stringify(sites, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
+  // Nom de fichier daté (AAAA-MM-JJ) pour retrouver facilement les exports
   a.download = `referentiel-sites-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
 
+// Exporte en CSV (ouvrable dans Excel). Même technique de téléchargement que JSON.
 function exportCSV(sites: SiteReference[]) {
   const headers = [
     "ID", "Nom", "Alias", "Adresse", "CP", "Ville",
@@ -99,9 +117,12 @@ function exportCSV(sites: SiteReference[]) {
     s.source ?? "",
     s.updatedAt,
   ]);
+  // Construction du CSV : chaque cellule est entour\u00E9e de guillemets et les
+  // guillemets internes sont doubl\u00E9s ("") pour respecter le format CSV standard.
   const csv = [headers, ...rows]
     .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
     .join("\n");
+  // "\uFEFF" (BOM) = force Excel \u00E0 lire le fichier en UTF-8 (accents corrects)
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -114,7 +135,9 @@ function exportCSV(sites: SiteReference[]) {
 // ─── Composant principal ──────────────────────────────────────────────────────
 
 export default function SitesPage() {
+  // Données + actions du référentiel (reload = relance le chargement)
   const { sites, loading, error, reload, stats } = useSitesReference();
+  // États locaux de l'interface : filtres, tri (colonne + sens), page, panneau filtres
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [sort, setSort] = useState<{ field: SortField; dir: SortDir }>({
     field: "name",
@@ -123,6 +146,7 @@ export default function SitesPage() {
   const [page, setPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Met à jour UN filtre et revient en page 1 (sinon on pourrait être sur une page vide)
   const setFilter = useCallback(
     <K extends keyof Filters>(key: K, value: Filters[K]) => {
       setFilters((prev) => ({ ...prev, [key]: value }));
@@ -136,6 +160,8 @@ export default function SitesPage() {
     setPage(1);
   }, []);
 
+  // Clic sur un en-tête de colonne : si c'est déjà la colonne triée, on inverse
+  // le sens (asc <-> desc) ; sinon on trie cette nouvelle colonne en ascendant.
   const handleSort = useCallback(
     (field: SortField) => {
       setSort((prev) =>
@@ -149,9 +175,12 @@ export default function SitesPage() {
 
   // ─── Filtrage ─────────────────────────────────────────────────────────────
 
+  // Étape 1 — FILTRAGE : on applique successivement chaque filtre actif sur la
+  // liste des sites. useMemo évite de tout recalculer à chaque rendu.
   const filtered = useMemo(() => {
     let result = [...sites];
 
+    // Recherche texte : on compare en minuscules sur nom, ID, adresse, alias et LT
     if (filters.search.trim()) {
       const q = filters.search.toLowerCase();
       result = result.filter(
@@ -163,6 +192,7 @@ export default function SitesPage() {
           s.ltNames.some((lt) => lt.toLowerCase().includes(q))
       );
     }
+    // Filtres par statut : chaque condition réduit encore la liste si elle est active
     if (filters.dsiOnly) result = result.filter((s) => s.likelyManagedByDSI);
     if (filters.addressStatus !== "all")
       result = result.filter((s) => s.addressStatus === filters.addressStatus);
@@ -182,27 +212,35 @@ export default function SitesPage() {
 
   // ─── Tri ──────────────────────────────────────────────────────────────────
 
+  // Étape 2 — TRI : on trie la liste filtrée.
   const sorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
+      // 1) Les sites de démo (DEMO_PRIORITY) passent toujours en premier
       const pa = DEMO_PRIORITY[a.id] ?? 99;
       const pb = DEMO_PRIORITY[b.id] ?? 99;
       if (pa !== pb) return pa - pb;
 
+      // 2) Puis tri sur la colonne choisie : numérique si nombres, sinon
+      //    alphabétique en respectant les accents français (localeCompare "fr").
       const va = (a as unknown as Record<string, unknown>)[sort.field] ?? "";
       const vb = (b as unknown as Record<string, unknown>)[sort.field] ?? "";
       const cmp =
         typeof va === "number" && typeof vb === "number"
           ? va - vb
           : String(va).localeCompare(String(vb), "fr");
+      // Sens du tri : on inverse le résultat si descendant
       return sort.dir === "asc" ? cmp : -cmp;
     });
   }, [filtered, sort]);
 
   // ─── Pagination ───────────────────────────────────────────────────────────
 
+  // Étape 3 — PAGINATION : nombre total de pages, puis découpe de la "tranche"
+  // correspondant à la page courante (ex : page 2 = éléments 21 à 40).
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  // Nombre de filtres actifs (hors recherche) pour afficher le badge sur le bouton "Filtres"
   const activeFilterCount = [
     filters.dsiOnly,
     filters.addressStatus !== "all",
@@ -435,7 +473,7 @@ export default function SitesPage() {
         {" · "} page {page}/{totalPages}
       </div>
 
-      {/* Tableau */}
+      {/* Tableau : 3 cas d'affichage — chargement, erreur, ou le tableau de données */}
       {loading ? (
         <div className="flex items-center justify-center h-48">
           <div className="text-gray-400 animate-pulse">Chargement du référentiel...</div>
@@ -464,6 +502,7 @@ export default function SitesPage() {
                       { label: "Carte",     field: "visibleOnMap",  cls: "w-20" },
                     ] as { label: string; field: SortField; cls: string }[]
                   ).map(({ label, field, cls }) => (
+                    /* En-tête cliquable : déclenche le tri sur la colonne et affiche la flèche */
                     <th
                       key={field}
                       className={`px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-300 transition-colors select-none ${cls}`}
@@ -488,6 +527,7 @@ export default function SitesPage() {
                   </th>
                 </tr>
               </thead>
+              {/* Corps du tableau : une ligne animée par site de la page courante */}
               <tbody className="divide-y divide-white/[0.03]">
                 <AnimatePresence>
                   {paginated.map((site, i) => (
@@ -601,6 +641,7 @@ export default function SitesPage() {
                 >
                   ← Préc.
                 </button>
+                {/* Boutons de pages : au plus 7 affichés (les premières puis les dernières si beaucoup de pages) */}
                 {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
                   const p = totalPages <= 7 ? i + 1 : i < 3 ? i + 1 : totalPages - 3 + i - 3;
                   return (

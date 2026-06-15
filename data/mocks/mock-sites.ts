@@ -2,6 +2,42 @@ import type { Site, Bay, Alert, Sensors } from "@/types";
 
 const MAISONS_ALFORT_CENTER: [number, number] = [48.8064, 2.4379];
 
+type SitePilotConfig = {
+  bayCount: number;
+  gatewayName: string;
+  gatewayLocation: string;
+  temperature: number;
+  humidity: number;
+  powerW: number;
+};
+
+const PILOT_CONFIG: Record<string, SitePilotConfig> = {
+  HTDV: {
+    bayCount: 4,
+    gatewayName: "BLACKBOX-HTDV",
+    gatewayLocation: "Salle serveur HTDV - gateway EME168A unique",
+    temperature: 22.5,
+    humidity: 45,
+    powerW: 12,
+  },
+  PLDS: {
+    bayCount: 2,
+    gatewayName: "BLACKBOX-PLDS",
+    gatewayLocation: "Salle serveur PLDS - gateway EME168A unique",
+    temperature: 23.2,
+    humidity: 48,
+    powerW: 8,
+  },
+  "DEMO-LAB": {
+    bayCount: 1,
+    gatewayName: "BLACKBOX-DEMO",
+    gatewayLocation: "Module 0 - Port 1",
+    temperature: 22.8,
+    humidity: 53,
+    powerW: 4,
+  },
+};
+
 /**
  * Sites actifs dans AURION : les deux sites pilotes DSI et un site laboratoire
  * utilise pour valider la chaine Black Box / Zabbix sans modifier la production.
@@ -14,13 +50,13 @@ export const MOCK_SITES: Site[] = [
     type: "administratif",
     status: "ok",
     coordinates: [48.8058, 2.4392],
-    bayCount: 5,
+    bayCount: 4,
     alertCount: 0,
     lastUpdate: new Date().toISOString(),
     temperature: 22.5,
     humidity: 45,
     uptime: 99.8,
-    powerConsumption: 12.5,
+    powerConsumption: 12,
   },
   {
     id: "PLDS",
@@ -29,13 +65,13 @@ export const MOCK_SITES: Site[] = [
     type: "sport",
     status: "warning",
     coordinates: [48.8012, 2.4318],
-    bayCount: 3,
-    alertCount: 2,
+    bayCount: 2,
+    alertCount: 0,
     lastUpdate: new Date().toISOString(),
-    temperature: 26.8,
-    humidity: 52,
-    uptime: 98.5,
-    powerConsumption: 8.3,
+    temperature: 23.2,
+    humidity: 48,
+    uptime: 99.1,
+    powerConsumption: 8,
   },
   {
     id: "DEMO-LAB",
@@ -50,18 +86,14 @@ export const MOCK_SITES: Site[] = [
     temperature: 22.8,
     humidity: 53,
     uptime: 99.1,
-    powerConsumption: 0.2,
+    powerConsumption: 4,
   },
 ];
 
-export function generateSensors(baseTemp: number = 22, status: string = "ok"): Sensors {
+export function generateSensors(baseTemp: number = 22, status: string = "ok", baseHumidity = 45): Sensors {
   const now = new Date().toISOString();
-  const isLabBlackBox = baseTemp >= 22.7 && baseTemp <= 22.9;
-  const tempVariation = isLabBlackBox ? 0 : Math.sin(Date.now() / 10000) * 2;
-  const humidityVariation = isLabBlackBox ? 8 : Math.cos(Date.now() / 15000) * 3;
-
-  const temperature = baseTemp + tempVariation;
-  const humidity = 45 + humidityVariation;
+  const temperature = baseTemp;
+  const humidity = baseHumidity;
 
   return {
     temperature: {
@@ -74,13 +106,13 @@ export function generateSensors(baseTemp: number = 22, status: string = "ok"): S
     humidity: {
       value: humidity,
       unit: "%",
-      status: humidity > 70 || humidity < 30 ? "critical" : humidity > 60 || humidity < 40 ? "warning" : "ok",
-      threshold: { warning: 60, critical: 70 },
+      status: humidity > 75 || humidity < 30 ? "critical" : humidity > 60 || humidity < 40 ? "warning" : "ok",
+      threshold: { warning: 60, critical: 75 },
       lastUpdate: now,
     },
     smoke: {
-      active: status === "critical" ? Math.random() > 0.8 : false,
-      status: "ok",
+      active: status === "critical",
+      status: status === "critical" ? "critical" : "ok",
       lastUpdate: now,
     },
     water: {
@@ -89,12 +121,12 @@ export function generateSensors(baseTemp: number = 22, status: string = "ok"): S
       lastUpdate: now,
     },
     door: {
-      active: Math.random() > 0.9,
+      active: false,
       status: "ok",
       lastUpdate: now,
     },
     vibration: {
-      value: Math.random() * 0.5,
+      value: 0,
       unit: "g",
       status: "ok",
       threshold: { warning: 0.3, critical: 0.5 },
@@ -106,14 +138,14 @@ export function generateSensors(baseTemp: number = 22, status: string = "ok"): S
       lastUpdate: now,
     },
     airflow: {
-      value: 120 + Math.random() * 20,
+      value: 0,
       unit: "m3/h",
       status: "ok",
       threshold: { warning: 80, critical: 60 },
       lastUpdate: now,
     },
     pressure: {
-      value: 1013 + Math.random() * 5,
+      value: 0,
       unit: "hPa",
       status: "ok",
       threshold: { warning: 1005, critical: 1000 },
@@ -122,109 +154,82 @@ export function generateSensors(baseTemp: number = 22, status: string = "ok"): S
   };
 }
 
+export function getPilotSiteConfig(siteId: string): SitePilotConfig | undefined {
+  return PILOT_CONFIG[siteId];
+}
+
 export function generateBaysForSite(siteId: string, siteName: string, count: number): Bay[] {
-  const bays: Bay[] = [];
+  const config = PILOT_CONFIG[siteId];
+  const bayCount = config?.bayCount ?? count;
 
-  for (let i = 1; i <= count; i++) {
-    const status = i === 2 && siteName.includes("Palais") ? "warning" : "ok";
-    const isBlackBox = siteId === "HTDV" || siteId === "PLDS" || siteId === "DEMO-LAB";
+  return Array.from({ length: bayCount }, (_, index) => {
+    const bayNumber = index + 1;
+    const baseTemp = (config?.temperature ?? 22) + index * 0.2;
+    const baseHumidity = (config?.humidity ?? 45) + (index % 2);
+    const isPilotSite = Boolean(config);
 
-    bays.push({
-      id: `${siteId}-bay-${i}`,
+    return {
+      id: `${siteId}-bay-${bayNumber}`,
       siteId,
-      name: isBlackBox ? `Baie BlackBox ${i}` : `Baie ${i}`,
-      location: isBlackBox ? `Local technique - BlackBox ServSensor ${i}` : `Salle serveur ${Math.ceil(i / 2)}`,
-      status,
-      sensors: generateSensors(siteId === "DEMO-LAB" ? 22.8 : 22 + i, status),
+      name: isPilotSite ? `Baie ${siteId} ${bayNumber}` : `Baie ${bayNumber}`,
+      location: config?.gatewayLocation ?? `Salle serveur ${Math.ceil(bayNumber / 2)}`,
+      status: siteId === "PLDS" ? "warning" : "ok",
+      sensors: generateSensors(baseTemp, "ok", baseHumidity),
       lastUpdate: new Date().toISOString(),
-      powerConsumption: 2 + Math.random() * 3,
+      powerConsumption: config?.powerW ?? 2,
       networkUsage: {
-        inbound: Math.random() * 1000,
-        outbound: Math.random() * 500,
+        inbound: 0,
+        outbound: 0,
       },
-    });
-  }
-
-  return bays;
+    };
+  });
 }
 
 export const MOCK_ALERTS: Alert[] = [
   {
-    id: "alert-1",
-    siteId: "PLDS",
-    siteName: "Palais des Sports",
-    bayId: "PLDS-bay-1",
-    bayName: "Baie BlackBox 1",
-    severity: "major",
-    title: "Temperature en hausse - BlackBox ServSensor",
-    description: "Le capteur Black Box signale une montee en temperature anormale dans la salle technique.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    acknowledged: false,
-    resolved: false,
-    sensorType: "temperature",
-    value: 26.8,
-    threshold: 25,
-  },
-  {
-    id: "alert-2",
-    siteId: "PLDS",
-    siteName: "Palais des Sports",
-    bayId: "PLDS-bay-2",
-    bayName: "Baie BlackBox 2",
-    severity: "minor",
-    title: "Porte baie ouverte - BlackBox ServSensor",
-    description: "Le capteur de contact signale que la porte de la baie est restee ouverte depuis plus de 30 minutes.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-    acknowledged: true,
-    acknowledgedBy: "Rayan DOB",
-    acknowledgedAt: new Date(Date.now() - 1000 * 60 * 50).toISOString(),
-    resolved: false,
-  },
-  {
-    id: "alert-3",
-    siteId: "HTDV",
-    siteName: "Hotel de Ville",
-    bayId: "HTDV-bay-3",
-    bayName: "Baie BlackBox 3",
-    severity: "info",
-    title: "Rapport hebdomadaire - BlackBox ServSensor",
-    description: "Tous les capteurs fonctionnent normalement. Temperature stable, humidite normale et alimentation OK.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
-    acknowledged: true,
-    acknowledgedBy: "Systeme automatique",
-    acknowledgedAt: new Date(Date.now() - 1000 * 60 * 119).toISOString(),
-    resolved: true,
-    resolvedAt: new Date(Date.now() - 1000 * 60 * 119).toISOString(),
-  },
-  {
-    id: "alert-4",
+    id: "alert-htdv-ok",
     siteId: "HTDV",
     siteName: "Hotel de Ville",
     bayId: "HTDV-bay-1",
-    bayName: "Baie BlackBox 1",
+    bayName: "Baie HTDV 1",
     severity: "info",
-    title: "Test capteurs effectue",
-    description: "Test mensuel automatique des capteurs Black Box ServSensor. Tous les modules repondent correctement.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    title: "Controle capteurs HTDV OK",
+    description: "Gateway BLACKBOX-HTDV et capteurs environnementaux declares pour la supervision.",
+    timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
     acknowledged: true,
-    acknowledgedBy: "Systeme automatique",
-    acknowledgedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 + 1000).toISOString(),
+    acknowledgedBy: "Systeme AURION",
+    acknowledgedAt: new Date(Date.now() - 1000 * 60 * 89).toISOString(),
     resolved: true,
-    resolvedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 + 1000).toISOString(),
+    resolvedAt: new Date(Date.now() - 1000 * 60 * 89).toISOString(),
+    sensorType: "temperature",
+  },
+  {
+    id: "alert-plds-prep",
+    siteId: "PLDS",
+    siteName: "Palais des Sports",
+    bayId: "PLDS-bay-1",
+    bayName: "Baie PLDS 1",
+    severity: "info",
+    title: "Preparation raccordement PLDS",
+    description: "La gateway BLACKBOX-PLDS est referencee. Le flux VLAN / Stormshield / SNMPv3 doit etre valide en production avant activation complete.",
+    timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    acknowledged: true,
+    acknowledgedBy: "Rayan DOB",
+    acknowledgedAt: new Date(Date.now() - 1000 * 60 * 42).toISOString(),
+    resolved: true,
+    resolvedAt: new Date(Date.now() - 1000 * 60 * 42).toISOString(),
+    sensorType: "snmp",
   },
 ];
 
 export function generateDynamicAlert(site: Site, bay?: Bay): Alert {
-  const severities: ("info" | "minor" | "major" | "critical")[] = ["info", "minor", "major", "critical"];
-  const severity = severities[Math.floor(Math.random() * severities.length)];
-
   const alertTypes = [
     { title: "Temperature anormale", description: "Variation de temperature detectee", sensor: "temperature" },
     { title: "Humidite hors norme", description: "Taux d'humidite inhabituel", sensor: "humidity" },
-    { title: "Porte ouverte", description: "Acces detecte", sensor: "door" },
-    { title: "Vibration detectee", description: "Mouvement inhabituel", sensor: "vibration" },
+    { title: "Eau detectee", description: "Presence d'eau detectee au sol", sensor: "water" },
+    { title: "Porte ouverte", description: "Ouverture de porte detectee", sensor: "door" },
+    { title: "Tension secteur absente", description: "Perte de tension 230V detectee", sensor: "power" },
   ];
-
   const alertType = alertTypes[Math.floor(Math.random() * alertTypes.length)];
 
   return {
@@ -233,7 +238,7 @@ export function generateDynamicAlert(site: Site, bay?: Bay): Alert {
     siteName: site.name,
     bayId: bay?.id,
     bayName: bay?.name,
-    severity,
+    severity: "major",
     title: alertType.title,
     description: alertType.description,
     timestamp: new Date().toISOString(),

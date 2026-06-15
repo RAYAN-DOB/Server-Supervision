@@ -1,3 +1,15 @@
+// ============================================================================
+// app/(dashboard)/dashboard/page.tsx — Tableau de bord principal d'AURION
+// ----------------------------------------------------------------------------
+// Rôle : page d'accueil de la supervision. Elle synthétise l'état des salles
+// serveurs : indicateurs clés (KPI), liste des sites supervisés, courbe de
+// température sur 24h, alertes récentes et sites à surveiller.
+// Reçoit : les données du store global (sites + alertes, alimentés par les
+// lectures Zabbix) et le référentiel DSI via le hook useSitesReference.
+// Produit : l'interface de pilotage que consulte la DSI en un coup d'œil.
+// NB : "use client" = composant exécuté côté navigateur (hooks, état, animations).
+// ============================================================================
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -34,11 +46,15 @@ import { useSitesReference } from "@/hooks/useSitesReference";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { useStore } from "@/store/useStore";
 
+// Données de démonstration de la courbe de température 24h : 24 points (un par
+// heure). La sinusoïde simule le cycle jour/nuit autour de 22°C ; remplacé en
+// production par l'historique réel renvoyé par Zabbix.
 const BASE_TEMP_DATA = Array.from({ length: 24 }, (_, i) => ({
   time: `${String(i).padStart(2, "0")}h`,
   temperature: +(22 + Math.sin((i / 24) * Math.PI * 2) * 1.6 + ((i * 7 + 3) % 8) / 20).toFixed(1),
 }));
 
+// Couleur de la pastille selon la gravité de l'alerte (du plus grave au plus léger)
 const severityDot: Record<string, string> = {
   critical: "bg-red-500",
   major: "bg-orange-500",
@@ -46,6 +62,8 @@ const severityDot: Record<string, string> = {
   info: "bg-sky-500",
 };
 
+// Renvoie les classes Tailwind (couleur rouge/ambre/vert) selon le statut.
+// Centralise le code couleur pour rester cohérent dans toute la page.
 function statusTone(status: string) {
   if (status === "critical") return "border-red-500/30 bg-red-500/10 text-red-300";
   if (status === "warning") return "border-amber-500/30 bg-amber-500/10 text-amber-200";
@@ -53,10 +71,15 @@ function statusTone(status: string) {
 }
 
 export default function DashboardPage() {
+  // sites/alerts viennent du store global ; setSites/setAlerts servent à l'initialiser
   const { sites, alerts, setSites, setAlerts } = useStore();
+  // Statistiques du référentiel DSI (nombre de sites, connectés Zabbix, etc.)
   const { stats: refStats, loading: refLoading } = useSitesReference();
+  // Horodatage du dernier rafraîchissement affiché ("Mis à jour il y a X")
   const [lastUpdate, setLastUpdate] = useState(new Date());
 
+  // Au montage : on amorce le store avec des données de démo si vide, puis on
+  // déclenche un "tick" toutes les 15s pour rafraîchir l'horodatage affiché.
   useEffect(() => {
     if (sites.length === 0 || !sites.some((site) => site.id === "DEMO-LAB")) {
       setSites(MOCK_SITES);
@@ -66,30 +89,38 @@ export default function DashboardPage() {
     }
 
     const timer = setInterval(() => setLastUpdate(new Date()), 15000);
+    // Nettoyage : on arrête le minuteur quand la page est démontée
     return () => clearInterval(timer);
   }, [alerts, alerts.length, setAlerts, setSites, sites, sites.length]);
 
+  // Filet de sécurité : si le store est vide, on affiche les données de démo
   const visibleSites = sites.length > 0 ? sites : MOCK_SITES;
   const visibleAlerts = alerts.length > 0 ? alerts : MOCK_ALERTS;
 
+  // Alertes actives = ni acquittées ni résolues ; dont on isole les critiques
   const activeAlerts = visibleAlerts.filter((alert) => !alert.acknowledged && !alert.resolved);
   const criticalAlerts = activeAlerts.filter((alert) => alert.severity === "critical");
+  // Sites à surveiller = en état critique ou warning, limités aux 4 premiers
   const sitesToWatch = visibleSites
     .filter((site) => site.status === "critical" || site.status === "warning")
     .slice(0, 4);
 
+  // Température moyenne de tous les sites (useMemo = recalcul seulement si les sites changent)
   const avgTemp = useMemo(() => {
+    // On ne garde que les valeurs numériques valides, puis on calcule la moyenne
     const values = visibleSites.map((site) => site.temperature).filter(Number.isFinite);
     if (values.length === 0) return 0;
     return values.reduce((sum, value) => sum + value, 0) / values.length;
   }, [visibleSites]);
 
+  // Disponibilité (uptime) moyenne, formatée à 1 décimale (ex : "99.8")
   const avgUptime = useMemo(() => {
     const values = visibleSites.map((site) => site.uptime).filter(Number.isFinite);
     if (values.length === 0) return "0.0";
     return (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(1);
   }, [visibleSites]);
 
+  // 5 alertes les plus récentes : on trie par date décroissante puis on coupe à 5
   const recentAlerts = useMemo(
     () =>
       [...visibleAlerts]
@@ -98,6 +129,9 @@ export default function DashboardPage() {
     [visibleAlerts]
   );
 
+  // Définition des 4 cartes d'indicateurs (KPI) affichées en haut de page.
+  // Chaque KPI = valeur calculée + libellé + icône + lien + code couleur (tone)
+  // qui change selon les seuils (ex : rouge si alertes critiques, ambre si >=27°C).
   const kpis = [
     {
       label: "Sites DSI",
@@ -166,6 +200,7 @@ export default function DashboardPage() {
           </div>
         </motion.header>
 
+        {/* Bandeau des 4 KPI : on déroule le tableau kpis défini plus haut */}
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {kpis.map((kpi, index) => {
             const Icon = kpi.icon;
@@ -212,11 +247,15 @@ export default function DashboardPage() {
             </Link>
           </div>
 
+          {/* Une carte par site équipé Black Box (référentiel SITE_BB_EQUIPMENT) */}
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             {Object.entries(SITE_BB_EQUIPMENT).map(([siteId, bays]) => {
+              // On retrouve les mesures temps réel du site correspondant
               const site = visibleSites.find((candidate) => candidate.id === siteId);
               const temp = site?.temperature;
+              // Seuils de température : >=30°C critique, >=27°C warning, sinon OK
               const tempStatus = temp == null ? "ok" : temp >= 30 ? "critical" : temp >= 27 ? "warning" : "ok";
+              // Quels types de capteurs ce site possède (d'après le référentiel)
               const sensors = {
                 temperature: hasSensorType(siteId, "temperature"),
                 humidity: hasSensorType(siteId, "humidity"),
@@ -291,6 +330,7 @@ export default function DashboardPage() {
               </span>
             </div>
 
+            {/* Graphique d'aire (recharts) : courbe de température sur 24h */}
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={BASE_TEMP_DATA} margin={{ top: 5, right: 10, left: -18, bottom: 0 }}>
                 <defs>
@@ -375,6 +415,7 @@ export default function DashboardPage() {
         </section>
 
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Bloc "Alertes récentes" : message vide si aucune, sinon la liste des 5 dernières */}
           <article className="ops-panel p-6">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-base font-semibold text-white">Alertes récentes</h2>
@@ -403,6 +444,7 @@ export default function DashboardPage() {
             )}
           </article>
 
+          {/* Bloc "Sites à surveiller" : sites en warning/critique calculés plus haut */}
           <article className="ops-panel p-6">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-base font-semibold text-white">Sites à surveiller</h2>

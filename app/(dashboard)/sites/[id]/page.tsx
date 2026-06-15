@@ -21,7 +21,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Cpu,
-  Images,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,12 +29,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AddressBadge, ZabbixBadge, SensorsBadge, DsiBadge, SupervisionBadge } from "@/components/ui/status-badge";
 import { useStore } from "@/store/useStore";
 import { useSitesReference } from "@/hooks/useSitesReference";
-import { useSiteMedia } from "@/hooks/useSiteMedia";
-import { MOCK_SITES, generateBaysForSite } from "@/data/mocks";
+import { MOCK_SITES, generateBaysForSite, getPilotSiteConfig } from "@/data/mocks";
 import { formatTemperature } from "@/lib/utils";
 import type { Bay, Site, SiteStatus } from "@/types";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { MediaGallery } from "@/components/features/media-gallery";
 import { hasSensorType } from "@/lib/blackbox-refs";
 
 interface LabSensor {
@@ -144,7 +141,6 @@ export default function SiteDetailPage() {
     ? labPayload.site
     : storedSupervisionSite;
   const refSite = getSiteById(siteId);
-  const { media, loading: mediaLoading, error: mediaError } = useSiteMedia(siteId);
 
   useEffect(() => {
     if (sites.length === 0 || !sites.some((site) => site.id === "DEMO-LAB")) {
@@ -231,7 +227,13 @@ export default function SiteDetailPage() {
   }
 
   const displayName = refSite?.name ?? supervisionSite?.name ?? siteId;
-  const displayAddress = refSite?.address ?? supervisionSite?.address ?? "—";
+  const displayAddress = refSite?.address ?? supervisionSite?.address ?? "�";
+  const pilotConfig = getPilotSiteConfig(siteId);
+  const supervisedBayCount =
+    refSite?.blackboxBayCount ??
+    pilotConfig?.bayCount ??
+    supervisionSite?.bayCount ??
+    0;
 
   // KPIs supervision
   const avgTemp = supervisionSite && hasSensorType(siteId, "temperature")
@@ -328,7 +330,7 @@ export default function SiteDetailPage() {
             {supervisionSite && (
               <TabsTrigger value="supervision" className="data-[state=active]:bg-purple-600/30">
                 <Activity className="w-4 h-4 mr-2" />
-                État technique
+                �0tat technique
               </TabsTrigger>
             )}
             {refSite && (
@@ -337,18 +339,9 @@ export default function SiteDetailPage() {
                 Historique
               </TabsTrigger>
             )}
-            <TabsTrigger value="gallery" className="data-[state=active]:bg-purple-600/30">
-              <Images className="w-4 h-4 mr-2" />
-              Galerie
-              {media.length > 0 && (
-                <span className="ml-1.5 text-[10px] bg-purple-500/30 text-purple-300 rounded-full px-1.5 py-0.5">
-                  {media.length}
-                </span>
-              )}
-            </TabsTrigger>
           </TabsList>
 
-          {/* ─── Onglet : Informations générales ─────────────────────────────── */}
+          {/* ������ Onglet : Informations générales �������������������������������������������������������������� */}
           {refSite && (
             <TabsContent value="general" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -363,11 +356,11 @@ export default function SiteDetailPage() {
                       <InfoRow label="Nom" value={refSite.name} />
                       <InfoRow
                         label="Alias"
-                        value={(refSite.aliases ?? []).join(", ") || "—"}
+                        value={(refSite.aliases ?? []).join(", ") || "�"}
                       />
                       <InfoRow
                         label="Catégorie"
-                        value={<span className="capitalize">{refSite.category ?? "—"}</span>}
+                        value={<span className="capitalize">{refSite.category ?? "�"}</span>}
                       />
                       <InfoRow
                         label="Géré par la DSI"
@@ -382,11 +375,11 @@ export default function SiteDetailPage() {
                               {refSite.telephonyEquipment}
                             </span>
                           ) : (
-                            "—"
+                            "�"
                           )
                         }
                       />
-                      <InfoRow label="Source" value={refSite.source ?? "—"} />
+                      <InfoRow label="Source" value={refSite.source ?? "�"} />
                       <InfoRow
                         label="Visible sur carte"
                         value={
@@ -460,26 +453,26 @@ export default function SiteDetailPage() {
                   )}
 
                   {/* Infrastructure Baies */}
-                  {(refSite.ltCount ?? 0) > 0 && (
+                  {supervisedBayCount > 0 && (
                     <Card className="bg-white/[0.02] border-white/[0.06]">
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                           <HardDrive className="w-4 h-4 text-gray-400" />
-                          Baies / Infrastructure IT
+                          Baies supervisees ({supervisedBayCount})
                           <span className={`ml-auto text-[10px] border rounded-full px-2 py-0.5 ${
                             refSite.blackboxInstalled
                               ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
                               : "bg-gray-500/10 text-gray-500 border-gray-500/20"
                           }`}>
-                            {refSite.blackboxInstalled ? "Supervisé — BlackBox" : "Non supervisé"}
+                            {refSite.blackboxInstalled ? "1 gateway Black Box" : "Non supervise"}
                           </span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-3 gap-2">
-                          {refSite.ltNames.map((lt, i) => (
+                          {Array.from({ length: supervisedBayCount }, (_, i) => (
                             <div
-                              key={lt}
+                              key={`${siteId}-bay-card-${i + 1}`}
                               className={`p-3 rounded-xl border text-center ${
                                 refSite.blackboxInstalled
                                   ? "bg-emerald-500/5 border-emerald-500/20"
@@ -487,21 +480,19 @@ export default function SiteDetailPage() {
                               }`}
                             >
                               <HardDrive className={`w-5 h-5 mx-auto mb-1 ${refSite.blackboxInstalled ? "text-emerald-400" : "text-gray-600"}`} />
-                              <p className="text-xs font-mono text-gray-300">{lt}</p>
+                              <p className="text-xs font-mono text-gray-300">Baie {siteId} {i + 1}</p>
                               <p className="text-[10px] text-gray-600 mt-0.5">
-                                {refSite.blackboxInstalled ? "Baie BlackBox" : `Baie ${i + 1}`}
+                                {refSite.blackboxInstalled ? "Supervisee par gateway unique" : "non supervisee"}
                               </p>
                               {!refSite.blackboxInstalled && (
-                                <span className="text-[9px] text-gray-600 italic">non supervisé</span>
+                                <span className="text-[9px] text-gray-600 italic">a equiper</span>
                               )}
                             </div>
                           ))}
                         </div>
-                        {!refSite.blackboxInstalled && (
-                          <p className="text-xs text-gray-600 mt-3 text-center italic">
-                            Ces baies existent physiquement mais ne sont pas encore équipées de capteurs.
-                          </p>
-                        )}
+                        <p className="text-xs text-gray-500 mt-3 text-center">
+                          La gateway Black Box EME168A est unique par site. Les capteurs environnementaux surveillent la salle et les zones critiques des baies.
+                        </p>
                       </CardContent>
                     </Card>
                   )}
@@ -611,7 +602,7 @@ export default function SiteDetailPage() {
             </TabsContent>
           )}
 
-          {/* ─── Onglet : État technique (supervision) ───────────────────────── */}
+          {/* ������ Onglet : �0tat technique (supervision) �������������������������������������������������� */}
           {supervisionSite && (
             <TabsContent value="supervision" className="space-y-6">
               {/* KPIs */}
@@ -620,7 +611,7 @@ export default function SiteDetailPage() {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-400 mb-1">Baies</p>
-                      <p className="text-2xl font-bold text-cyan-400">{supervisionSite.bayCount}</p>
+                      <p className="text-2xl font-bold text-cyan-400">{supervisedBayCount || supervisionSite.bayCount}</p>
                     </div>
                     <HardDrive className="w-8 h-8 text-cyan-400 opacity-30" />
                   </CardContent>
@@ -749,33 +740,8 @@ export default function SiteDetailPage() {
             </TabsContent>
           )}
 
-          {/* ─── Onglet : Historique ─────────────────────────────────────────── */}
-          {/* ─── Onglet : Galerie multimédia ─────────────────────────────────── */}
-          <TabsContent value="gallery">
-            <Card className="bg-white/[0.02] border-white/[0.06]">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Images className="w-4 h-4 text-purple-400" />
-                  Galerie multimédia
-                  {media.length > 0 && (
-                    <span className="text-xs bg-purple-500/20 text-purple-300 rounded-full px-2 py-0.5">
-                      {media.length} fichier{media.length !== 1 ? "s" : ""}
-                    </span>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MediaGallery
-                  siteId={siteId}
-                  media={media}
-                  loading={mediaLoading}
-                  error={mediaError}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {refSite && (
+          {/* ������ Onglet : Historique �������������������������������������������������������������������������������������� */}
+{refSite && (
             <TabsContent value="history">
               <Card className="bg-white/[0.02] border-white/[0.06]">
                 <CardHeader>
@@ -792,7 +758,7 @@ export default function SiteDetailPage() {
                     {refSite.blackboxInstalled && refSite.blackboxInstalledAt && (
                       <HistoryEntry
                         date={refSite.blackboxInstalledAt}
-                        action={`Installation BlackBox ServSensor — ${refSite.blackboxModel ?? ""} (${refSite.blackboxSerial ?? ""})`}
+                        action={`Installation BlackBox ServSensor � ${refSite.blackboxModel ?? ""} (${refSite.blackboxSerial ?? ""})`}
                         source={refSite.blackboxInstalledBy ?? "DSI"}
                         color="green"
                       />
@@ -825,7 +791,7 @@ export default function SiteDetailPage() {
   );
 }
 
-// ─── Composants utilitaires ───────────────────────────────────────────────────
+// ������ Composants utilitaires ������������������������������������������������������������������������������������������������������
 
 function InfoRow({
   label,

@@ -1,3 +1,14 @@
+// ============================================================================
+// app/(dashboard)/historique/page.tsx — Journal / timeline des événements
+// ----------------------------------------------------------------------------
+// Rôle : présenter l'historique des événements de la supervision sous forme de
+// frise chronologique (alertes, maintenances, modifications, infos). L'utilisateur
+// peut filtrer par type d'événement.
+// Reçoit : ici des données de démonstration (mock) ; en production, ces événements
+// proviendraient de Zabbix / de la base de données.
+// Produit : une timeline lisible de "qui a fait quoi / quand" sur les sites.
+// ============================================================================
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -22,6 +33,8 @@ import { Button } from "@/components/ui/button";
 import type { HistoryEvent } from "@/types";
 import { formatRelativeTime, cn } from "@/lib/utils";
 
+// Catalogue des types d'événements : libellé, icône et couleur associés.
+// Sert à la fois aux boutons de filtre et à l'affichage de chaque carte.
 const EVENT_TYPES = {
   alert: { label: "Alertes", icon: AlertTriangle, color: "red" },
   maintenance: { label: "Maintenance", icon: Wrench, color: "blue" },
@@ -30,9 +43,12 @@ const EVENT_TYPES = {
 } as const;
 
 export default function HistoriquePage() {
+  // events = la liste des événements ; filterType = types cochés dans les filtres
   const [events, setEvents] = useState<HistoryEvent[]>([]);
   const [filterType, setFilterType] = useState<string[]>([]);
 
+  // Au montage : on charge des événements de démonstration. Les timestamps sont
+  // calculés relativement à "maintenant" (Date.now() - X) pour rester réalistes.
   useEffect(() => {
     const mockEvents: HistoryEvent[] = [
       {
@@ -142,11 +158,13 @@ export default function HistoriquePage() {
     setEvents(mockEvents);
   }, []);
 
+  // Filtrage : si aucun type coché on montre tout, sinon seulement les types sélectionnés
   const filteredEvents = events.filter((event) => {
     if (filterType.length === 0) return true;
     return filterType.includes(event.type);
   });
 
+  // Coche/décoche un type de filtre (ajout si absent, retrait si déjà présent)
   const toggleFilter = (type: string) => {
     setFilterType((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
@@ -217,12 +235,13 @@ export default function HistoriquePage() {
         </CardContent>
       </Card>
 
-      {/* Timeline */}
+      {/* Timeline : la barre verticale en dégradé matérialise la ligne du temps */}
       <div className="relative">
         <div className="absolute left-7 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500/40 via-cyan-500/20 to-transparent" />
 
         <div className="space-y-4">
           {filteredEvents.map((event, index) => {
+            // On récupère la config (icône/couleur) du type ; "info" par défaut si type inconnu
             const cfg = EVENT_TYPES[event.type as keyof typeof EVENT_TYPES] ?? EVENT_TYPES.info;
             const Icon = cfg.icon;
             const colorMap: Record<string, string> = {
