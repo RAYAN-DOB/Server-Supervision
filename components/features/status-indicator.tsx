@@ -1,34 +1,51 @@
 "use client";
 
+// Composant côté navigateur : il vérifie l'état de connexion du navigateur.
+// À expliquer au jury : il donne une indication visuelle simple sur l'état en ligne/hors ligne et la dernière synchronisation simulée.
+
 import { motion } from "framer-motion";
 import { Wifi, WifiOff, Database } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function StatusIndicator() {
+  // isOnline garde l'état réseau du navigateur.
+  // true = navigateur en ligne, false = navigateur hors ligne.
   const [isOnline, setIsOnline] = useState(true);
+
+  // mounted évite d'afficher le composant avant que le navigateur soit prêt.
+  // C'est utile avec Next.js pour éviter les différences entre rendu serveur et rendu client.
   const [mounted, setMounted] = useState(false);
+
+  // timeSinceSync simule le temps écoulé depuis la dernière synchronisation.
+  // Cette valeur sert uniquement à l'affichage dans le badge.
   const [timeSinceSync, setTimeSinceSync] = useState(0);
 
   useEffect(() => {
+    // useEffect s'exécute côté navigateur après le chargement du composant.
     setMounted(true);
     
     const handleOnline = () => setIsOnline(true);
+    // Fonction appelée quand le navigateur repasse en ligne.
+
     const handleOffline = () => setIsOnline(false);
+    // Fonction appelée quand le navigateur passe hors ligne.
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    // Écoute les événements réseau du navigateur.
 
-    // Update timer every second
     const interval = setInterval(() => {
       setTimeSinceSync(prev => prev + 1);
     }, 1000);
+    // Incrémente le compteur toutes les secondes.
 
-    // Reset timer every 30 seconds
     const syncInterval = setInterval(() => {
       setTimeSinceSync(0);
     }, 30000);
+    // Remet le compteur à zéro toutes les 30 secondes pour simuler une synchronisation.
 
     return () => {
+      // Nettoyage : on retire les écouteurs et les timers quand le composant disparaît.
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       clearInterval(interval);
@@ -37,10 +54,11 @@ export function StatusIndicator() {
   }, []);
 
   if (!mounted) return null;
+  // Tant que le composant n'est pas monté côté navigateur, on n'affiche rien.
 
   const content = (
     <>
-      {/* Online Status */}
+      {/* Badge en ligne / hors ligne */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -64,7 +82,7 @@ export function StatusIndicator() {
         )}
       </motion.div>
 
-      {/* Sync Status */}
+      {/* Badge de synchronisation */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
@@ -75,6 +93,7 @@ export function StatusIndicator() {
         <Database className="w-3.5 h-3.5 text-nebula-cyan" />
         <span className="text-xs text-gray-400 whitespace-nowrap">
           {timeSinceSync < 60 ? `${timeSinceSync}s` : `${Math.floor(timeSinceSync / 60)}m`}
+          {/* Affiche les secondes puis les minutes si le compteur dépasse 60 secondes. */}
         </span>
       </motion.div>
     </>
