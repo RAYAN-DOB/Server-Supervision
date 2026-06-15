@@ -1,12 +1,30 @@
+// Fichier central des types TypeScript du projet AURION.
+// À expliquer au jury : TypeScript permet de décrire la forme attendue des données.
+// Exemple : un site doit avoir un nom, un statut, des coordonnées, une température, etc.
+// L'objectif est d'éviter d'utiliser de mauvaises données dans les composants React.
+
 export type SiteStatus = "ok" | "warning" | "critical" | "maintenance";
+// SiteStatus limite les valeurs possibles du statut d'un site.
+// Cela évite par exemple d'écrire un statut non prévu comme "grave" ou "erreur".
+
 export type Severity = "info" | "minor" | "major" | "critical";
+// Severity décrit le niveau de gravité d'une alerte.
+
 export type SiteType = "administratif" | "sport" | "education" | "culture" | "securite" | "technique";
+// SiteType décrit la catégorie générale d'un site dans l'ancien modèle de supervision.
+
 export type UserRole = "super_admin" | "admin" | "tech" | "viewer";
+// UserRole limite les rôles possibles d'un utilisateur.
 
 // ─── Référentiel des sites — nouveaux types ───────────────────────────────────
 export type AddressStatus = "verified" | "internal_only" | "needs_manual_validation";
+// AddressStatus indique si l'adresse d'un site est vérifiée ou encore à contrôler.
+
 export type ZabbixStatus = "not_connected" | "pending" | "partial" | "connected";
+// ZabbixStatus indique le niveau de connexion du site à Zabbix.
+
 export type SensorsStatus = "none" | "partial" | "active";
+// SensorsStatus indique si des capteurs sont absents, partiellement présents ou actifs.
 
 export type SiteCategory =
   | "administratif"
@@ -19,12 +37,15 @@ export type SiteCategory =
   | "restauration municipale"
   | "technique"
   | "autre";
+// SiteCategory sert à classer les sites municipaux dans la cartographie AURION.
 
 /** Statut d'inventaire d'un site */
 export type InventoryStatus = "active" | "planned" | "maintenance";
+// InventoryStatus distingue un site actif, prévu ou en maintenance.
 
 /** Entrée média liée à un site */
 export interface SiteMedia {
+  // SiteMedia représente une photo, un plan ou un média lié à un site, une baie ou un équipement.
   id: string;
   url: string;
   /** PHOTO_LOCAL | PHOTO_BAY | ZOOM_EQUIPMENT | PLAN_PDF */
@@ -41,6 +62,8 @@ export interface SiteMedia {
 
 /** Interface principale du référentiel des sites municipaux */
 export interface SiteReference {
+  // SiteReference est le modèle détaillé d'un site municipal dans le référentiel AURION.
+  // Il mélange les informations administratives, cartographiques, Zabbix et Black Box.
   id: string;
   name: string;
   aliases?: string[];
@@ -97,6 +120,8 @@ export interface SiteReference {
 
 // ─── Modèle legacy supervision (inchangé pour compatibilité) ─────────────────
 export interface Site {
+  // Site est le modèle simple utilisé par les cartes et dashboards historiques.
+  // À l'oral : c'est une structure qui représente les données principales d'un site affiché.
   id: string;
   name: string;
   address: string;
@@ -113,6 +138,7 @@ export interface Site {
 }
 
 export interface Bay {
+  // Bay représente une baie ou zone technique dans un site.
   id: string;
   siteId: string;
   name: string;
@@ -128,6 +154,7 @@ export interface Bay {
 }
 
 export interface Sensors {
+  // Sensors regroupe les différentes mesures ou états capteurs d'une baie.
   temperature: SensorReading;
   humidity: SensorReading;
   smoke: BinarySensor;
@@ -140,6 +167,7 @@ export interface Sensors {
 }
 
 export interface SensorReading {
+  // SensorReading représente une mesure analogique : température, humidité, airflow, etc.
   value: number;
   unit: string;
   status: SiteStatus;
@@ -151,6 +179,7 @@ export interface SensorReading {
 }
 
 export interface BinarySensor {
+  // BinarySensor représente un capteur à deux états : eau détectée / non détectée, porte ouverte / fermée.
   active: boolean;
   status: SiteStatus;
   lastUpdate: string;
@@ -158,6 +187,7 @@ export interface BinarySensor {
 }
 
 export interface Alert {
+  // Alert représente une alerte affichée côté AURION.
   id: string;
   siteId: string;
   siteName: string;
@@ -178,6 +208,7 @@ export interface Alert {
 }
 
 export interface HistoryEvent {
+  // HistoryEvent représente un événement dans l'historique : alerte, maintenance, changement ou info.
   id: string;
   siteId: string;
   siteName: string;
@@ -191,6 +222,7 @@ export interface HistoryEvent {
 }
 
 export interface User {
+  // User représente un utilisateur de l'application.
   id: string;
   username: string;
   email: string;
@@ -206,6 +238,7 @@ export interface User {
 }
 
 export interface Maintenance {
+  // Maintenance représente une opération planifiée sur un site ou une baie.
   id: string;
   siteId: string;
   siteName: string;
@@ -222,12 +255,15 @@ export interface Maintenance {
 }
 
 export interface ChecklistItem {
+  // ChecklistItem représente une ligne de checklist pour une intervention.
   id: string;
   label: string;
   completed: boolean;
 }
 
 export interface ZabbixConfig {
+  // ZabbixConfig contient les informations de connexion logique à Zabbix.
+  // Le token ne doit jamais être exposé côté client.
   apiUrl: string;
   apiToken?: string;
   connected: boolean;
@@ -235,6 +271,7 @@ export interface ZabbixConfig {
 }
 
 export interface DashboardWidget {
+  // DashboardWidget décrit un bloc personnalisable du dashboard.
   id: string;
   type: "kpi" | "chart" | "alerts" | "sites" | "custom";
   title: string;
@@ -244,6 +281,7 @@ export interface DashboardWidget {
 }
 
 export interface ChatMessage {
+  // ChatMessage représente un message dans l'assistant ou chatbot intégré.
   id: string;
   role: "user" | "assistant";
   content: string;
@@ -251,6 +289,7 @@ export interface ChatMessage {
 }
 
 export interface NetworkDevice {
+  // NetworkDevice représente un équipement réseau ou serveur lié à une baie.
   id: string;
   bayId: string;
   name: string;
@@ -265,6 +304,7 @@ export interface NetworkDevice {
 }
 
 export interface AuditLog {
+  // AuditLog garde une trace d'une action faite dans l'application.
   id: string;
   userId: string;
   userName: string;
